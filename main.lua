@@ -1,5 +1,3 @@
-Log = {}    -- Required to use it ouside of Engine Framework
-Framework = {}  -- Stores Engine Framework in a variable
 Engine = {}
 Engine.new = function()
     local self = {}
@@ -8,6 +6,7 @@ Engine.new = function()
     local _Logger = {}
     local _Indexer = {}
     local _EventDispatcher = {}
+    local _Mouse = {}
     local _Keyboard = {}
     local _Window = {}
     local _Clock = {}
@@ -38,14 +37,6 @@ Engine.new = function()
             end
         end
 
-        function self.Error(message)
-
-            if self.Level >= 1 then
-                print("|cffdc143c[ERROR]|r" .. " " .. message)
-            end
-        
-        end
-
         function self.Warn(message)
 
             if self.Level >= 2 then
@@ -54,13 +45,21 @@ Engine.new = function()
         
         end
 
+        function self.Error(message)
+
+            if self.Level >= 1 then
+                print("|cffdc143c[ERROR]|r" .. " " .. message)
+            end
+        
+        end
+
         return self
 
     end
 
-    Logger = _Logger.new
+    local Logger = _Logger.new
 
-    Log = Logger(2)
+    local Log = Logger(2)
 
     _Indexer.new = function()
         local self = {}
@@ -96,63 +95,63 @@ Engine.new = function()
 
     local Indexer = _Indexer.new()
 
-    _GetTriggerUnit = GetTriggerUnit
-    GetTriggerUnit = function()
+    local _GetTriggerUnit = GetTriggerUnit
+    local GetTriggerUnit = function()
         local handle = _GetTriggerUnit()
         local unit = Indexer.find(handle)
         return unit
     end
 
-    _GetAttacker = GetAttacker
-    GetAttacker = function()
+    local _GetAttacker = GetAttacker
+    local GetAttacker = function()
         local handle = _GetAttacker()
         local unit = Indexer.find(handle)
         return unit
     end
 
-    _GetFilterUnit = GetFilterUnit
-    GetFilterUnit = function()
+    local _GetFilterUnit = GetFilterUnit
+    local GetFilterUnit = function()
         local handle = _GetFilterUnit()
         local unit = Indexer.find(handle)
         return unit
     end
 
-    _GetSpellTargetUnit = GetSpellTargetUnit
-    GetSpellTargetUnit = function()
+    local _GetSpellTargetUnit = GetSpellTargetUnit
+    local GetSpellTargetUnit = function()
         local handle = _GetSpellTargetUnit()
         local unit = Indexer.find(handle)
         return unit
     end
 
-    _GetManipulatedItem = GetManipulatedItem
-    GetManipulatedItem = function()
+    local _GetManipulatedItem = GetManipulatedItem
+    local GetManipulatedItem = function()
         local handle = _GetManipulatedItem()
         local item = Indexer.find(handle)
         return item
     end
 
-    _GetFilterItem = GetFilterItem
-    GetFilterItem = function()
+    local _GetFilterItem = GetFilterItem
+    local GetFilterItem = function()
         local handle = _GetFilterItem()
         local item = Indexer.find(handle)
         return item
     end
 
-    _GetTriggerPlayer = GetTriggerPlayer
-    GetTriggerPlayer = function()
+    local _GetTriggerPlayer = GetTriggerPlayer
+    local GetTriggerPlayer = function()
         local handle = _GetTriggerPlayer()
         local player = Indexer.find(handle)
         return player
     end
 
-    _GetItemPlayer = GetItemPlayer
-    GetItemPlayer = function()
+    local _GetItemPlayer = GetItemPlayer
+    local GetItemPlayer = function()
         local handle = _GetItemPlayer()
         local player = Indexer.find(handle)
         return player
     end
 
-    GetSpellObject = function()
+    local GetSpellObject = function()
         local self = {}
         self.handle = GetSpellAbility()
         self.id = GetSpellAbilityId()
@@ -162,7 +161,7 @@ Engine.new = function()
         return self
     end
 
-    GetDamageObject = function()
+    local GetDamageObject = function()
         local self = {}
         self.attackType = BlzGetEventAttackType()
         self.damageType = BlzGetEventDamageType()
@@ -171,33 +170,258 @@ Engine.new = function()
         return self
     end
 
-    _GetEventDamageSource = GetEventDamageSource
-    GetEventDamageSource = function()
+    local _GetEventDamageSource = GetEventDamageSource
+    local GetEventDamageSource = function()
         local handle = _GetEventDamageSource()
         local unit = Indexer.find(handle)
         return unit
     end
 
-    _GetEventDamageTarget = BlzGetEventDamageTarget
-    GetEventDamageTarget = function()
+    local _GetEventDamageTarget = BlzGetEventDamageTarget
+    local GetEventDamageTarget = function()
         local handle = _GetEventDamageTarget()
         local unit = Indexer.find(handle)
         return unit
     end
 
-    _Player_ = Player
-    Player = function(id)
+    local _Player_ = Player
+    local Player = function(id)
         local handle = _Player_(id)
         local player = Indexer.find(handle)
         return player
     end
 
-    _GetOwningPlayer = GetOwningPlayer
-    GetOwningPlayer = function(unit)
+    local _GetOwningPlayer = GetOwningPlayer
+    local GetOwningPlayer = function(unit)
         local handle = _GetOwningPlayer(unit.handle)
         local player = Indexer.find(handle)
         return player
     end
+    
+    local _FirstOfGroup = FirstOfGroup
+    local FirstOfGroup = function(whichGroup)
+        local handle = _FirstOfGroup(whichGroup)
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetEnumUnit = GetEnumUnit
+    local GetEnumUnit = function()
+        local handle = _GetEnumUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetEnteringUnit = GetEnteringUnit
+    local GetEnteringUnit = function()
+        local handle = _GetEnteringUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetLeavingUnit = GetLeavingUnit
+    local GetLeavingUnit = function()
+        local handle = _GetLeavingUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetLevelingUnit = GetLevelingUnit
+    local GetLevelingUnit = function()
+        local handle = _GetLevelingUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetLearningUnit = GetLearningUnit
+    local GetLearningUnit = function()
+        local handle = _GetLearningUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetRevivableUnit = GetRevivableUnit
+    local GetRevivableUnit = function()
+        local handle = _GetRevivableUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetRevivingUnit = GetRevivingUnit
+    local GetRevivingUnit = function()
+        local handle = _GetRevivingUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetRescuer = GetRescuer
+    local GetRescuer = function()
+        local handle = _GetRescuer()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetDyingUnit = GetDyingUnit
+    local GetDyingUnit = function()
+        local handle = _GetDyingUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetKillingUnit = GetKillingUnit
+    local GetKillingUnit = function()
+        local handle = _GetKillingUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetDecayingUnit = GetDecayingUnit
+    local GetDecayingUnit = function()
+        local handle = _GetDecayingUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetSelectedUnit = GetSelectedUnit
+    local GetSelectedUnit = function()
+        local handle = _GetSelectedUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetConstructingStructure = GetConstructingStructure
+    local GetConstructingStructure = function()
+        local handle = _GetConstructingStructure()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetCancelledStructure = GetCancelledStructure
+    local GetCancelledStructure = function()
+        local handle = _GetCancelledStructure()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetConstructedStructure = GetConstructedStructure
+    local GetConstructedStructure = function()
+        local handle = _GetConstructedStructure()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetResearchingUnit = GetResearchingUnit
+    local GetResearchingUnit = function()
+        local handle = _GetResearchingUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetTrainedUnit = GetTrainedUnit
+    local GetTrainedUnit = function()
+        local handle = _GetTrainedUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetDetectedUnit = GetDetectedUnit
+    local GetDetectedUnit = function()
+        local handle = _GetDetectedUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetSummoningUnit = GetSummoningUnit
+    local GetSummoningUnit = function()
+        local handle = _GetSummoningUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetSummonedUnit = GetSummonedUnit
+    local GetSummonedUnit = function()
+        local handle = _GetSummonedUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetTransportUnit = GetTransportUnit
+    local GetTransportUnit = function()
+        local handle = _GetTransportUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetLoadedUnit = GetLoadedUnit
+    local GetLoadedUnit = function()
+        local handle = _GetLoadedUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetSellingUnit = GetSellingUnit
+    local GetSellingUnit = function()
+        local handle = _GetSellingUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetSoldUnit = GetSoldUnit
+    local GetSoldUnit = function()
+        local handle = _GetSoldUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetBuyingUnit = GetBuyingUnit
+    local GetBuyingUnit = function()
+        local handle = _GetBuyingUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetChangingUnit = GetChangingUnit
+    local GetChangingUnit = function()
+        local handle = _GetChangingUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetManipulatingUnit = GetManipulatingUnit
+    local GetManipulatingUnit = function()
+        local handle = _GetManipulatingUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetOrderedUnit = GetOrderedUnit
+    local GetOrderedUnit = function()
+        local handle = _GetOrderedUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetOrderTargetUnit = GetOrderTargetUnit
+    local GetOrderTargetUnit = function()
+        local handle = _GetOrderTargetUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetSpellAbilityUnit = GetSpellAbilityUnit
+    local GetSpellAbilityUnit = function()
+        local handle = _GetSpellAbilityUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
+    local _GetEventTargetUnit = GetEventTargetUnit
+    local GetEventTargetUnit = function()
+        local handle = _GetEventTargetUnit()
+        local unit = Indexer.find(handle)
+        return unit
+    end
+
 
     _Trigger.new = function()
         local self = {}
@@ -308,7 +532,7 @@ Engine.new = function()
             return self
         end
 
-        self.registerTrackableTrackEvent = function(Tan)
+        self.registerTrackableTrackEvent = function(t)
             local status, val = xpcall(self._registerTrackableTrackEvent, Log.Error, t)
             if status then return val end
         end
@@ -477,13 +701,11 @@ Engine.new = function()
 
     end
 
-    self.Trigger = {}
-    self.Trigger.new = function()
+    local Trigger = {}
+    Trigger.new = function()
         local status, val = xpcall(_Trigger.new, Log.Error)
         if status then return val end
     end
-
-    Trigger = self.Trigger.new
 
     _EventDispatcher.new = function(types)
         local self = {}
@@ -607,14 +829,11 @@ Engine.new = function()
         return self
     end
 
-    self.EventDispatcher = {}
-    self.EventDispatcher.new = function(types)
+    local EventDispatcher = {}
+    EventDispatcher.new = function(types)
         local status, val = xpcall(_EventDispatcher.new, Log.Error, types)
         if status then return val end
     end
-
-    EventDispatcher = self.EventDispatcher.new
-
 
     _Effect.new = function()
         local self = {}
@@ -865,13 +1084,11 @@ Engine.new = function()
         return self
     end
 
-    self.Effect = {}
-    self.Effect.new = function()
+    local Effect = {}
+    Effect.new = function()
         local status, val = xpcall(_Effect.new, Log.Error)
         if status then return val end
     end
-
-    Effect = self.Effect.new
 
     --[[
         ** Player Structure **
@@ -903,6 +1120,7 @@ Engine.new = function()
         local handle = Indexer.add(self, player)
         local name = GetPlayerName(handle)
         local units = Group()
+        local mouse = nil
         local keyboard = nil
         local id = GetPlayerId(handle)
         local selection = true
@@ -926,8 +1144,6 @@ Engine.new = function()
                 SetPlayerState(handle, PLAYER_STATE_RESOURCE_FOOD_CAP, value)
             elseif index == "food" then
                 SetPlayerState(handle, PLAYER_STATE_RESOURCE_FOOD_USED, value)
-            elseif index == "keyboard" then
-                keyboard = value
             elseif index == "selection" then
                 selection = value
                 BlzEnableSelections(selection, selectionCircle)
@@ -967,6 +1183,8 @@ Engine.new = function()
                 return units
             elseif index == "keyboard" then
                 return keyboard
+            elseif index == "mouse" then
+                return mouse
             elseif index == "handle" then
                 return handle
             elseif index == "selection" then
@@ -984,6 +1202,27 @@ Engine.new = function()
 
         self.kick = function()
             local status, val = xpcall(self._kick, Log.Error)
+            if status then return val end
+        end
+
+        -- NOT SYNC
+        function self._clear_messages()
+            if GetLocalPlayer() == handle then
+                ClearTextMessages()
+            end
+        end
+
+        self.clear_messages = function()
+            local status, val = xpcall(self._clear_messages, Log.Error)
+            if status then return val end
+        end
+
+        function self._send_message(message, duration)
+            DisplayTimedTextToPlayer(handle, 0, 0, duration, message)
+        end
+
+        self.send_message = function(message, duration)
+            local status, val = xpcall(self._send_message, Log.Error, message, duration)
             if status then return val end
         end
 
@@ -1067,7 +1306,13 @@ Engine.new = function()
         end
 
         local eventDispatcher = EventDispatcher(
-            {"on_leave", "on_message", "on_sync", "on_createUnit", "on_unitDeath"}
+            {"on_leave", "on_message", "on_sync", "on_createUnit",
+             "on_unit_death",
+             "on_unit_damage_pre", "on_unit_damaged_pre", "on_unit_damage_after", "on_unit_damaged_after", 
+             "on_unit_attack", "on_unit_attacked",
+             "on_unit_level", 
+             "on_unit_drop_item", "on_unit_pickup_item", "on_unit_use_item", "on_unit_stack_item",
+             "on_unit_spell_channel", "on_unit_spell_cast", "on_unit_spell_effect", "on_unit_spell_finish", "on_unit_spell_end"}
         )
         self.bind = eventDispatcher.bind
         self.unbind = eventDispatcher.unbind
@@ -1108,18 +1353,165 @@ Engine.new = function()
             if status then return val end
         end
 
-        function self._on_unitDeath(unit)
-            eventDispatcher.dispatch("on_unitDeath", self, unit)
+        function self._on_unit_death(unit)
+            eventDispatcher.dispatch("on_unit_death", unit)
         end
 
-        self.on_unitDeath = function(unit)
-            local status, val = xpcall(self._on_unitDeath, Log.Error, unit)
+        self.on_unit_death = function(unit)
+            local status, val = xpcall(self._on_unit_death, Log.Error, unit)
+            if status then return val end
+        end
+
+        function self._on_unit_damage_pre(source, target, attack)
+            eventDispatcher.dispatch("on_unit_damage_pre", source, target, attack)
+        end
+
+        self.on_unit_damage_pre = function(source, target, attack)
+            local status, val = xpcall(self._on_unit_damage_pre, Log.Error, source, target, attack)
+            if status then return val end
+        end
+
+        function self._on_unit_damaged_pre(source, target, attack)
+            eventDispatcher.dispatch("on_unit_damaged_pre", source, target, attack)
+        end
+
+        self.on_unit_damaged_pre = function(source, target, attack)
+            local status, val = xpcall(self._on_unit_damaged_pre, Log.Error, source, target, attack)
+            if status then return val end
+        end
+
+        function self._on_unit_damage_after(source, target, attack)
+            eventDispatcher.dispatch("on_unit_damage_after", source, target, attack)
+        end
+
+        self.on_unit_damage_after = function(source, target, attack)
+            local status, val = xpcall(self._on_unit_damage_after, Log.Error, source, target, attack)
+            if status then return val end
+        end
+
+        function self._on_unit_damaged_after(source, target, attack)
+            eventDispatcher.dispatch("on_unit_damaged_after", source, target, attack)
+        end
+
+        self.on_unit_damaged_after = function(source, target, attack)
+            local status, val = xpcall(self._on_unit_damaged_after, Log.Error, source, target, attack)
+            if status then return val end
+        end
+
+        function self._on_unit_attack(source, target)
+            eventDispatcher.dispatch("on_unit_attack", source, target)
+        end
+
+        self.on_unit_attack = function(source, target)
+            local status, val = xpcall(self._on_unit_attack, Log.Error, source, target)
+            if status then return val end
+        end
+
+        function self._on_unit_attacked(source, target)
+            eventDispatcher.dispatch("on_unit_attacked", source, target)
+        end
+
+        self.on_unit_attacked = function(source, target)
+            local status, val = xpcall(self._on_unit_attacked, Log.Error, source, target)
+            if status then return val end
+        end
+
+        function self._on_unit_level(unit)
+            eventDispatcher.dispatch("on_unit_level", unit)
+        end
+
+        self.on_unit_level = function(unit)
+            local status, val = xpcall(self._on_unit_level, Log.Error, unit)
+            if status then return val end
+        end
+
+        function self._on_unit_drop_item(unit, item)
+            eventDispatcher.dispatch("on_unit_drop_item", unit, item)
+        end
+
+        self.on_unit_drop_item = function(unit, item)
+            local status, val = xpcall(self._on_unit_drop_item, Log.Error, unit, item)
+            if status then return val end
+        end
+
+        function self._on_unit_pickup_item(unit, item)
+            eventDispatcher.dispatch("on_unit_pickup_item", unit, item)
+        end
+
+        self.on_unit_pickup_item = function(unit, item)
+            local status, val = xpcall(self._on_unit_pickup_item, Log.Error, unit, item)
+            if status then return val end
+        end
+
+        function self._on_unit_use_item(unit, item)
+            eventDispatcher.dispatch("on_unit_use_item", unit, item)
+        end
+
+        self.on_unit_use_item = function(unit, item)
+            local status, val = xpcall(self._on_unit_use_item, Log.Error, unit, item)
+            if status then return val end
+        end
+
+        function self._on_unit_stack_item(unit, item)
+            eventDispatcher.dispatch("on_unit_stack_item", unit, item)
+        end
+
+        self.on_unit_stack_item = function(unit, item)
+            local status, val = xpcall(self._on_unit_stack_item, Log.Error, unit, item)
+            if status then return val end
+        end
+
+        function self._on_unit_spell_channel(unit, spell)
+            eventDispatcher.dispatch("on_unit_spell_channel", unit, spell)
+        end
+
+        self.on_unit_spell_channel = function(unit, spell)
+            local status, val = xpcall(self._on_unit_spell_channel, Log.Error, unit, spell)
+            if status then return val end
+        end
+
+        function self._on_unit_spell_cast(unit, spell)
+            eventDispatcher.dispatch("on_unit_spell_cast", unit, spell)
+        end
+
+        self.on_unit_spell_cast = function(unit, spell)
+            local status, val = xpcall(self._on_unit_spell_cast, Log.Error, unit, spell)
+            if status then return val end
+        end
+
+        function self._on_unit_spell_effect(unit, spell)
+            eventDispatcher.dispatch("on_unit_spell_effect", unit, spell)
+        end
+
+        self.on_unit_spell_effect = function(unit, spell)
+            local status, val = xpcall(self._on_unit_spell_effect, Log.Error, unit, spell)
+            if status then return val end
+        end
+
+        function self._on_unit_spell_finish(unit, spell)
+            eventDispatcher.dispatch("on_unit_spell_finish", unit, spell)
+        end
+
+        self.on_unit_spell_finish = function(unit, spell)
+            local status, val = xpcall(self._on_unit_spell_finish, Log.Error, unit, spell)
+            if status then return val end
+        end
+
+        function self._on_unit_spell_end(unit, spell)
+            eventDispatcher.dispatch("on_unit_spell_end", unit, spell)
+        end
+
+        self.on_unit_spell_end = function(unit, spell)
+            local status, val = xpcall(self._on_unit_spell_end, Log.Error, unit, spell)
             if status then return val end
         end
 
         setmetatable(self, mt)
 
         do
+            mouse = _Window.request_mouse(self)
+            keyboard = _Window.request_keyboard(self)
+
             Trigger()
             .registerPlayerEvent(self, EVENT_PLAYER_LEAVE)
             .addAction(
@@ -1201,7 +1593,7 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT DEATH] ...")
-                    self.on_unitDeath(GetTriggerUnit())
+                    GetTriggerUnit().owner.on_unit_death(GetTriggerUnit())
                     GetTriggerUnit().on_death()
                 end
             )
@@ -1211,7 +1603,9 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT DAMAGE PRE] ...")
+                    GetEventDamageSource().owner.on_unit_damage_pre(GetEventDamageSource(), GetEventDamageTarget(), GetDamageObject())
                     GetEventDamageSource().on_damage_pre(GetEventDamageTarget(), GetDamageObject())
+                    GetEventDamageTarget().owner.on_unit_damaged_pre(GetEventDamageSource(), GetEventDamageTarget(), GetDamageObject())
                     GetEventDamageTarget().on_damaged_pre(GetEventDamageSource(), GetDamageObject())
                 end
             )
@@ -1221,7 +1615,9 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT DAMAGE AFTER] ...")
+                    GetEventDamageSource().owner.on_unit_damage_after(GetEventDamageSource(), GetEventDamageTarget(), GetDamageObject())
                     GetEventDamageSource().on_damage_after(GetEventDamageTarget(), GetDamageObject())
+                    GetEventDamageTarget().owner.on_unit_damaged_after(GetEventDamageSource(), GetEventDamageTarget(), GetDamageObject())
                     GetEventDamageTarget().on_damaged_after(GetEventDamageSource(), GetDamageObject())
                 end
             )
@@ -1231,7 +1627,9 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT ATTACK] ...")
+                    GetAttacker().owner.on_unit_attack(GetAttacker(), GetTriggerUnit())
                     GetAttacker().on_attack(GetTriggerUnit())
+                    GetTriggerUnit().owner.on_unit_attacked(GetAttacker(), GetTriggerUnit())
                     GetTriggerUnit().on_attacked(GetAttacker())
                 end
             )
@@ -1241,6 +1639,7 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT LEVEL] ...")
+                    GetTriggerUnit().owner.on_unit_level(GetTriggerUnit())
                     GetTriggerUnit().on_level()
                 end
             )
@@ -1250,6 +1649,7 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT DROP ITEM] ...")
+                    GetTriggerUnit().owner.on_unit_drop_item(GetTriggerUnit(), GetManipulatedItem())
                     GetTriggerUnit().on_drop_item(GetManipulatedItem())
                     GetManipulatedItem().on_drop(GetTriggerUnit())
                 end
@@ -1260,6 +1660,7 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT PICKUP ITEM] ...")
+                    GetTriggerUnit().owner.on_unit_pickup_item(GetTriggerUnit(), GetManipulatedItem())
                     GetTriggerUnit().on_pickup_item(GetManipulatedItem())
                     GetManipulatedItem().on_pickup(GetTriggerUnit())
                 end
@@ -1270,6 +1671,7 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT USE ITEM] ...")
+                    GetTriggerUnit().owner.on_unit_use_item(GetTriggerUnit(), GetManipulatedItem())
                     GetTriggerUnit().on_use_item(GetManipulatedItem())
                     GetManipulatedItem().on_use(GetTriggerUnit())
                 end
@@ -1280,8 +1682,9 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT STACK ITEM] ...")
+                    GetTriggerUnit().owner.on_unit_stack_item(GetTriggerUnit(), GetManipulatedItem())
                     GetTriggerUnit().on_stack_item(GetManipulatedItem())
-                    GetManipulatedItem().on_use(GetTriggerUnit())
+                    GetManipulatedItem().on_stack(GetTriggerUnit())
                 end
             )
 
@@ -1290,6 +1693,7 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT SPELL CHANNEL] ...")
+                    GetTriggerUnit().owner.on_unit_spell_channel(GetTriggerUnit(), GetSpellObject())
                     GetTriggerUnit().on_spell_channel(GetSpellObject())
                 end
             )
@@ -1299,6 +1703,7 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT SPELL CAST] ...")
+                    GetTriggerUnit().owner.on_unit_spell_cast(GetTriggerUnit(), GetSpellObject())
                     GetTriggerUnit().on_spell_cast(GetSpellObject())
                 end
             )
@@ -1308,6 +1713,7 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT SPELL EFFECT] ...")
+                    GetTriggerUnit().owner.on_unit_spell_effect(GetTriggerUnit(), GetSpellObject())
                     GetTriggerUnit().on_spell_effect(GetSpellObject())
                 end
             )
@@ -1317,6 +1723,7 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT SPELL FINISH] ...")
+                    GetTriggerUnit().owner.on_unit_spell_finish(GetTriggerUnit(), GetSpellObject())
                     GetTriggerUnit().on_spell_finish(GetSpellObject())
                 end
             )
@@ -1326,6 +1733,7 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT SPELL END] ...")
+                    GetTriggerUnit().owner.on_unit_spell_end(GetTriggerUnit(), GetSpellObject())
                     GetTriggerUnit().on_spell_end(GetSpellObject())
                 end
             )
@@ -1338,33 +1746,33 @@ Engine.new = function()
     end
 
 
-    AnimationTransition = {}
+    local Easing = {}
 
-    AnimationTransition.linear = function(progress)
+    Easing.linear = function(progress)
         return progress
     end
 
-    AnimationTransition.in_sine = function(progress)
+    Easing.in_sine = function(progress)
         return 1. - Cos((progress * math.pi) / 2.)
     end
 
-    AnimationTransition.out_sine = function(progress)
+    Easing.out_sine = function(progress)
         return Sin((progress * math.pi) / 2.)
     end
 
-    AnimationTransition.in_out_sine = function(progress)
+    Easing.in_out_sine = function(progress)
         return -(Cos(math.pi * progress) - 1.) / 2.
     end
 
-    AnimationTransition.in_quad = function(progress)
+    Easing.in_quad = function(progress)
         return progress * progress
     end
 
-    AnimationTransition.out_quad = function(progress)
+    Easing.out_quad = function(progress)
         return 1. - (1. - progress) * (1. - progress)
     end
 
-    AnimationTransition.in_out_quad = function(progress)
+    Easing.in_out_quad = function(progress)
         if progress < 0.5 then
             return 2. * progress * progress
         else
@@ -1372,15 +1780,15 @@ Engine.new = function()
         end
     end
 
-    AnimationTransition.in_cubic = function(progress)
+    Easing.in_cubic = function(progress)
         return progress * progress * progress
     end
 
-    AnimationTransition.out_cubic = function(progress)
+    Easing.out_cubic = function(progress)
         return 1. - Pow(1. - progress, 3.)
     end
 
-    AnimationTransition.in_out_cubic = function(progress)
+    Easing.in_out_cubic = function(progress)
         if progress < 0.5 then
             return 4. * progress * progress * progress
         else
@@ -1388,15 +1796,15 @@ Engine.new = function()
         end
     end
 
-    AnimationTransition.in_quart = function(progress)
+    Easing.in_quart = function(progress)
         return progress * progress * progress * progress
     end
 
-    AnimationTransition.out_quart = function(progress)
+    Easing.out_quart = function(progress)
         return 1. - Pow(1. - progress, 4.)
     end
 
-    AnimationTransition.in_out_quart = function(progress)
+    Easing.in_out_quart = function(progress)
         if progress < 0.5 then
             return 8. * progress * progress * progress * progress
         else
@@ -1404,15 +1812,15 @@ Engine.new = function()
         end
     end
 
-    AnimationTransition.in_quint = function(progress)
+    Easing.in_quint = function(progress)
         return progress * progress * progress * progress * progress
     end
 
-    AnimationTransition.out_quint = function(progress)
+    Easing.out_quint = function(progress)
         return 1. - Pow(1. - progress, 5.)
     end
 
-    AnimationTransition.in_out_quint = function(progress)
+    Easing.in_out_quint = function(progress)
         if progress < 0.5 then
             return 16. * progress * progress * progress * progress * progress
         else
@@ -1420,7 +1828,7 @@ Engine.new = function()
         end
     end
 
-    AnimationTransition.in_expo = function(progress)
+    Easing.in_expo = function(progress)
         if progress == 0. then
             return 0.
         else
@@ -1428,7 +1836,7 @@ Engine.new = function()
         end
     end
 
-    AnimationTransition.out_expo = function(progress)
+    Easing.out_expo = function(progress)
         if progress == 1. then
             return 1.
         else
@@ -1436,7 +1844,7 @@ Engine.new = function()
         end
     end
 
-    AnimationTransition.in_out_expo = function(progress)
+    Easing.in_out_expo = function(progress)
         if progress == 0. then
             return 0.
         elseif progress == 1. then
@@ -1448,15 +1856,15 @@ Engine.new = function()
         end
     end
 
-    AnimationTransition.in_circ = function(progress)
+    Easing.in_circ = function(progress)
         return 1. - math.sqrt(1. - Pow(progress, 2.))
     end
 
-    AnimationTransition.out_circ = function(progress)
+    Easing.out_circ = function(progress)
         return math.sqrt(1. - Pow(progress - 1., 2.))
     end
 
-    AnimationTransition.in_out_circ = function(progress)
+    Easing.in_out_circ = function(progress)
         if progress < 0.5 then
             return (1. - math.sqrt(1. - Pow(2. * progress, 2.))) / 2.
         else
@@ -1464,21 +1872,21 @@ Engine.new = function()
         end
     end
 
-    AnimationTransition.in_back = function(progress)
+    Easing.in_back = function(progress)
     local c1 = 1.70158
     local c3 = c1 + 1.
 
         return c3 * progress * progress * progress - c1 * progress * progress
     end
 
-    AnimationTransition.out_back = function(progress)
+    Easing.out_back = function(progress)
     local c1 = 1.70158
     local c3 = c1 + 1.
 
         return 1. + c3 * Pow(progress - 1., 3.) + c1 * Pow(progress - 1., 2.)
     end
 
-    AnimationTransition.in_out_back = function(progress)
+    Easing.in_out_back = function(progress)
     local c1 = 1.70158
     local c2 = c1 * 1.525
 
@@ -1489,7 +1897,7 @@ Engine.new = function()
         end
     end
 
-    AnimationTransition.in_elastic = function(progress)
+    Easing.in_elastic = function(progress)
     local c4 = (2. * math.pi) / 3.
 
         if progress == 0. then
@@ -1501,7 +1909,7 @@ Engine.new = function()
         end
     end
 
-    AnimationTransition.out_elastic = function(progress)
+    Easing.out_elastic = function(progress)
     local c4 = (2. * math.pi) / 3.
 
         if progress == 0. then
@@ -1513,7 +1921,7 @@ Engine.new = function()
         end
     end
 
-    AnimationTransition.in_out_elastic = function(progress)
+    Easing.in_out_elastic = function(progress)
     local c5 = (2. * math.pi) / 4.5
 
         if progress == 0. then
@@ -1527,11 +1935,11 @@ Engine.new = function()
         end
     end
 
-    AnimationTransition.in_bounce = function(progress)
-        return 1. - AnimationTransition.out_bounce(1. - progress)
+    Easing.in_bounce = function(progress)
+        return 1. - Easing.out_bounce(1. - progress)
     end
 
-    AnimationTransition.out_bounce = function(progress)
+    Easing.out_bounce = function(progress)
     local n1 = 7.5625
     local d1 = 2.75
         
@@ -1546,11 +1954,11 @@ Engine.new = function()
         end
     end
 
-    AnimationTransition.in_out_bounce = function(progress)
+    Easing.in_out_bounce = function(progress)
         if progress < 0.5 then
-            return (1. - AnimationTransition.out_bounce(1. - 2. * progress)) / 2.
+            return (1. - Easing.out_bounce(1. - 2. * progress)) / 2.
         else
-            return (1. + AnimationTransition.out_bounce(2. * progress - 1.)) / 2.
+            return (1. + Easing.out_bounce(2. * progress - 1.)) / 2.
         end
     end
 
@@ -1562,7 +1970,7 @@ Engine.new = function()
         clock.start()
         
         self.duration = duration or 0.0
-        self.transition = AnimationTransition[transition] or AnimationTransition.linear
+        self.transition = Easing[transition] or Easing.linear
         self.step = step or 0
 
         local animatedWidgets = {}
@@ -2216,8 +2624,9 @@ Engine.new = function()
         local self = {}
 
         local player = whichPlayer
-        player.keyboard = self
         local keydown = {}
+
+        local mt = {}
 
         -- Keycodes mapping, between str <-> int. These keycodes are
         -- currently taken from common.j. But when a new provider will be
@@ -2255,6 +2664,17 @@ Engine.new = function()
             ['f13']= 0x7C, ['f14']= 0x7D, ['f15']= 0x7E, ['f16']= 0x7F, ['f17']= 0x80, ['f18']= 0x81,
             ['f19']= 0x82, ['f20']= 0x83, ['f21']= 0x84, ['f22']= 0x85, ['f23']= 0x86, ['f24']= 0x87,
         }
+
+        -- Keyboard Getter
+        function mt.__index(table, index)
+            if index == "player" then
+                return player
+            else
+                Log.Error("Unknown attribute '" .. index .. "'.")
+            end
+        end
+
+        setmetatable(self, mt)
 
         function self.string_to_keycode(value)
             -- Convert a string to a keycode number according to the keycodes
@@ -2359,7 +2779,143 @@ Engine.new = function()
 
     end
 
+    -- Engine Mouse
+    _Mouse.new = function(whichPlayer)
+        local self = {}
+
+        local player = whichPlayer
+        local keydown = {}
+
+        local x = 0.
+        local y = 0.
+
+        local mt = {}
+
+        -- Mouse Getter
+        function mt.__index(table, index)
+            if index == "x" then
+                return x
+            elseif index == "y" then
+                return y
+            elseif index == "player" then
+                return player
+            else
+                Log.Error("Unknown attribute '" .. index .. "'.")
+            end
+        end
+
+
+        local eventDispatcher = EventDispatcher(
+            {"on_mouse_down", "on_mouse_up", "on_motion"}
+        )
+        self.bind = eventDispatcher.bind
+        self.unbind = eventDispatcher.unbind
+        
+        -- Fired when user presses mouse key
+        function self._on_mouse_down(pos, button)
+            eventDispatcher.dispatch("on_mouse_down", self, pos, button)
+        end
+
+        self.on_mouse_down = function(pos, button)
+            local status, val = xpcall(self._on_mouse_down, Log.Error, pos, button)
+            if status then return val end
+        end
+
+        -- Fired when user releases mouse key
+        function self._on_mouse_up(pos, button)
+            eventDispatcher.dispatch("on_mouse_up", self, pos, button)
+        end
+
+        self.on_mouse_up = function(pos, button)
+            local status, val = xpcall(self._on_mouse_up, Log.Error, pos, button)
+            if status then return val end
+        end
+
+        -- Fired when user moves mouse
+        function self._on_motion(pos)
+            eventDispatcher.dispatch("on_motion", self, pos)
+        end
+
+        self.on_motion = function(pos)
+            local status, val = xpcall(self._on_motion, Log.Error, pos)
+            if status then return val end
+        end
+
+        setmetatable(self, mt)
+
+        Trigger()
+        .registerPlayerEvent(player, EVENT_PLAYER_MOUSE_DOWN)
+        .addAction(
+            function()
+                if BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_LEFT then
+                    whichButton = "left"
+                elseif BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_MIDDLE then
+                    whichButton = "middle"
+                elseif BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_RIGHT then
+                    whichButton = "right"
+                end
+                Log.Debug("[MOUSE DOWN] Mouse Button: " .. whichButton)
+                x = BlzGetTriggerPlayerMouseX()
+                y = BlzGetTriggerPlayerMouseY()
+                self.on_mouse_down({x, y}, {BlzGetTriggerPlayerMouseButton(), whichButton})
+            end
+        )
+
+        Trigger()
+        .registerPlayerEvent(player, EVENT_PLAYER_MOUSE_UP)
+        .addAction(
+            function()
+                if BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_LEFT then
+                    whichButton = "left"
+                elseif BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_MIDDLE then
+                    whichButton = "middle"
+                elseif BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_RIGHT then
+                    whichButton = "right"
+                end
+                Log.Debug("[MOUSE UP] Mouse Button: " .. whichButton)
+                x = BlzGetTriggerPlayerMouseX()
+                y = BlzGetTriggerPlayerMouseY()
+                self.on_mouse_up({x, y}, {BlzGetTriggerPlayerMouseButton(), whichButton})
+            end
+        )
+
+        Trigger()
+        .registerPlayerEvent(player, EVENT_PLAYER_MOUSE_MOVE)
+        .addAction(
+            function()
+                x = BlzGetTriggerPlayerMouseX()
+                y = BlzGetTriggerPlayerMouseY()
+                Log.Debug("[MOUSE MOVE] Mouse Position: (" .. x .. " | " .. y .. ")")
+                self.on_motion({x, y})
+            end
+        )
+
+        print("Generated new Mouse for " .. player.name)
+
+        return self
+
+    end
+
     -- Engine Window
+    -- Request Player Keyboard
+    function _Window._request_keyboard(player)
+        if player.keyboard ~= nil then return player.keyboard else return _Keyboard.new(player) end
+    end
+
+    _Window.request_keyboard = function(player)
+        local status, val = xpcall(_Window._request_keyboard, Log.Error, player)
+        if status then return val end
+    end
+
+    -- Request Player Mouse
+    function _Window._request_mouse(player)
+        if player.mouse ~= nil then return player.mouse else return _Mouse.new(player) end
+    end
+
+    _Window.request_mouse = function(player)
+        local status, val = xpcall(_Window._request_mouse, Log.Error, player)
+        if status then return val end
+    end
     _Window.new = function()
         local self = {}
         local handle = BlzGetFrameByName("ConsoleUIBackdrop", 0)
@@ -2368,7 +2924,7 @@ Engine.new = function()
         BlzFrameSetEnable(handle, false)
         local mt = {}
 
-        -- Sound Getter
+        -- Window Getter
         function mt.__index(table, index)
             if index == "width" then
                 return BlzGetLocalClientWidth()
@@ -2381,16 +2937,6 @@ Engine.new = function()
             else
                 Log.Error("Unknown attribute '" .. index .. "'.")
             end
-        end
-
-        -- Request Player Keyboard
-        function self._request_keyboard(player)
-            if player.keyboard ~= nil then return player.keyboard else return _Keyboard.new(player) end
-        end
-
-        self.request_keyboard = function(player)
-            local status, val = xpcall(self._request_keyboard, Log.Error, player)
-            if status then return val end
         end
 
         --[[
@@ -2464,90 +3010,14 @@ Engine.new = function()
         end
         ]]--
 
-        local eventDispatcher = EventDispatcher(
-            {"on_mouse_down", "on_mouse_up", "on_motion"}
-        )
-        self.bind = eventDispatcher.bind
-        self.unbind = eventDispatcher.unbind
-        
-        -- Fired when user presses mouse key
-        function self._on_mouse_down(player, pos, button)
-            eventDispatcher.dispatch("on_mouse_down", self, player, pos, button)
-        end
-
-        self.on_mouse_down = function(player, pos, button)
-            local status, val = xpcall(self._on_mouse_down, Log.Error, player, pos, button)
-            if status then return val end
-        end
-
-        -- Fired when user releases mouse key
-        function self._on_mouse_up(player, pos, button)
-            eventDispatcher.dispatch("on_mouse_up", self, player, pos, button)
-        end
-
-        self.on_mouse_up = function(player, pos, button)
-            local status, val = xpcall(self._on_mouse_up, Log.Error, player, pos, button)
-            if status then return val end
-        end
-
-        -- Fired when user moves mouse
-        function self._on_motion(player, pos)
-            eventDispatcher.dispatch("on_motion", self, player, pos)
-        end
-
-        self.on_motion = function(player, pos)
-            local status, val = xpcall(self._on_motion, Log.Error, player, pos)
-            if status then return val end
-        end
-
         setmetatable(self, mt)
-
-        for pID = 0, 23 do
-            Trigger()
-            .registerPlayerEvent(Player(pID), EVENT_PLAYER_MOUSE_DOWN)
-            .addAction(
-                function()
-                    if BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_LEFT then
-                        whichButton = "left"
-                    elseif BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_MIDDLE then
-                        whichButton = "middle"
-                    elseif BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_RIGHT then
-                        whichButton = "right"
-                    end
-                    Log.Debug("[MOUSE DOWN] Mouse Button: " .. whichButton)
-                    self.on_mouse_down(GetTriggerPlayer(), {BlzGetTriggerPlayerMouseX(), BlzGetTriggerPlayerMouseY()}, {BlzGetTriggerPlayerMouseButton(), whichButton})
-                end
-            )
-
-            Trigger()
-            .registerPlayerEvent(Player(pID), EVENT_PLAYER_MOUSE_UP)
-            .addAction(
-                function()
-                    if BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_LEFT then
-                        whichButton = "left"
-                    elseif BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_MIDDLE then
-                        whichButton = "middle"
-                    elseif BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_RIGHT then
-                        whichButton = "right"
-                    end
-                    Log.Debug("[MOUSE UP] Mouse Button: " .. whichButton)
-                    self.on_mouse_up(GetTriggerPlayer(), {BlzGetTriggerPlayerMouseX(), BlzGetTriggerPlayerMouseY()}, {BlzGetTriggerPlayerMouseButton(), whichButton})
-                end
-            )
-
-            Trigger()
-            .registerPlayerEvent(Player(pID), EVENT_PLAYER_MOUSE_MOVE)
-            .addAction(
-                function()
-                    Log.Debug("[MOUSE MOVE] Mouse Position: (" .. BlzGetTriggerPlayerMouseX() .. " | " .. BlzGetTriggerPlayerMouseY() .. ")")
-                    self.on_motion(GetTriggerPlayer(), {BlzGetTriggerPlayerMouseX(), BlzGetTriggerPlayerMouseY()})
-                end
-            )
-        end
 
         return self
 
     end
+
+    local Window = _Window.new()
+
     
     -- Engine Clock
     _Clock.new = function()
@@ -2571,6 +3041,7 @@ Engine.new = function()
 
             function self._setCondition(filterfunc)
                 self.condition = filterfunc
+                return self
             end
 
             self.setCondition = function(filterfunc)
@@ -2625,6 +3096,7 @@ Engine.new = function()
             Log.Debug("[CLOCK] A clock was stopped.")
             self.running = false
             PauseTimer(handle)
+            return self
         end
 
         self.stop = function()
@@ -2636,6 +3108,7 @@ Engine.new = function()
             Log.Debug("[CLOCK] A clock was started.")
             self.running = true
             TimerStart(handle, 0.001, true, self.on_schedule)
+            return self
         end
 
         self.start = function()
@@ -2681,13 +3154,13 @@ Engine.new = function()
 
     end
 
-    self.Clock = {}
-    self.Clock.new = function()
+    local Clock = {}
+    Clock.new = function()
         local status, val = xpcall(_Clock.new, Log.Error)
         if status then return val end
     end
 
-    Clock = self.Clock.new
+    local Clock = self.Clock.new
 
     _SoundLoader.new = function()
         local self = {}
@@ -2833,13 +3306,12 @@ Engine.new = function()
 
     end
 
-    self.SoundLoader = {}
-    self.SoundLoader.new = function()
+    local SoundLoader = {}
+    SoundLoader.new = function()
         local status, val = xpcall(_SoundLoader.new, Log.Error)
         if status then return val end
     end
 
-    SoundLoader = self.SoundLoader.new
 
     --[[
         ** Unit Structure **
@@ -2972,8 +3444,6 @@ Engine.new = function()
                 manualY = GetUnitY(handle)
             elseif index == "face" then
                 SetUnitFacing(handle, value)
-            elseif index == "faceEx" then
-                BlzSetUnitFacingEx(handle, value)
             elseif index == "ms" then
                 if value > 800 then
                     Log.Warn("Movement Speed over cap, reducing to 800...")
@@ -3013,12 +3483,6 @@ Engine.new = function()
             elseif index == "blendtime" then
                 SetUnitBlendTime(handle, value)
                 blendtime = value
-            elseif index == "animation" then
-                if type(value) == "number" then
-                    SetUnitAnimationByIndex(handle, value)
-                else
-                    SetUnitAnimation(handle, value)
-                end
             elseif index == "attackspeed" then
                 BlzSetUnitAttackCooldown(handle, 1.0 / value, 0)
             elseif index == "damage" then
@@ -3156,6 +3620,8 @@ Engine.new = function()
                 return BlzGetUnitSkin(handle)
             elseif index == "invulnerable" then
                 return BlzIsUnitInvulnerable(handle)
+            elseif index == "range" then
+                return GetUnitAcquireRange(handle)
             else
                 Log.Error("Unknown attribute '" .. index .. "'.")
             end
@@ -3170,8 +3636,33 @@ Engine.new = function()
             if status then return val end
         end
 
+        function self._faceInstant(angle)
+            BlzSetUnitFacingEx(handle, angle)
+            return self
+        end
+
+        self.faceInstant = function(angle)
+            local status, val = xpcall(self._faceInstant, Log.Error, angle)
+            if status then return val end
+        end
+
+        function self._playAnimation(animation)
+            if type(animation) == "number" then
+                SetUnitAnimationByIndex(handle, animation)
+            else
+                SetUnitAnimation(handle, animation)
+            end
+            return self
+        end
+
+        self.playAnimation = function(animation)
+            local status, val = xpcall(self._playAnimation, Log.Error, animation)
+            if status then return val end
+        end
+
         function self._kill()
             KillUnit(handle)
+            return self
         end
 
         self.kill = function()
@@ -3181,6 +3672,7 @@ Engine.new = function()
 
         function self._respawn(spawnPoint)
             ReviveHero(handle, spawnPoint.x, spawnPoint.y, false)
+            return self
         end
 
         self.respawn = function(spawnPoint)
@@ -3236,6 +3728,7 @@ Engine.new = function()
                     IssuePointOrder(handle, order, arg[1], arg[2])
                 end
             end
+            return self
         end
 
         self.issueOrder = function(order, ...)
@@ -3249,6 +3742,7 @@ Engine.new = function()
             else
                 IssueBuildOrder(handle, order, x, y)
             end
+            return self
         end
 
         self.buildOrder = function(order, x, y)
@@ -3258,6 +3752,7 @@ Engine.new = function()
 
         function self._damageTarget(target, amount, attack, ranged, attackType, damageType, weaponType)
             UnitDamageTarget(handle, target.handle, amount, attack, ranged, attackType, damageType, weaponType)
+            return self
         end
 
         self.damageTarget = function(target, amount, attack, ranged, attackType, damageType, weaponType)
@@ -3285,10 +3780,11 @@ Engine.new = function()
 
         function self._addAbility(abilityId)
             if type(abilityId) == "number" then
-                return UnitAddAbility(handle, abilityId)
+                UnitAddAbility(handle, abilityId)
             else
-                return UnitAddAbility(handle, FourCC(abilityId))
+                UnitAddAbility(handle, FourCC(abilityId))
             end
+            return self
         end
 
         self.addAbility = function(abilityId)
@@ -3311,6 +3807,7 @@ Engine.new = function()
 
         function self._setWeaponIntegerField(field, index, value)
             BlzSetUnitWeaponIntegerField(handle, field, index, value)
+            return self
         end
 
         self.setWeaponIntegerField = function(field, index, value)
@@ -3328,7 +3825,7 @@ Engine.new = function()
         end
 
         function self._getWeaponIntegerField(field, index)
-            BlzGetUnitWeaponIntegerField(handle, field, index)
+            return BlzGetUnitWeaponIntegerField(handle, field, index)
         end
 
         self.getWeaponIntegerField = function(field, index)
@@ -3337,10 +3834,7 @@ Engine.new = function()
         end
 
         function self._getWeaponStringField(field, index)
-            print(GetHandleId(handle))
-            print(field)
-            print(index)
-            BlzGetUnitWeaponStringField(handle, field, index)
+            return BlzGetUnitWeaponStringField(handle, field, index)
         end
 
         self.getWeaponStringField = function(field, index)
@@ -3350,6 +3844,7 @@ Engine.new = function()
 
         function self._setVertexColor(red, green, blue, alpha)
             SetUnitVertexColor(handle, red, green, blue, alpha)
+            return self
         end
 
         self.setVertexColor = function(red, green, blue, alpha)
@@ -3549,13 +4044,11 @@ Engine.new = function()
         return self
     end
 
-    self.Unit = {}
-    self.Unit.new = function(player, unitId, x, y, face)
+    local Unit = {}
+    Unit.new = function(player, unitId, x, y, face)
         local status, val = xpcall(_Unit.new, Log.Error, player.createUnit(unitId, x, y, face))
         if status then return val end
     end
-
-    Unit = self.Unit.new
 
     --[[
         ** Group Structure **
@@ -3749,13 +4242,11 @@ Engine.new = function()
         return self
     end
 
-    self.Group = {}
-    self.Group.new = function(groupList)
+    local Group = {}
+    Group.new = function(groupList)
         local status, val = xpcall(_Group.new, Log.Error, groupList)
         if status then return val end
     end
-
-    Group = self.Group.new
 
     --[[
         ** Item Structure **
@@ -3947,13 +4438,11 @@ Engine.new = function()
         return self
     end
 
-    self.Item = {}
-    self.Item.new = function(itemId, x, y)
+    local Item = {}
+    Item.new = function(itemId, x, y)
         local status, val = xpcall(_Item.new, Log.Error, CreateItem(itemId, x, y))
         if status then return val end
     end
-
-    Item = self.Item.new
 
     self.Player = {}
     for pID = 0, 27 do
@@ -3983,2022 +4472,155 @@ Engine.new = function()
         )
     end
 
-    self.Window = _Window.new()
 
-    return self
+    -- Capture default creationg functions
+    local _PlaceRandomUnit = PlaceRandomUnit
+    PlaceRandomUnit = function(whichPool, forWhichPlayer, x, y, facing)
+        local handle = _PlaceRandomUnit(whichPool, forWhichPlayer, x, y, facing)
+        local unit = _Unit.new(handle)
+        GetOwningPlayer(unit).units.append(unit)
+        return handle
+    end
+
+    local _CreateUnit = CreateUnit
+    CreateUnit = function(whichPlayer, unitId, x, y, face)
+        local handle = _CreateUnit(whichPlayer, unitId, x, y, face)
+        local unit = _Unit.new(handle)
+        GetOwningPlayer(unit).units.append(unit)
+        return handle
+    end
+
+    local _CreateUnitByName = CreateUnitByName
+    CreateUnitByName = function(whichPlayer, unitName, x, y, face)
+        local handle = _CreateUnitByName(whichPlayer, unitName, x, y, face)
+        local unit = _Unit.new(handle)
+        GetOwningPlayer(unit).units.append(unit)
+        return handle
+    end
+
+    local _CreateUnitAtLoc = CreateUnitAtLoc
+    CreateUnitAtLoc = function(whichPlayer, unitId, whichLocation, face)
+        local handle = _CreateUnitAtLoc(whichPlayer, unitId, whichLocation, face)
+        local unit = _Unit.new(handle)
+        GetOwningPlayer(unit).units.append(unit)
+        return handle
+    end
+
+    local _CreateUnitAtLocByName = CreateUnitAtLocByName
+    CreateUnitAtLocByName = function(whichPlayer, unitName, whichLocation, face)
+        local handle = _CreateUnitAtLocByName(whichPlayer, unitName, whichLocation, face)
+        local unit = _Unit.new(handle)
+        GetOwningPlayer(unit).units.append(unit)
+        return handle
+    end
+
+    local _CreateCorpse = CreateCorpse
+    CreateCorpse = function(whichPlayer, unitId, x, y, face)
+        local handle = _CreateCorpse(whichPlayer, unitId, x, y, face)
+        local unit = _Unit.new(handle)
+        GetOwningPlayer(unit).units.append(unit)
+        return handle
+    end
+
+    local _PlaceRandomItem = PlaceRandomItem
+    PlaceRandomItem = function(whichItemPool, x, y)
+        local handle = _PlaceRandomItem(whichItemPool, x, y)
+        local item = _Item.new(handle)
+        return handle
+    end
+
+    local _UnitAddItemById = UnitAddItemById
+    UnitAddItemById = function(whichUnit, itemId)
+        local handle = _UnitAddItemById(whichUnit, itemId)
+        local item = _Item.new(handle)
+        return handle
+    end
+
+    local _CreateItem = CreateItem
+    CreateItem = function(itemId, x, y)
+        local handle = _CreateItem(itemId, x, y)
+        local item = _Item.new(handle)
+        return handle
+    end
+
+    -- Internal Player Handling
+    local Player = function(playerId)
+        return self.Player[playerId]
+    end
+
+    -- Interface [Object API]
+    local IEngine = {}
+    IEngine.Trigger = Trigger
+    IEngine.EventDispatcher = EventDispatcher
+    IEngine.Effect = Effect
+    IEngine.Player = Player
+    IEngine.Easing = Easing
+    IEngine.Window = Window
+    IEngine.Clock = Clock
+    IEngine.SoundLoader = SoundLoader
+    IEngine.Unit = Unit
+    IEngine.Item = Item
+
+    -- Interface [Unit API]
+    IEngine.GetTriggerUnit = GetTriggerUnit
+    IEngine.GetAttacker = GetAttacker
+    IEngine.GetFilterUnit = GetFilterUnit
+    IEngine.GetSpellTargetUnit = GetSpellTargetUnit
+    IEngine.GetManipulatedItem = GetManipulatedItem
+    IEngine.GetFilterItem = GetFilterItem
+    IEngine.GetTriggerPlayer = GetTriggerPlayer
+    IEngine.GetItemPlayer = GetItemPlayer
+    IEngine.GetEventDamageSource = GetEventDamageSource
+    IEngine.GetEventDamageTarget = GetEventDamageTarget
+    IEngine.GetOwningPlayer = GetOwningPlayer
+    IEngine.FirstOfGroup = FirstOfGroup
+    IEngine.GetEnumUnit = GetEnumUnit
+    IEngine.GetEnteringUnit = GetEnteringUnit
+    IEngine.GetLeavingUnit = GetLeavingUnit
+    IEngine.GetLevelingUnit = GetLevelingUnit
+    IEngine.GetLearningUnit = GetLearningUnit
+    IEngine.GetRevivableUnit = GetRevivableUnit
+    IEngine.GetRevivingUnit = GetRevivingUnit
+    IEngine.GetRescuer = GetRescuer
+    IEngine.GetDyingUnit = GetDyingUnit
+    IEngine.GetKillingUnit = GetKillingUnit
+    IEngine.GetDecayingUnit = GetDecayingUnit
+    IEngine.GetSelectedUnit = GetSelectedUnit
+    IEngine.GetConstructingStructure = GetConstructingStructure
+    IEngine.GetCancelledStructure = GetCancelledStructure
+    IEngine.GetConstructedStructure = GetConstructedStructure
+    IEngine.GetResearchingUnit = GetResearchingUnit
+    IEngine.GetTrainedUnit = GetTrainedUnit
+    IEngine.GetDetectedUnit = GetDetectedUnit
+    IEngine.GetSummoningUnit = GetSummoningUnit
+    IEngine.GetSummonedUnit = GetSummonedUnit
+    IEngine.GetTransportUnit = GetTransportUnit
+    IEngine.GetLoadedUnit = GetLoadedUnit
+    IEngine.GetSellingUnit = GetSellingUnit
+    IEngine.GetSoldUnit = GetSoldUnit
+    IEngine.GetBuyingUnit = GetBuyingUnit
+    IEngine.GetChangingUnit = GetChangingUnit
+    IEngine.GetManipulatingUnit = GetManipulatingUnit
+    IEngine.GetOrderedUnit = GetOrderedUnit
+    IEngine.GetOrderTargetUnit = GetOrderTargetUnit
+    IEngine.GetSpellAbilityUnit = GetSpellAbilityUnit
+    IEngine.GetEventTargetUnit = GetEventTargetUnit
+
+    return IEngine
 
 end
 
 
 
-
-
---[[
-Wave = {}
-Wave.new = function()
-    local self = {}
-    local waveTimer = Clock()
-    local time
-    local maxTime = 0
-    local units
-    local mt = {}
-
-    function mt.__newindex(index, value)
-        if index == "maxTime" then
-            if maxTime >= 0 then maxTime = value else Log.Warn("Wave Time can't be below 0") end
-        else
-            Log.Error("Unknown attribute '" .. index .. "'.")
-        end
-    end
-
-    function mt.__index(table, index)
-        if index == "time" then
-            return time
-        elseif index == "maxTime" then
-            return maxTime
-        else
-            Log.Error("Unknown attribute '" .. index .. "'.")
-        end
-    end
-
-    function self._start()
-        self.on_start()
-        waveTimer.start()
-    end
-
-    function self._resume()
-        self.on_resume()
-        waveTimer.start()
-    end
-    
-    function self._pause()
-        self.on_pause()
-        waveTimer.stop()
-    end
-
-    function self._end()
-        self.on_end()
-        waveTimer.stop()
-    end
-
-    local eventDispatcher = EventDispatcher(
-        {"on_kill", "on_start", "on_resume", "on_pause", "on_end"}
-    )
-    self.bind = eventDispatcher.bind
-    self.unbind = eventDispatcher.unbind
-
-    function self._on_kill()
-        eventDispatcher.dispatch("on_kill", self)
-    end
-
-    self.on_kill = function()
-        local status, val = xpcall(self._on_kill, Log.Error)
-        if status then return val end
-    end
-
-    function self._on_start()
-        eventDispatcher.dispatch("on_start", self)
-    end
-
-    self.on_start = function()
-        local status, val = xpcall(self._on_start, Log.Error)
-        if status then return val end
-    end
-    
-    function self._on_resume()
-        eventDispatcher.dispatch("on_resume", self)
-    end
-
-    self.on_resume = function()
-        local status, val = xpcall(self._on_resume, Log.Error)
-        if status then return val end
-    end
-    
-    function self._on_pause()
-        eventDispatcher.dispatch("on_pause", self)
-    end
-
-    self.on_pause = function()
-        local status, val = xpcall(self._on_pause, Log.Error)
-        if status then return val end
-    end
-
-    function self._on_end()
-        eventDispatcher.dispatch("on_end", self)
-    end
-
-    self.on_end = function()
-        local status, val = xpcall(self._on_end, Log.Error)
-        if status then return val end
-    end
-
-    setmetatable(self, mt)
-    
-    return self
-end
-]]--
-
-Game = {}
-Game.new = function()
-    local self = {}
-    
-    local _Spawn = {}
-    local _Teleporter = {}
-    local _Wildcard = {}
-    local ENEMY_PLAYER = Player(PLAYER_NEUTRAL_AGGRESSIVE)
-
-    _Spawn = {}
-    _Spawn.new = function()
-        local self = {}
-        local mt = {}
-        local x
-        local y
-
-        function mt.__newindex(table, index, value)
-            if index == "x" then
-                x = value
-            elseif index == "y" then
-                y = value
-            else
-                Log.Error("Unknown attribute '" .. index .. "'.")
-            end
-        end
-
-        function mt.__index(table, index)
-            if index == "x" then
-                return x
-            elseif index == "y" then
-                return y
-            else
-                Log.Error("Unknown attribute '" .. index .. "'.")
-            end
-        end
-
-        function self._teleport(unit)
-            unit.x = x
-            unit.y = y
-        end
-
-        self.teleport = function(unit)
-            local status, val = xpcall(self._teleport, Log.Error, unit)
-            if status then return val end
-        end
-
-        setmetatable(self, mt)
-
-        return self
-
-    end
-
-    Spawn = _Spawn.new
-
-    _Teleporter = {}
-    _Teleporter.new = function()
-        local self = {}
-        local mt = {}
-        local exit
-        local entry
-
-        function mt.__newindex(table, index, value)
-            if index == "entry" then
-                entry = value
-            elseif index == "exit" then
-                exit = value
-            else
-                Log.Error("Unknown attribute '" .. index .. "'.")
-            end
-        end
-
-        function mt.__index(table, index)
-            if index == "entry" then
-                return entry
-            elseif index == "exit" then
-                return exit
-            else
-                Log.Error("Unknown attribute '" .. index .. "'.")
-            end
-        end
-
-
-        setmetatable(self, mt)
-
-        return self
-    end
-
-    Teleporter = _Teleporter.new
-
-
-    -- WIP
-    _Wildcard = {}
-    _Wildcard.new = function(key)
-        local self = {}
-        local mt = {}
-
-        function isValid(player, wildcard_key)
-            
-        end
-
-        return self
-    end
-
-    Wildcard = _Wildcard.new
-
-    return self
-end
-
-_Abilities = {}
-_Abilities.Shadow_Strike = {}
-_Abilities.Shadow_Strike.new = function()
-    local self = {}
-    local disappearEffect = Effect()
-    disappearEffect.scale = 0.7
-    disappearEffect.model = "Effects\\Soul Discharge Purple.mdx"
-    local slashEffect = Effect()
-    slashEffect.scale = 2.0
-    slashEffect.model = "Effects\\Ephemeral Cut Midnight.mdx"
-    local clock = Clock()
-    local events = {}
-
-    function self.apply(unit)
-        if events.unit == nil then
-            events.unit = unit.bind("on_damage_after",
-                function(source, target, attack)
-                    local damage = GetEventDamage()
-                    local x = source.x
-                    local y = source.y
-                    local x2 = target.x
-                    local y2 = target.y
-                    local a = Atan2(y2 - y, x2 - x) + 3.14159 + GetRandomReal(-0.436332, 0.436332)
-                    local x3 = x + 25 * Cos(a)
-                    local y3 = y + 25 * Sin(a)
-                    a = Atan2(y2 - y3, x2 - x3)
-                    local tempUnit = source.owner.createUnit('hrif', x3, y3, bj_RADTODEG * a)
-                    tempUnit.skin = source.skin
-                    tempUnit.addAbility('Aloc')
-                    tempUnit.setVertexColor(55, 55, 55, 255)
-                    tempUnit.attackspeed = source.attackspeed
-                    tempUnit.bind("on_attack",
-                        function(source, target)
-                            source.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
-                        end
-                    )
-                    tempUnit.bind("on_damage_pre",
-                        function(source, target, attack)    
-                            BlzSetEventDamage(damage)
-                            slashEffect.x = target.x
-                            slashEffect.y = target.y
-                            slashEffect.create().destroy()
-                        end
-                    )
-
-                    clock.schedule_once(
-                        function(triggeringClock, triggeringSchedule)
-                            disappearEffect.x = tempUnit.x
-                            disappearEffect.y = tempUnit.y
-                            disappearEffect.create().destroy()
-                            tempUnit.remove()
-                        end, 1.5
-                    )
-                    tempUnit.issueOrder("attack", target)
-                end
-            ).setCondition(
-                function(source, target, attack)
-                    return source.hasAbility('A001') and attack.isAttack
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Blink_Strike = {}
-_Abilities.Blink_Strike.new = function()
-    local self = {}
-    local casterEffect = Effect()
-    casterEffect.scale = 0.8
-    casterEffect.model = "Effects\\Blink Red Caster.mdx"
-    local targetEffect = Effect()
-    targetEffect.scale = 0.8
-    targetEffect.model = "Effects\\Blink Red Target.mdx"
-    local events = {}
-
-    function self.apply(unit)
-        if events.unit == nil then
-            events.unit = unit.bind("on_damage_after",
-                function(source, target, attack)
-                    local x = source.x
-                    local y = source.y
-                    local x2 = target.x
-                    local y2 = target.y
-                    local a = GetRandomReal(0, 6.28318)
-                    local dx = y2 - y
-                    local dy = x2 - x
-                    local dist = SquareRoot(dx * dx + dy * dy)
-                    local x4 = x2 + dist * Cos(a)
-                    local y4 = y2 + dist * Sin(a)
-                    casterEffect.x = x
-                    casterEffect.y = y
-                    casterEffect.create().destroy()
-                    source.x = x4
-                    source.y = y4
-                    source.faceEx = bj_RADTODEG * (a + 3.14159)
-                    targetEffect.x = x4
-                    targetEffect.y = y4
-                    targetEffect.create().destroy()
-                end
-            ).setCondition(
-                function(source, target, attack)
-                    return source.hasAbility('A001') and attack.isAttack
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    return self
-end
-
-_Abilities.Demon_Control = {}
-_Abilities.Demon_Control.new = function()
-    local self = {}
-    local events = {}
-    local roarEffect = Effect()
-    roarEffect.model = "Abilities\\Spells\\Undead\\UnholyFrenzyAOE\\UnholyFrenzyAOETarget.mdl"
-    roarEffect.scale = 2.0
-    local clock = Clock()
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local demonEffect = Effect()
-            demonEffect.model = "Models\\Manifestation Pride.mdx"
-            demonEffect.scale = 2.0
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    local cx = demonEffect.x
-                    local cy = demonEffect.y
-                    local cz = demonEffect.z
-                    local a = unit.face + 180.
-                    local tx = unit.x + 95. * Cos(bj_DEGTORAD * a)
-                    local ty = unit.y + 95. * Sin(bj_DEGTORAD * a)
-                    local tz = unit.z + 50.
-                    local dx = tx - cx
-                    local dy = ty - cy
-                    local dist = SquareRoot(dx * dx + dy * dy)
-                    if dist > 1. then
-                        local increment = 1. + 1.2 * dist / 70
-                        local rad = Atan2(ty - cy, tx - cx)
-                        demonEffect.x = cx + increment * Cos(rad)
-                        demonEffect.y = cy + increment * Sin(rad)
-                    else
-                        demonEffect.x = tx
-                        demonEffect.y = ty
-                    end
-                    if RAbsBJ(tz - cz) > 1. then
-                        local increment = 1. + 0.6 * dist / 70
-                        if tz > cz then
-                            demonEffect.z = cz + increment
-                        else
-                            demonEffect.z = cz - increment
-                        end
-                    else
-                        demonEffect.z = tz
-                    end
-                    demonEffect.yaw = Atan2(unit.y - cy, unit.x - cx)
-                end, 0.005
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if unit.hasAbility('A001') then
-                        if demonEffect.handle == nil then
-                            demonEffect.create()
-                        end
-                        return true
-                    else
-                        if demonEffect.handle ~= nil then
-                            demonEffect.destroy()
-                        end
-                        return false
-                    end
-                end
-            )
-            local attackCount = 0
-            local casting = false
-            events.unit = unit.bind("on_damage_after",
-                function(source, target, attack)
-                    attackCount = attackCount + 1
-                    if attackCount >= 50 and not casting then
-                        attackCount = 0
-                        casting = true
-                        roarEffect.x = demonEffect.x
-                        roarEffect.y = demonEffect.y
-                        roarEffect.z = demonEffect.z
-                        roarEffect.create().destroy()
-                        demonEffect.addSubAnim(SUBANIM_TYPE_SLAM).play(ANIM_TYPE_SPELL).removeSubAnim(SUBANIM_TYPE_SLAM)
-                        clock.schedule_once(
-                            function()
-                                casting = false
-                                demonEffect.play(ANIM_TYPE_STAND)
-                            end, 1.1
-                        )
-                    end
-                end
-            ).setCondition(
-                function(source, target, attack)
-                    return source.hasAbility('A001')
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Blade_Dance = {}
-_Abilities.Blade_Dance.new = function()
-    local self = {}
-    local events = {}
-    local bladeEffect = Effect()
-    bladeEffect.model = "Effects\\Ephemeral Slash Purple.mdx"
-    local bloodEffect = Effect()
-    bloodEffect.model = "Objects\\Spawnmodels\\Human\\HumanBlood\\HumanBloodLarge0.mdl"
-    bloodEffect.scale = 1.2
-    local clock = Clock()
-    local group = CreateGroup()
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    bladeEffect.x = unit.x
-                    bladeEffect.y = unit.y
-                    bladeEffect.height = GetRandomReal(30., 100.)
-                    bladeEffect.timeScale = GetRandomReal(0.8, 1.3)
-                    bladeEffect.yaw = GetRandomReal(0., 6.26573)
-                    bladeEffect.create().destroy()
-                    GroupEnumUnitsInRange(group, unit.x, unit.y, 150., 
-                        Filter(
-                            function()
-                                local target = GetFilterUnit()
-                                if unit.isEnemy(target) then
-                                    bloodEffect.x = target.x
-                                    bloodEffect.y = target.y
-                                    bloodEffect.create().destroy()
-                                    unit.damageTarget(target, unit.damage, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
-                                end
-                            end
-                        )
-                    )
-                end, 0.05
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    return unit.hasAbility('A001')
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Possessed = {}
-_Abilities.Possessed.new = function()
-    local self = {}
-    local events = {}
-    local clock = Clock()
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local auraEffect = Effect()
-            auraEffect.model = "Effects\\Fountain of Souls.mdx"
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    auraEffect.x = unit.x
-                    auraEffect.y = unit.y
-                    auraEffect.z = unit.z
-                end, 0.01
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if unit.hasAbility('A001') then
-                        if auraEffect.handle == nil then
-                            auraEffect.create()
-                        end
-                        return true
-                    else
-                        if auraEffect.handle ~= nil then
-                            auraEffect.destroy()
-                        end
-                        return false
-                    end
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
---_Abilities.Reaper_1 = {}
---_Abilities.Reaper_1.new = function()
---    local self = {}
---    local events = {}
---    local clock = Clock()
---    
---    function self.apply(unit)
---        if events.unit == nil then
---            local summonEffect = Effect()
---            summonEffect.model = "Models\\Reaper 1.mdx"
---            summonEffect.scale = 1.5
---            local tx = nil
---            local ty = nil
---            clock.schedule_interval(
---                function(triggeringClock, triggeringSchedule)
---                    if tx == nil or ty == nil then
---                        tx = summonEffect.x
---                        ty = summonEffect.y
---                    end
---                    local cx = summonEffect.x
---                    local cy = summonEffect.y
---                    local a = unit.face + 180.
---                    local ux = unit.x
---                    local uy = unit.y
---                    local dx = tx - ux
---                    local dy = ty - uy
---                    local dist = SquareRoot(dx * dx + dy * dy)
---                    if dist > 800. then
---                        local otherDist = GetRandomReal(400, 600)
---                        local rad = GetRandomReal(0., math.pi * 2)
---                        tx = ux + otherDist * Cos(rad)
---                        ty = uy + otherDist * Sin(rad)
---                    else
---                        local dx = tx - cx
---                        local dy = ty - cy
---                        local dist = SquareRoot(dx * dx + dy * dy)
---                        if dist > 1. then
---                            local rad = Atan2(dy, dx)
---                            local increment = 0.
---                            if RAbsBJ(summonEffect.yaw - rad) > 0.001 then
---                                local diff = RAbsBJ(summonEffect.yaw - rad)
---                                increment = 0. * (math.pi - diff) / math.pi
---                                if diff > 0.035 then
---                                    if summonEffect.yaw < rad then
---                                        summonEffect.yaw = summonEffect.yaw + 0.034
---                                    else
---                                        summonEffect.yaw = summonEffect.yaw - 0.034
---                                    end
---                                    if summonEffect.yaw > math.pi * 2 then
---                                        summonEffect.yaw = summonEffect.yaw - math.pi * 2
---                                    end
---                                else
---                                    summonEffect.yaw = rad
---                                end
---                            else
---                                increment = 0.3 + 0.1 * dist / 70
---                            end
---                            summonEffect.x = cx + increment * Cos(rad)
---                            summonEffect.y = cy + increment * Sin(rad)
---                            if increment > 0.05 then
---                                if summonEffect.current ~=  ANIM_TYPE_WALK then
---                                    summonEffect.play(ANIM_TYPE_WALK)
---                                end
---                            end
---                        elseif dist > 0.01 then
---                            summonEffect.x = tx
---                            summonEffect.y = ty
---                        elseif GetRandomInt(0, 1000) == 1 then
---                            local otherDist = GetRandomReal(400, 700)
---                            local rad = GetRandomReal(0., math.pi * 2)
---                            tx = ux + otherDist * Cos(rad)
---                            ty = uy + otherDist * Sin(rad)
---                        else
---                            if summonEffect.current ~=  ANIM_TYPE_STAND then
---                                summonEffect.play(ANIM_TYPE_STAND)
---                            end
---                        end
---                    end
---                end, 0.005
---            ).setCondition(
---                function(triggeringClock, triggeringSchedule)
---                    if unit.hasAbility('A005') then
---                        if summonEffect.handle == nil then
---                            local distance = GetRandomReal(0, 400)
---                            local rad = GetRandomReal(0., math.pi * 2)
---                            summonEffect.yaw = GetRandomReal(0., math.pi * 2)
---                            summonEffect.x = unit.x + distance * Cos(rad)
---                            summonEffect.y = unit.y + distance * Sin(rad)
---                            summonEffect.create()
---                        end
---                        return true
---                    else
---                        if summonEffect.handle ~= nil then
---                            summonEffect.destroy()
---                        end
---                        return false
---                    end
---                end
---            )
---        end
---    end
---
---    function self.remove(unit)
---        if events.unit ~= nil then
---            unit.unbind(events.unit)
---            events.unit = nil
---        end
---    end
---
---    clock.start()
---
---    return self
---end
-
-_Abilities.Reaper_1 = {}
-_Abilities.Reaper_1.new = function()
-    local self = {}
-    local events = {}
-    local clock = Clock()
-    local slashEffect = Effect()
-    slashEffect.scale = 2.0
-    slashEffect.model = "Effects\\Coup de Grace Purple.mdx"
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local summonUnit = nil 
-            local tx = nil
-            local ty = nil
-            local auraEffect = Effect()
-            auraEffect.model = "Effects\\Malevolence Aura Purple.mdx"
-            auraEffect.scale = 1.5
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    if tx == nil or ty == nil then
-                        tx = summonUnit.x
-                        ty = summonUnit.y
-                    end
-                    local cx = summonUnit.x
-                    local cy = summonUnit.y
-                    local a = unit.face + 180.
-                    local ux = unit.x
-                    local uy = unit.y
-                    local dx = tx - ux
-                    local dy = ty - uy
-                    local dist = SquareRoot(dx * dx + dy * dy)
-                    auraEffect.x = summonUnit.x
-                    auraEffect.y = summonUnit.y
-                    auraEffect.z = summonUnit.z
-                    if dist > 800. then
-                        local otherDist = GetRandomReal(400, 600)
-                        local rad = GetRandomReal(0., math.pi * 2)
-                        tx = ux + otherDist * Cos(rad)
-                        ty = uy + otherDist * Sin(rad)
-                        summonUnit.issueOrder("move", tx, ty)
-                    else
-                        local dx = tx - cx
-                        local dy = ty - cy
-                        local dist = SquareRoot(dx * dx + dy * dy)
-                        if dist > 1. then
-                            local rad = Atan2(dy, dx)
-                            local increment = 200 + 200 * 0.03 * dist / 70
-                            summonUnit.ms = increment
-                        elseif GetRandomInt(0, 1000) == 1 then
-                            local otherDist = GetRandomReal(400, 700)
-                            local rad = GetRandomReal(0., math.pi * 2)
-                            tx = ux + otherDist * Cos(rad)
-                            ty = uy + otherDist * Sin(rad)
-                            summonUnit.issueOrder("move", tx, ty)
-                        end
-                    end
-                end, 0.005
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if unit.hasAbility('A005') then
-                        if summonUnit == nil then
-                            local distance = GetRandomReal(0, 400)
-                            local deg = GetRandomReal(0., 360.)
-                            local rad = deg * bj_DEGTORAD
-                            summonUnit = unit.owner.createUnit('h001', unit.x + distance * Cos(rad), unit.y + distance * Sin(rad), deg)
-                            summonUnit.addAbility('Aloc')
-                            auraEffect.create()
-                            summonUnit.bind("on_attack",
-                                function(source, target)
-                                    local rad = Atan2(target.y - source.y, target.x - source.x)
-                                    slashEffect.x = source.x + 50. * Cos(rad)
-                                    slashEffect.y = source.y + 50. * Sin(rad)
-                                    slashEffect.yaw = rad
-                                    slashEffect.create().destroy()
-                                end
-                            )
-                            summonUnit.bind("on_damage_pre",
-                                function(source, target, attack)
-                                    BlzSetEventDamage(0)
-                                    unit.damageTarget(target, unit.damage * 5.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
-                                end
-                            )
-                            --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
-                        end
-                        return true
-                    else
-                        if summonUnit ~= nil then
-                            auraEffect.destroy()
-                            summonUnit.remove()
-                        end
-                        return false
-                    end
-                end
-            )
-            unit.bind("on_damage_after",
-                function(source, target, attack)
-                    summonUnit.issueOrder("attack", target)
-                end
-            ).setCondition(
-                function(source, target, attack)
-                    return source.hasAbility('A005') and attack.isAttack and summonUnit ~= nil
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Reaper_2 = {}
-_Abilities.Reaper_2.new = function()
-    local self = {}
-    local events = {}
-    local clock = Clock()
-    local group = CreateGroup()
-    local explodeEffect = Effect()
-    explodeEffect.model = "Effects\\Soul Discharge Red.mdx"
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local summonUnit = nil 
-            local tx = nil
-            local ty = nil 
-            local cooldown = 0
-            local auraEffect = Effect()
-            auraEffect.model = "Effects\\Malevolence Aura Red.mdx"
-            auraEffect.scale = 1.5
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    auraEffect.x = summonUnit.x
-                    auraEffect.y = summonUnit.y
-                    auraEffect.z = summonUnit.z
-                    if cooldown > 0 then
-                        cooldown = cooldown - 1
-                    end
-                    if cooldown <= 0 then
-                        if tx == nil or ty == nil then
-                            tx = summonUnit.x
-                            ty = summonUnit.y
-                        end
-                        local cx = summonUnit.x
-                        local cy = summonUnit.y
-                        local a = unit.face + 180.
-                        local ux = unit.x
-                        local uy = unit.y
-                        local dx = tx - ux
-                        local dy = ty - uy
-                        local dist = SquareRoot(dx * dx + dy * dy)
-                        if dist > 800. then
-                            local otherDist = GetRandomReal(400, 600)
-                            local rad = GetRandomReal(0., math.pi * 2)
-                            tx = ux + otherDist * Cos(rad)
-                            ty = uy + otherDist * Sin(rad)
-                            summonUnit.issueOrder("move", tx, ty)
-                        else
-                            local dx = tx - cx
-                            local dy = ty - cy
-                            local dist = SquareRoot(dx * dx + dy * dy)
-                            if dist > 1. then
-                                local rad = Atan2(dy, dx)
-                                local increment = 200 + 200 * 0.03 * dist / 70
-                                summonUnit.ms = increment
-                            elseif GetRandomInt(0, 1000) == 1 then
-                                local otherDist = GetRandomReal(400, 700)
-                                local rad = GetRandomReal(0., math.pi * 2)
-                                tx = ux + otherDist * Cos(rad)
-                                ty = uy + otherDist * Sin(rad)
-                                summonUnit.issueOrder("move", tx, ty)
-                            end
-                        end
-                    end
-                end, 0.005
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if unit.hasAbility('A005') then
-                        if summonUnit == nil then
-                            local distance = GetRandomReal(0, 400)
-                            local deg = GetRandomReal(0., 360.)
-                            local rad = deg * bj_DEGTORAD
-                            summonUnit = unit.owner.createUnit('h002', unit.x + distance * Cos(rad), unit.y + distance * Sin(rad), deg)
-                            summonUnit.addAbility('Aloc')
-                            auraEffect.create()
-                            summonUnit.bind("on_attack",
-                                function(source, target)
-                                    BlzUnitInterruptAttack(source.handle)
-                                    cooldown = math.floor(9.3 / 0.005)
-                                    local rad = (source.face - 5.) * bj_DEGTORAD
-                                    local x = source.x + 295. * Cos(rad)
-                                    local y = source.y + 295. * Sin(rad)
-                                    source.animation = "Spell Eight"
-                                    clock.schedule_once(
-                                        function(triggeringClock, triggeringSchedule)
-                                            local dist = 0
-                                            clock.schedule_interval(
-                                                function(triggeringClock, triggeringSchedule)
-                                                    dist = dist + 100
-                                                    for i = 0, 12 do
-                                                        local rad = i * 0.5236
-                                                        local x2 = x + dist * Cos(rad)
-                                                        local y2 = y + dist * Sin(rad)
-                                                        explodeEffect.x = x2
-                                                        explodeEffect.y = y2
-                                                        explodeEffect.create().destroy()
-                                                        GroupEnumUnitsInRange(group, x2, y2, 150., 
-                                                            Filter(
-                                                                function()
-                                                                    local target = GetFilterUnit()
-                                                                    if unit.isEnemy(target) then
-                                                                        unit.damageTarget(target, unit.damage * 30., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                                                                    end
-                                                                end
-                                                            )
-                                                        )
-                                                    end
-                                                    if dist >= 500 then
-                                                        clock.unschedule(triggeringSchedule)
-                                                    end
-                                                end, 0.05
-                                            )
-                                        end, 2.30
-                                    )
-                                end
-                            )
-                            --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
-                        end
-                        return true
-                    else
-                        if summonUnit ~= nil then
-                            auraEffect.destroy()
-                            summonUnit.remove()
-                        end
-                        return false
-                    end
-                end
-            )
-            unit.bind("on_damage_after",
-                function(source, target, attack)
-                    summonUnit.issueOrder("attack", target)
-                end
-            ).setCondition(
-                function(source, target, attack)
-                    return source.hasAbility('A005') and attack.isAttack and summonUnit ~= nil and cooldown <= 0.
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Reaper_3 = {}
-_Abilities.Reaper_3.new = function()
-    local self = {}
-    local events = {}
-    local clock = Clock()
-    local group = CreateGroup()
-    local bloodEffect = Effect()
-    bloodEffect.model = "Objects\\Spawnmodels\\Human\\HumanBlood\\HumanBloodLarge0.mdl"
-    bloodEffect.scale = 1.2
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local summonUnit = nil 
-            local tx = nil
-            local ty = nil 
-            local casting = false
-            local auraEffect = Effect()
-            auraEffect.model = "Effects\\Malevolence Aura Blue.mdx"
-            auraEffect.scale = 1.5
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    auraEffect.x = summonUnit.x
-                    auraEffect.y = summonUnit.y
-                    auraEffect.z = summonUnit.z
-                    if not casting then
-                        if tx == nil or ty == nil then
-                            tx = summonUnit.x
-                            ty = summonUnit.y
-                        end
-                        local cx = summonUnit.x
-                        local cy = summonUnit.y
-                        local a = unit.face + 180.
-                        local ux = unit.x
-                        local uy = unit.y
-                        local dx = tx - ux
-                        local dy = ty - uy
-                        local dist = SquareRoot(dx * dx + dy * dy)
-                        if dist > 800. then
-                            local otherDist = GetRandomReal(400, 600)
-                            local rad = GetRandomReal(0., math.pi * 2)
-                            tx = ux + otherDist * Cos(rad)
-                            ty = uy + otherDist * Sin(rad)
-                            summonUnit.issueOrder("move", tx, ty)
-                        else
-                            local dx = tx - cx
-                            local dy = ty - cy
-                            local dist = SquareRoot(dx * dx + dy * dy)
-                            if dist > 1. then
-                                local rad = Atan2(dy, dx)
-                                local increment = 200 + 200 * 0.03 * dist / 70
-                                summonUnit.ms = increment
-                            elseif GetRandomInt(0, 1000) == 1 then
-                                local otherDist = GetRandomReal(400, 700)
-                                local rad = GetRandomReal(0., math.pi * 2)
-                                tx = ux + otherDist * Cos(rad)
-                                ty = uy + otherDist * Sin(rad)
-                                summonUnit.issueOrder("move", tx, ty)
-                            end
-                        end
-                    end
-                end, 0.005
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if unit.hasAbility('A005') then
-                        if summonUnit == nil then
-                            local distance = GetRandomReal(0, 400)
-                            local deg = GetRandomReal(0., 360.)
-                            local rad = deg * bj_DEGTORAD
-                            summonUnit = unit.owner.createUnit('h006', unit.x + distance * Cos(rad), unit.y + distance * Sin(rad), deg)
-                            summonUnit.addAbility('Aloc')
-                            auraEffect.create()
-                            summonUnit.bind("on_attack",
-                                function(source, target)
-                                    casting = true
-                                    BlzUnitInterruptAttack(source.handle)
-                                    local rad = Atan2(target.y - source.y, target.x - source.x)
-                                    local x = source.x
-                                    local y = source.y
-                                    source.animation = 4
-                                    clock.schedule_once(
-                                        function(triggeringClock, triggeringSchedule)
-                                            local progress = 0.0
-                                            local cosRes = Cos(rad)
-                                            local sinRes = Sin(rad)
-                                            source.animation = 11
-                                            clock.schedule_interval(
-                                                function(triggeringClock, triggeringSchedule)
-                                                    progress = progress + 0.005
-                                                    local dist = 1000 * AnimationTransition.in_out_sine(progress)
-                                                    local x2 = x + dist * cosRes
-                                                    local y2 = y + dist * sinRes
-                                                    source.x = x2
-                                                    source.y = y2
-                                                    GroupEnumUnitsInRange(group, x2, y2, 150., 
-                                                        Filter(
-                                                            function()
-                                                                local target = GetFilterUnit()
-                                                                if unit.isEnemy(target) then
-                                                                    bloodEffect.x = target.x
-                                                                    bloodEffect.y = target.y
-                                                                    bloodEffect.create().destroy()
-                                                                    unit.damageTarget(target, unit.damage, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                                                                end
-                                                            end
-                                                        )
-                                                    )
-                                                    if progress >= 1. then
-                                                        casting = false
-                                                        source.animation = "stand"
-                                                        clock.unschedule(triggeringSchedule)
-                                                    end
-                                                end, 0.01
-                                            )
-                                        end, 1.0
-                                    )
-                                end
-                            )
-                            --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
-                        end
-                        return true
-                    else
-                        if summonUnit ~= nil then
-                            auraEffect.destroy()
-                            summonUnit.remove()
-                        end
-                        return false
-                    end
-                end
-            )
-            unit.bind("on_damage_after",
-                function(source, target, attack)
-                    summonUnit.issueOrder("attack", target)
-                end
-            ).setCondition(
-                function(source, target, attack)
-                    return source.hasAbility('A005') and attack.isAttack and summonUnit ~= nil and not casting
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Soul_Steal = {}
-_Abilities.Soul_Steal.new = function()
-    local self = {}
-    local events = {}
-    local clock = Clock()
-    local healEffect = Effect()
-    healEffect.model = "Effects\\Grim Curse.mdx"
-    healEffect.yaw = 270. * bj_DEGTORAD
-
-    function self.apply(unit)
-        if events.unit == nil then
-            unit.bind("on_damage_after",
-                function(source, target, attack)
-                    local healAmount = GetEventDamage()
-                    local bulletEffect = Effect()
-                    bulletEffect.model = "Effects\\Purple Missile.mdx"
-                    bulletEffect.x = target.x
-                    bulletEffect.y = target.y
-                    bulletEffect.create()
-                    clock.schedule_interval(
-                        function(triggeringClock, triggeringSchedule)
-                            local dx = unit.x - bulletEffect.x
-                            local dy = unit.y - bulletEffect.y
-                            local dist = SquareRoot(dx * dx + dy * dy)
-                            if dist > 5. then
-                                local rad = Atan2(dy, dx)
-                                bulletEffect.x = bulletEffect.x + 5. * Cos(rad)
-                                bulletEffect.y = bulletEffect.y + 5. * Sin(rad)
-                                bulletEffect.z = unit.z
-                            else
-                                bulletEffect.x = unit.x
-                                bulletEffect.y = unit.y
-                                bulletEffect.z = unit.z
-                                bulletEffect.destroy()
-                                healEffect.x = unit.x
-                                healEffect.y = unit.y
-                                healEffect.z = unit.z
-                                healEffect.create().destroy()
-                                unit.hp = unit.hp + healAmount
-                                clock.unschedule(triggeringSchedule)
-                            end
-                        end, 0.005
-                    )
-                end
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    return unit.hasAbility('A005')
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Grim_Reaper = {}
-_Abilities.Grim_Reaper.new = function()
-    local self = {}
-    local events = {}
-    local clock = Clock()
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local auraEffect = Effect()
-            auraEffect.model = "Effects\\Grim Reaper Aura Origin.mdx"
-            local overheadEffect = Effect()
-            overheadEffect.model = "Effects\\Grim Reaper Aura Overhead.mdx"
-            overheadEffect.yaw = 270. * bj_DEGTORAD
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    auraEffect.x = unit.x
-                    auraEffect.y = unit.y
-                    auraEffect.z = unit.z
-                    overheadEffect.x = unit.x
-                    overheadEffect.y = unit.y
-                    overheadEffect.z = unit.z + 100
-                end, 0.01
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if unit.hasAbility('A005') then
-                        if auraEffect.handle == nil then
-                            auraEffect.create()
-                            overheadEffect.create()
-                        end
-                        return true
-                    else
-                        if auraEffect.handle ~= nil then
-                            auraEffect.destroy()
-                            overheadEffect.destroy()
-                        end
-                        return false
-                    end
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Overload = {}
-_Abilities.Overload.new = function()
-    local self = {}
-    local explodeEffect = Effect()
-    explodeEffect.scale = 1.0
-    explodeEffect.model = "Effects\\Shining Flare.mdx"
-    local events = {}
-    local clock = Clock()
-    local group = CreateGroup()
-
-    function self.apply(unit)
-        if events.unit == nil then
-            events.unit = unit.bind("on_damaged_after",
-                function(source, target, attack)
-                    if GetRandomInt(1, 10) == 1 then
-                        local caster = target
-                        local x = caster.x
-                        local y = caster.y
-                        local dist = 0
-                        clock.schedule_interval(
-                            function(triggeringClock, triggeringSchedule)
-                                dist = dist + 100
-                                for i = 0, 12 do
-                                    local rad = i * 0.5236
-                                    local x2 = x + dist * Cos(rad)
-                                    local y2 = y + dist * Sin(rad)
-                                    explodeEffect.x = x2
-                                    explodeEffect.y = y2
-                                    explodeEffect.create().destroy()
-                                    GroupEnumUnitsInRange(group, x2, y2, 150., 
-                                        Filter(
-                                            function()
-                                                local target = GetFilterUnit()
-                                                if caster.isEnemy(target) then
-                                                    caster.damageTarget(target, caster.damage * 30., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                                                end
-                                            end
-                                        )
-                                    )
-                                end
-                                if dist >= 500 then
-                                    clock.unschedule(triggeringSchedule)
-                                end
-                            end, 0.05
-                        )
-                    end
-                end
-            ).setCondition(
-                function(source, target, attack)
-                    return target.hasAbility('A002') and attack.isAttack
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Heaven_Justice = {}
-_Abilities.Heaven_Justice.new = function()
-    local self = {}
-    local events = {}
-    local clock = Clock()
-    local explodeEffect = Effect()
-    explodeEffect.scale = 1.3
-    explodeEffect.model = "Effects\\Shining Flare.mdx"
-    local afterEffect = Effect()
-    afterEffect.scale = 0.7
-    afterEffect.model = "Effects\\Earth Shock.mdx"
-    local pointEffect = Effect()
-    pointEffect.scale = 1.0
-    pointEffect.model = "Effects\\Blight.mdx"
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local count = 0
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    count = count + 1
-                    if count >= 200 then
-                        count = 0
-                        local dist = GetRandomReal(300, 700)
-                        local rad = GetRandomReal(0., math.pi * 2)
-                        local x = unit.x + dist * Cos(rad)
-                        local y = unit.y + dist * Sin(rad)
-                        local auraEffect = Effect()
-                        auraEffect.model = "Effects\\Holy Aura.mdx"
-                        auraEffect.x = x
-                        auraEffect.y = y
-                        auraEffect.scale = 1.0
-                        auraEffect.create()
-                        local angelUnit = unit.owner.createUnit('h003', x, y, 270.)
-                        angelUnit.addAbility('Aloc')
-                        angelUnit.animation = "birth"
-                        clock.schedule_once(
-                            function(triggeringClock, triggeringSchedule)
-                                angelUnit.animation = 2
-                                clock.schedule_once(
-                                    function(triggeringClock, triggeringSchedule)
-                                        angelUnit.animation = 5
-                                        clock.schedule_once(
-                                            function(triggeringClock, triggeringSchedule)
-                                                angelUnit.remove()
-                                                auraEffect.destroy()
-                                            end, 1.9
-                                        )
-                                    end, 2.55
-                                )
-                                clock.schedule_once(
-                                    function(triggeringClock, triggeringSchedule)
-                                        local max = math.pi * 2
-                                        for i = 0, 35 do
-                                            local dist = GetRandomReal(0., 850.)
-                                            local rad = GetRandomReal(0., max)
-                                            local x2 = x + dist * Cos(rad)
-                                            local y2 = y + dist * Sin(rad)
-                                            pointEffect.x = x2
-                                            pointEffect.y = y2
-                                            pointEffect.create().destroy()
-                                            clock.schedule_once(
-                                                function(triggeringClock, triggeringSchedule)
-                                                    explodeEffect.x = x2
-                                                    explodeEffect.y = y2
-                                                    explodeEffect.create().destroy()
-                                                    afterEffect.x = x2
-                                                    afterEffect.y = y2
-                                                    afterEffect.create().destroy()
-                                                    GroupEnumUnitsInRange(group, x2, y2, 150., 
-                                                        Filter(
-                                                            function()
-                                                                local target = GetFilterUnit()
-                                                                if unit.isEnemy(target) then
-                                                                    unit.damageTarget(target, unit.damage * 30., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                                                                end
-                                                            end
-                                                        )
-                                                    )
-                                                end, 1.05
-                                            )
-                                        end
-                                    end, 1.1
-                                )
-                            end, 1.3
-                        )
-                    end
-                end, 0.05
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    return unit.hasAbility('A002')
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Impale = {}
-_Abilities.Impale.new = function()
-    local self = {}
-    local events = {}
-    local clock = Clock()
-    local group = CreateGroup()
-    local impaleEffect = Effect()
-    impaleEffect.scale = 1.0
-    impaleEffect.model = "Effects\\Holy Light.mdx"
-
-    function self.apply(unit)
-        if events.unit == nil then
-            local count = 0
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    count = count + 1
-                    if count >= 60 then
-                        count = 0
-                        GroupEnumUnitsInRange(group, unit.x, unit.y, 850., 
-                            Filter(
-                                function()
-                                    local target = GetFilterUnit()
-                                    if unit.isEnemy(target) then
-                                        impaleEffect.x = target.x
-                                        impaleEffect.y = target.y
-                                        impaleEffect.create().destroy()
-                                        unit.damageTarget(target, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                                    end
-                                end
-                            )
-                        )
-                    end
-                end, 0.05
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    return unit.hasAbility('A002')
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Judgement = {}
-_Abilities.Judgement.new = function()
-    local self = {}
-    local impaleEffect = Effect()
-    impaleEffect.scale = 1.0
-    impaleEffect.model = "Effects\\Holy Light.mdx"
-    local events = {}
-    local clock = Clock()
-    local group = CreateGroup()
-
-    function self.apply(unit)
-        if events.unit == nil then
-            events.unit = unit.bind("on_damage_after",
-                function(source, target, attack)
-                    if GetRandomInt(1, 100) == 1 then
-                        local x = source.x
-                        local y = source.y
-                        local baseRad = bj_DEGTORAD * source.face
-                        local dist = 0
-                        clock.schedule_interval(
-                            function(triggeringClock, triggeringSchedule)
-                                dist = dist + 80
-                                for i = 0, 3 do
-                                    local rad = baseRad - 0.3 + 0.3 * i
-                                    local x2 = x + dist * Cos(rad)
-                                    local y2 = y + dist * Sin(rad)
-                                    impaleEffect.x = x2
-                                    impaleEffect.y = y2
-                                    impaleEffect.create().destroy()
-                                    GroupEnumUnitsInRange(group, x2, y2, 100., 
-                                        Filter(
-                                            function()
-                                                local target = GetFilterUnit()
-                                                if source.isEnemy(target) then
-                                                    source.damageTarget(target, source.damage * 30., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                                                end
-                                            end
-                                        )
-                                    )
-                                end
-                                if dist >= 480 then
-                                    clock.unschedule(triggeringSchedule)
-                                end
-                            end, 0.05
-                        )
-                    end
-                end
-            ).setCondition(
-                function(source, target, attack)
-                    return source.hasAbility('A002') and attack.isAttack
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Temple_Knight = {}
-_Abilities.Temple_Knight.new = function()
-    local self = {}
-    local events = {}
-    local clock = Clock()
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local auraEffect = Effect()
-            auraEffect.model = "Effects\\Archangel Aura.mdx"
-            auraEffect.scale = 1.4
-            auraEffect.yaw = bj_DEGTORAD * 270.
-            local floatingEffect = Effect()
-            floatingEffect.model = "Effects\\Floating Swords.mdx"
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    auraEffect.x = unit.x
-                    auraEffect.y = unit.y
-                    auraEffect.z = unit.z
-                    floatingEffect.x = unit.x
-                    floatingEffect.y = unit.y
-                    floatingEffect.z = unit.z
-                    floatingEffect.yaw = unit.face * bj_DEGTORAD
-                end, 0.01
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if unit.hasAbility('A002') then
-                        if auraEffect.handle == nil then
-                            auraEffect.create()
-                            floatingEffect.create()
-                        end
-                        return true
-                    else
-                        if auraEffect.handle ~= nil then
-                            auraEffect.create()
-                            floatingEffect.destroy()
-                        end
-                        return false
-                    end
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Wolf = {}
-_Abilities.Wolf.new = function()
-    local self = {}
-    local events = {}
-    local clock = Clock()
-    local bloodEffect = Effect()
-    bloodEffect.model = "Objects\\Spawnmodels\\Human\\HumanBlood\\HumanBloodLarge0.mdl"
-    bloodEffect.scale = 1.2
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local summonUnit = nil 
-            local tx = nil
-            local ty = nil
-            local level = 0
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    if level ~= unit.getAbilityLevel('A010') then
-                        level = unit.getAbilityLevel('A010')
-                        summonUnit.scale = 0.8 + (level - 1) * 0.06
-                        local levelUpEffect = Effect()
-                        levelUpEffect.model = "Effects\\Heal Green.blp"
-                        levelUpEffect.attachTo(summonUnit, "origin")
-                        clock.schedule_once(
-                            function(triggeringClock, triggeringSchedule)
-                                levelUpEffect.destroy()
-                            end, 3.0
-                        )
-                    end
-                    if tx == nil or ty == nil then
-                        tx = summonUnit.x
-                        ty = summonUnit.y
-                    end
-                    local cx = summonUnit.x
-                    local cy = summonUnit.y
-                    local a = unit.face + 180.
-                    local ux = unit.x
-                    local uy = unit.y
-                    local dx = tx - ux
-                    local dy = ty - uy
-                    local dist = SquareRoot(dx * dx + dy * dy)
-                    if dist > 800. then
-                        local otherDist = GetRandomReal(400, 600)
-                        local rad = GetRandomReal(0., math.pi * 2)
-                        tx = ux + otherDist * Cos(rad)
-                        ty = uy + otherDist * Sin(rad)
-                        summonUnit.issueOrder("move", tx, ty)
-                    else
-                        local dx = tx - cx
-                        local dy = ty - cy
-                        local dist = SquareRoot(dx * dx + dy * dy)
-                        if dist > 1. then
-                            local rad = Atan2(dy, dx)
-                            local increment = 200 + 200 * 0.03 * dist / 70
-                            summonUnit.ms = increment
-                        elseif GetRandomInt(0, 1000) == 1 then
-                            local otherDist = GetRandomReal(400, 700)
-                            local rad = GetRandomReal(0., math.pi * 2)
-                            tx = ux + otherDist * Cos(rad)
-                            ty = uy + otherDist * Sin(rad)
-                            summonUnit.issueOrder("move", tx, ty)
-                        end
-                    end
-                end, 0.005
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if unit.hasAbility('A010') then
-                        if summonUnit == nil then
-                            local distance = GetRandomReal(0, 400)
-                            local deg = GetRandomReal(0., 360.)
-                            local rad = deg * bj_DEGTORAD
-                            summonUnit = unit.owner.createUnit('h011', unit.x + distance * Cos(rad), unit.y + distance * Sin(rad), deg)
-                            summonUnit.addAbility('Aloc')
-                            summonUnit.bind("on_attack",
-                                function(source, target)
-                                    local rad = Atan2(target.y - source.y, target.x - source.x)
-                                    bloodEffect.x = source.x + 140. * Cos(rad)
-                                    bloodEffect.y = source.y + 140. * Sin(rad)
-                                    bloodEffect.yaw = rad
-                                    bloodEffect.create().destroy()
-                                end
-                            )
-                            summonUnit.bind("on_damage_pre",
-                                function(source, target, attack)
-                                    BlzSetEventDamage(0)
-                                    unit.damageTarget(target, unit.damage * 2.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
-                                end
-                            )
-                            --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
-                        end
-                        return true
-                    else
-                        if summonUnit ~= nil then
-                            auraEffect.destroy()
-                            summonUnit.remove()
-                        end
-                        return false
-                    end
-                end
-            )
-            unit.bind("on_damage_after",
-                function(source, target, attack)
-                    summonUnit.issueOrder("attack", target)
-                end
-            ).setCondition(
-                function(source, target, attack)
-                    return source.hasAbility('A010') and attack.isAttack and summonUnit ~= nil
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Bear = {}
-_Abilities.Bear.new = function()
-    local self = {}
-    local events = {}
-    local clock = Clock()
-    local bloodEffect = Effect()
-    bloodEffect.model = "Objects\\Spawnmodels\\Human\\HumanBlood\\HumanBloodLarge0.mdl"
-    bloodEffect.scale = 1.2
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local summonUnit = nil 
-            local tx = nil
-            local ty = nil
-            local level = 0
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    if level ~= unit.getAbilityLevel('A010') then
-                        level = unit.getAbilityLevel('A010')
-                        summonUnit.scale = 1.0 + (level - 1) * 0.06
-                        local levelUpEffect = Effect()
-                        levelUpEffect.model = "Effects\\Heal Gold.blp"
-                        levelUpEffect.attachTo(summonUnit, "origin")
-                        clock.schedule_once(
-                            function(triggeringClock, triggeringSchedule)
-                                levelUpEffect.destroy()
-                            end, 3.0
-                        )
-                    end
-                    if tx == nil or ty == nil then
-                        tx = summonUnit.x
-                        ty = summonUnit.y
-                    end
-                    local cx = summonUnit.x
-                    local cy = summonUnit.y
-                    local a = unit.face + 180.
-                    local ux = unit.x
-                    local uy = unit.y
-                    local dx = tx - ux
-                    local dy = ty - uy
-                    local dist = SquareRoot(dx * dx + dy * dy)
-                    if dist > 800. then
-                        local otherDist = GetRandomReal(400, 600)
-                        local rad = GetRandomReal(0., math.pi * 2)
-                        tx = ux + otherDist * Cos(rad)
-                        ty = uy + otherDist * Sin(rad)
-                        summonUnit.issueOrder("move", tx, ty)
-                    else
-                        local dx = tx - cx
-                        local dy = ty - cy
-                        local dist = SquareRoot(dx * dx + dy * dy)
-                        if dist > 1. then
-                            local rad = Atan2(dy, dx)
-                            local increment = 200 + 200 * 0.03 * dist / 70
-                            summonUnit.ms = increment
-                        elseif GetRandomInt(0, 1000) == 1 then
-                            local otherDist = GetRandomReal(400, 700)
-                            local rad = GetRandomReal(0., math.pi * 2)
-                            tx = ux + otherDist * Cos(rad)
-                            ty = uy + otherDist * Sin(rad)
-                            summonUnit.issueOrder("move", tx, ty)
-                        end
-                    end
-                end, 0.005
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if unit.hasAbility('A010') then
-                        if summonUnit == nil then
-                            local distance = GetRandomReal(0, 400)
-                            local deg = GetRandomReal(0., 360.)
-                            local rad = deg * bj_DEGTORAD
-                            summonUnit = unit.owner.createUnit('h012', unit.x + distance * Cos(rad), unit.y + distance * Sin(rad), deg)
-                            summonUnit.addAbility('Aloc')
-                            summonUnit.bind("on_attack",
-                                function(source, target)
-                                    local rad = Atan2(target.y - source.y, target.x - source.x)
-                                    bloodEffect.x = source.x + 140. * Cos(rad)
-                                    bloodEffect.y = source.y + 140. * Sin(rad)
-                                    bloodEffect.yaw = rad
-                                    bloodEffect.create().destroy()
-                                end
-                            )
-                            summonUnit.bind("on_damage_pre",
-                                function(source, target, attack)
-                                    BlzSetEventDamage(0)
-                                    unit.damageTarget(target, unit.damage * 2.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
-                                end
-                            )
-                            --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
-                        end
-                        return true
-                    else
-                        if summonUnit ~= nil then
-                            auraEffect.destroy()
-                            summonUnit.remove()
-                        end
-                        return false
-                    end
-                end
-            )
-            unit.bind("on_damage_after",
-                function(source, target, attack)
-                    summonUnit.issueOrder("attack", target)
-                end
-            ).setCondition(
-                function(source, target, attack)
-                    return source.hasAbility('A010') and attack.isAttack and summonUnit ~= nil
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Frost_Arrow = {}
-_Abilities.Frost_Arrow.new = function()
-    local self = {}
-    local clock = Clock()
-
-
-    function self.apply(unit)
-        unit.bind("on_damage_after",
-            function(source, target, attack)
-                local amount = 10
-                local offset = 100.
-                for current = 1, amount do
-                    local rad = (6.28319 / amount) * current
-                    local x = target.x + 30. * Cos(rad)
-                    local y = target.y + 30. * Sin(rad)
-                    local z = target.z + 200.
-                    local effect = Effect()
-                    effect.model = "Effects\\Freezingsplinter.mdx"
-                    effect.x = x
-                    effect.y = y
-                    effect.z = z
-                    effect.yaw = rad
-                    effect.pitch = 45. * bj_DEGTORAD
-                    effect.create()
-                    local increment = 0
-                    clock.schedule_interval(
-                        function(triggeringClock, triggeringSchedule)
-                            effect.x = x + (offset / (20 - increment)) * Cos(rad)
-                            effect.y = y + (offset / (20 - increment)) * Sin(rad)
-                            effect.z = z - (200 / (20 - increment))
-                            increment = increment + 1
-                            if increment >= 20 then
-                                clock.unschedule(triggeringSchedule)
-                                effect.destroy()
-                            end
-                        end, 0.01
-                    )
-                end
-            end
-        ).setCondition(
-            function(source, target, attack)
-                return source.hasAbility('A003') and attack.isAttack
-            end
-        )
-    end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Boar = {}
-_Abilities.Boar.new = function()
-    local self = {}
-    local events = {}
-    local clock = Clock()
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local summonUnit = nil 
-            local tx = nil
-            local ty = nil
-            local level = 0
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    if level ~= unit.getAbilityLevel('A010') then
-                        level = unit.getAbilityLevel('A010')
-                        summonUnit.scale = 1.2 + (level - 1) * 0.06
-                        local levelUpEffect = Effect()
-                        levelUpEffect.model = "Effects\\Heal Orange.blp"
-                        levelUpEffect.attachTo(summonUnit, "origin")
-                        clock.schedule_once(
-                            function(triggeringClock, triggeringSchedule)
-                                levelUpEffect.destroy()
-                            end, 3.0
-                        )
-                    end
-                    if tx == nil or ty == nil then
-                        tx = summonUnit.x
-                        ty = summonUnit.y
-                    end
-                    local cx = summonUnit.x
-                    local cy = summonUnit.y
-                    local a = unit.face + 180.
-                    local ux = unit.x
-                    local uy = unit.y
-                    local dx = tx - ux
-                    local dy = ty - uy
-                    local dist = SquareRoot(dx * dx + dy * dy)
-                    if dist > 800. then
-                        local otherDist = GetRandomReal(400, 600)
-                        local rad = GetRandomReal(0., math.pi * 2)
-                        tx = ux + otherDist * Cos(rad)
-                        ty = uy + otherDist * Sin(rad)
-                        summonUnit.issueOrder("move", tx, ty)
-                    else
-                        local dx = tx - cx
-                        local dy = ty - cy
-                        local dist = SquareRoot(dx * dx + dy * dy)
-                        if dist > 1. then
-                            local rad = Atan2(dy, dx)
-                            local increment = 200 + 200 * 0.03 * dist / 70
-                            summonUnit.ms = increment
-                        elseif GetRandomInt(0, 1000) == 1 then
-                            local otherDist = GetRandomReal(400, 700)
-                            local rad = GetRandomReal(0., math.pi * 2)
-                            tx = ux + otherDist * Cos(rad)
-                            ty = uy + otherDist * Sin(rad)
-                            summonUnit.issueOrder("move", tx, ty)
-                        end
-                    end
-                end, 0.005
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if unit.hasAbility('A010') then
-                        if summonUnit == nil then
-                            local distance = GetRandomReal(0, 400)
-                            local deg = GetRandomReal(0., 360.)
-                            local rad = deg * bj_DEGTORAD
-                            summonUnit = unit.owner.createUnit('h013', unit.x + distance * Cos(rad), unit.y + distance * Sin(rad), deg)
-                            summonUnit.addAbility('Aloc')
-                            summonUnit.bind("on_damage_pre",
-                                function(source, target, attack)
-                                    BlzSetEventDamage(0)
-                                    unit.damageTarget(target, unit.damage * 2.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
-                                end
-                            )
-                            --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
-                        end
-                        return true
-                    else
-                        if summonUnit ~= nil then
-                            auraEffect.destroy()
-                            summonUnit.remove()
-                        end
-                        return false
-                    end
-                end
-            )
-            unit.bind("on_damage_after",
-                function(source, target, attack)
-                    summonUnit.issueOrder("attack", target)
-                end
-            ).setCondition(
-                function(source, target, attack)
-                    return source.hasAbility('A010') and attack.isAttack and summonUnit ~= nil
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
-
-Abilities = {}
-Abilities.new = function()
-    local self = {}
-
-    self.Shadow_Strike = _Abilities.Shadow_Strike.new()
-    self.Blink_Strike = _Abilities.Blink_Strike.new()
-    self.Demon_Control = _Abilities.Demon_Control.new()
-    self.Blade_Dance = _Abilities.Blade_Dance.new()
-    self.Possessed = _Abilities.Possessed.new()
-
-    self.Reaper_1 = _Abilities.Reaper_1.new()
-    self.Reaper_2 = _Abilities.Reaper_2.new()
-    self.Reaper_3 = _Abilities.Reaper_3.new()
-    self.Soul_Steal = _Abilities.Soul_Steal.new()
-    self.Grim_Reaper = _Abilities.Grim_Reaper.new()
-
-    self.Wolf = _Abilities.Wolf.new()
-    self.Bear = _Abilities.Bear.new()
-    self.Boar = _Abilities.Boar.new()
-
-    self.Frost_Arrow = _Abilities.Frost_Arrow.new()
-    
-    self.Overload = _Abilities.Overload.new()
-    self.Heaven_Justice = _Abilities.Heaven_Justice.new()
-    self.Impale = _Abilities.Impale.new()
-    self.Judgement = _Abilities.Judgement.new()
-    self.Temple_Knight = _Abilities.Temple_Knight.new()
-
-    return self
-end
 
 function onInit()
 xpcall(function()
 
     -- Initiate Framework
-    Framework = Engine.new()
-    Gameplay = Game.new()
-    Ability = Abilities.new()
-
-    spawn = Spawn()
-    spawn.x = GetRectCenterX(gg_rct_Example_Spawn)
-    spawn.y = GetRectCenterY(gg_rct_Example_Spawn)
+    local Framework = Engine.new()
 
     -- Edit player 0 (red)
-    player = Player(0)
+    player = Framework.Player(0)
     player.bind("on_leave", 
         function(player)
             print("player leave")
@@ -6015,189 +4637,6 @@ xpcall(function()
     if player.controller == MAP_CONTROL_USER then
         print(player.name .. " is a user")
     end
-
-    if player.state == PLAYER_SLOT_STATE_PLAYING and player.controller == MAP_CONTROL_USER then
-        player.setCameraField(CAMERA_FIELD_TARGET_DISTANCE, 2250., 0.)
-        local unit = player.createUnit('H001', spawn.x, spawn.y, 270.)
-        unit.maxhp = 570
-        unit.hp = 326
-        unit.damage = 150
-        unit.agi = 100
-        unit.attackspeed = 1.0
-        unit.ms = 800
-        unit.level = 10
-        effect = Effect()
-        effect.model = "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdl"
-        unit.bind("on_death",
-            function(unit)
-                unit.respawn(spawn)
-                effect.x = unit.x
-                effect.y = unit.y
-                effect.create().destroy()
-            end
-        ).setCondition(
-            function(unit)
-                return unit.owner == player
-            end
-        )
-
-        --effect = Effect()
-        --effect.model = "Effects\\Fountain of Souls.mdx"
-        --unit.attachEffect(effect, "origin")
-
-        effect = Effect()
-        effect.model = "Effects\\Wings.mdx"
-        unit.attachEffect(effect, "chest")
-
-        --effect = Effect()
-        --effect.model = "Effects\\Ubershield Azure.mdx"
-        --unit.attachEffect(effect, "chest")
-
-        Ability.Shadow_Strike.apply(unit)
-        Ability.Blink_Strike.apply(unit)
-        Ability.Demon_Control.apply(unit)
-        Ability.Blade_Dance.apply(unit)
-        Ability.Possessed.apply(unit)
-
-        Ability.Reaper_1.apply(unit)
-        Ability.Reaper_2.apply(unit)
-        Ability.Reaper_3.apply(unit)
-        Ability.Soul_Steal.apply(unit)
-        Ability.Grim_Reaper.apply(unit)
-
-        Ability.Wolf.apply(unit)
-        Ability.Bear.apply(unit)
-        Ability.Boar.apply(unit)
-
-        Ability.Overload.apply(unit)
-        Ability.Heaven_Justice.apply(unit)
-        Ability.Impale.apply(unit)
-        Ability.Judgement.apply(unit)
-        Ability.Temple_Knight.apply(unit)
-
-        Ability.Frost_Arrow.apply(unit)
-        
-        --unit.bind("on_damaged_pre",
-        --    function(source, target, attack)
-        --        print("unit is about to take damage")
-        --    end
-        --)
-        --unit.bind("on_damaged_after",
-        --    function(source, target, attack)
-        --        print("unit took damage")
-        --    end
-        --)
-        --unit.bind("on_damage_pre",
-        --    function(source, target, attack)
-        --        print("unit is about to deal damage")
-        --    end
-        --)
-        --unit.bind("on_damage_after",
-        --    function(source, target, attack)
-        --        print("unit dealt damage")
-        --    end
-        --)
-
-        print(unit.hp .. " / " .. unit.maxhp)
-        player.bind("on_message",
-            function(player, message)
-                unit.kill()
-            end
-        ).setCondition(
-            function(player, message)
-                return message == "-kill"
-            end
-        )
-    end
-
-    -- Request Player 0 Keyboard
-    --keyboard = Framework.Window.request_keyboard(Player(0))
-    --keyboard.bind("on_key_down", 
-    --    function(triggeringKeyboard, keydata, metakey)
-    --        print("key down")
-    --        print("keycode: " .. keydata[1])
-    --        print("string: " .. keydata[2])
-    --        print("metakey: " .. metakey)
-    --    end
-    --)
-
-    --keyboard.bind("on_key_up", 
-    --    function(triggeringKeyboard, keydata, metakey)
-    --        print("key up")
-    --        print("keycode: " .. keydata[1])
-    --        print("string: " .. keydata[2])
-    --        print("metakey: " .. metakey)
-    --    end
-    --)
-
-    --Framework.Window.bind("on_mouse_down",
-    --    function(triggeringWindow, player, pos, button)
-    --        print("mouse down")
-    --        print("player: " .. player.name)
-    --        print("pos: " .. "(" .. pos[1] .. " | " .. pos[2] .. ")")
-    --        print("key: " .. button[2])
-    --    end
-    --)
-
-    --Framework.Window.bind("on_mouse_up",
-    --    function(triggeringWindow, player, pos, button)
-    --        print("mouse up")
-    --        print("player: " .. player.name)
-    --        print("pos: " .. "(" .. pos[1] .. " | " .. pos[2] .. ")")
-    --        print("key: " .. button[2])
-    --    end
-    --)
-
-    --Framework.Window.bind("on_motion",
-    --    function(triggeringWindow, player, pos)
-    --        print("mouse motion")
-    --        print("player: " .. player.name)
-    --        print("pos: " .. "(" .. pos[1] .. " | " .. pos[2] .. ")")
-    --    end
-    --).setCondition(
-    --    function(triggeringWindow, player, pos)
-    --        return player == Player(0)
-    --    end
-    --)
-
-    player = Player(PLAYER_NEUTRAL_AGGRESSIVE)
-    clock = Clock()
-    clock.start()
-
-    player.bind("on_unitDeath",
-        function(player, unit)
-            local id = unit.id
-            local x = unit.x
-            local y = unit.y
-            local face = unit.face
-            clock.schedule_once(
-                function(triggeringClock, triggeringSchedule)
-                    player.createUnit(id, x, y, face)
-                end, 5.0
-            )
-        end
-    )
-
-    --clock = Clock()
-    --clock.schedule_once(
-    --    function(triggeringClock, triggeringSchedule, arguments)
-    --        print("5 seconds expired " .. arguments)
-    --    end, 5.0, "[once]"
-    --).setCondition(
-    --    function(triggeringClock, triggeringSchedule, arguments)
-    --        print("This condition check is always true")
-    --        return true
-    --    end
-    --)
-
-    --clock.schedule_interval(
-    --    function(triggeringClock, triggeringSchedule, arguments)
-    --        print("7 seconds expired [repeat]")
-    --    end, 7.0
-    --)
-    --clock.start()
-
-    --soundLoader = SoundLoader()
 
 end, print)
 end
