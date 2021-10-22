@@ -18,6 +18,16 @@ Engine.new = function()
     local _Trigger = {}
     local _Effect = {}
 
+    local Clock = {}
+    local SoundLoader = {}
+    local Unit = {}
+    local Group = {}
+    local Item = {}
+    local Trigger = {}
+    local Effect = {}
+    local EventDispatcher = {}
+    local Easing = {}
+
     -- Engine Logger
     local LOG_LEVEL = {
         NONE,
@@ -701,7 +711,6 @@ Engine.new = function()
 
     end
 
-    local Trigger = {}
     Trigger.new = function()
         local status, val = xpcall(_Trigger.new, Log.Error)
         if status then return val end
@@ -829,7 +838,6 @@ Engine.new = function()
         return self
     end
 
-    local EventDispatcher = {}
     EventDispatcher.new = function(types)
         local status, val = xpcall(_EventDispatcher.new, Log.Error, types)
         if status then return val end
@@ -988,7 +996,7 @@ Engine.new = function()
             if status then return val end
         end
 
-        local eventDispatcher = EventDispatcher(
+        local eventDispatcher = EventDispatcher.new(
             {"on_create", "on_destroy"}
         )
         self.bind = eventDispatcher.bind
@@ -1084,7 +1092,6 @@ Engine.new = function()
         return self
     end
 
-    local Effect = {}
     Effect.new = function()
         local status, val = xpcall(_Effect.new, Log.Error)
         if status then return val end
@@ -1119,7 +1126,7 @@ Engine.new = function()
         local self = {}
         local handle = Indexer.add(self, player)
         local name = GetPlayerName(handle)
-        local units = Group()
+        local units = Group.new()
         local mouse = nil
         local keyboard = nil
         local id = GetPlayerId(handle)
@@ -1305,7 +1312,7 @@ Engine.new = function()
             if status then return val end
         end
 
-        local eventDispatcher = EventDispatcher(
+        local eventDispatcher = EventDispatcher.new(
             {"on_leave", "on_message", "on_sync", "on_createUnit",
              "on_unit_death",
              "on_unit_damage_pre", "on_unit_damaged_pre", "on_unit_damage_after", "on_unit_damaged_after", 
@@ -1512,7 +1519,7 @@ Engine.new = function()
             mouse = _Window.request_mouse(self)
             keyboard = _Window.request_keyboard(self)
 
-            Trigger()
+            Trigger.new()
             .registerPlayerEvent(self, EVENT_PLAYER_LEAVE)
             .addAction(
                 function()
@@ -1521,7 +1528,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerChatEvent(self, "", false)
             .addAction(
                 function()
@@ -1530,7 +1537,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerSyncEvent(self, "avalon", false)
             .addAction(trig,
                 function()
@@ -1588,7 +1595,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_DEATH)
             .addAction(
                 function()
@@ -1598,7 +1605,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_DAMAGING)
             .addAction(
                 function()
@@ -1610,7 +1617,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_DAMAGED)
             .addAction(
                 function()
@@ -1622,7 +1629,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_ATTACKED)
             .addAction(
                 function()
@@ -1634,7 +1641,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerUnitEvent(self, EVENT_PLAYER_HERO_LEVEL)
             .addAction(
                 function()
@@ -1644,7 +1651,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_DROP_ITEM)
             .addAction(
                 function()
@@ -1655,7 +1662,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_PICKUP_ITEM)
             .addAction(
                 function()
@@ -1666,7 +1673,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_USE_ITEM)
             .addAction(
                 function()
@@ -1677,7 +1684,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_STACK_ITEM)
             .addAction(
                 function()
@@ -1688,7 +1695,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_SPELL_CHANNEL)
             .addAction(
                 function()
@@ -1698,7 +1705,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_SPELL_CAST)
             .addAction(
                 function()
@@ -1708,7 +1715,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_SPELL_EFFECT)
             .addAction(
                 function()
@@ -1718,7 +1725,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_SPELL_FINISH)
             .addAction(
                 function()
@@ -1728,7 +1735,7 @@ Engine.new = function()
                 end
             )
 
-            Trigger()
+            Trigger.new()
             .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_SPELL_ENDCAST)
             .addAction(
                 function()
@@ -1744,9 +1751,6 @@ Engine.new = function()
         return self
 
     end
-
-
-    local Easing = {}
 
     Easing.linear = function(progress)
         return progress
@@ -2039,7 +2043,7 @@ Engine.new = function()
             if status then return val end
         end
 
-        local eventDispatcher = EventDispatcher(
+        local eventDispatcher = EventDispatcher.new(
             {"on_start", "on_complete", "on_progress"}
         )
         self.bind = eventDispatcher.bind
@@ -2413,7 +2417,7 @@ Engine.new = function()
     _Button.new = function()
         local self = _Widget.new('BUTTON')
         
-        local eventDispatcher = EventDispatcher(
+        local eventDispatcher = EventDispatcher.new(
             {"on_press", "on_release", "on_state"}
         )
         self.bind = eventDispatcher.bind
@@ -2457,7 +2461,7 @@ Engine.new = function()
     _Checkbox = {}
     _Checkbox.new = function()
         local self = _Widget.new('CHECKBOX')
-        local eventDispatcher = EventDispatcher(
+        local eventDispatcher = EventDispatcher.new(
             {"on_active"}
         )
         self.bind = eventDispatcher.bind
@@ -2507,7 +2511,7 @@ Engine.new = function()
     _Slider = {}
     _Slider.new = function()
         local self = _Widget.new('SLIDER')
-        local eventDispatcher = EventDispatcher(
+        local eventDispatcher = EventDispatcher.new(
             {"on_touch_down", "on_touch_move", "on_touch_up"}
         )
         self.bind = eventDispatcher.bind
@@ -2551,7 +2555,7 @@ Engine.new = function()
     _ProgressBar = {}
     _ProgressBar.new = function()
         local self = _Widget.new('SIMPLESTATUSBAR')
-        local eventDispatcher = EventDispatcher(
+        local eventDispatcher = EventDispatcher.new(
             {"on_state"}
         )
         self.bind = eventDispatcher.bind
@@ -2577,7 +2581,7 @@ Engine.new = function()
     _TextInput = {}
     _TextInput.new = function()
         local self = _Widget.new('EDITBOX')
-        local eventDispatcher = EventDispatcher(
+        local eventDispatcher = EventDispatcher.new(
             {"on_enter", "on_text", "on_focus"}
         )
         self.bind = eventDispatcher.bind
@@ -2700,7 +2704,7 @@ Engine.new = function()
             return ''
         end
 
-        local eventDispatcher = EventDispatcher(
+        local eventDispatcher = EventDispatcher.new(
             {"on_key_up", "on_key_down"}
         )
         self.bind = eventDispatcher.bind
@@ -2740,7 +2744,7 @@ Engine.new = function()
         end
 
         for index = 8, 255 do
-            local keyDown = Trigger()
+            local keyDown = Trigger.new()
             keyDown.addAction(
                 function()
                     if not keydown[index] then
@@ -2751,7 +2755,7 @@ Engine.new = function()
                 end
             )
 
-            local keyUp = Trigger()
+            local keyUp = Trigger.new()
             keyUp.addAction(
                 function()
                     if keydown[index] then
@@ -2805,7 +2809,7 @@ Engine.new = function()
         end
 
 
-        local eventDispatcher = EventDispatcher(
+        local eventDispatcher = EventDispatcher.new(
             {"on_mouse_down", "on_mouse_up", "on_motion"}
         )
         self.bind = eventDispatcher.bind
@@ -2843,7 +2847,7 @@ Engine.new = function()
 
         setmetatable(self, mt)
 
-        Trigger()
+        Trigger.new()
         .registerPlayerEvent(player, EVENT_PLAYER_MOUSE_DOWN)
         .addAction(
             function()
@@ -2861,7 +2865,7 @@ Engine.new = function()
             end
         )
 
-        Trigger()
+        Trigger.new()
         .registerPlayerEvent(player, EVENT_PLAYER_MOUSE_UP)
         .addAction(
             function()
@@ -2879,7 +2883,7 @@ Engine.new = function()
             end
         )
 
-        Trigger()
+        Trigger.new()
         .registerPlayerEvent(player, EVENT_PLAYER_MOUSE_MOVE)
         .addAction(
             function()
@@ -3154,13 +3158,10 @@ Engine.new = function()
 
     end
 
-    local Clock = {}
     Clock.new = function()
         local status, val = xpcall(_Clock.new, Log.Error)
         if status then return val end
     end
-
-    local Clock = self.Clock.new
 
     _SoundLoader.new = function()
         local self = {}
@@ -3260,7 +3261,7 @@ Engine.new = function()
                 if status then return val end
             end
 
-            local eventDispatcher = EventDispatcher(
+            local eventDispatcher = EventDispatcher.new(
                 {"on_play", "on_stop"}
             )
             self.bind = eventDispatcher.bind
@@ -3306,7 +3307,6 @@ Engine.new = function()
 
     end
 
-    local SoundLoader = {}
     SoundLoader.new = function()
         local status, val = xpcall(_SoundLoader.new, Log.Error)
         if status then return val end
@@ -3372,7 +3372,7 @@ Engine.new = function()
         local timescale = 1.0
         local blendtime = 1.0
         local movementSpeed = GetUnitMoveSpeed(handle)
-        local movementSpeedClock = Clock()
+        local movementSpeedClock = Clock.new()
         local manualX = GetUnitX(handle)
         local manualY = GetUnitY(handle)
         movementSpeedClock.schedule_interval(
@@ -3385,7 +3385,7 @@ Engine.new = function()
                 return manualX ~= self.x or manualY ~= self.y
             end
         )
-        local highMovementSpeedEffect = Effect()
+        local highMovementSpeedEffect = Effect.new()
         highMovementSpeedEffect.model = "Effects\\Windwalk Blue Soul.mdx"
         local baseStr = 0
         local baseAgi = 0
@@ -3852,7 +3852,7 @@ Engine.new = function()
             if status then return val end
         end
 
-        local eventDispatcher = EventDispatcher(
+        local eventDispatcher = EventDispatcher.new(
             {"on_death", "on_remove", 
              "on_damage_pre", "on_damaged_pre", "on_damage_after", "on_damaged_after", 
              "on_attack", "on_attacked",
@@ -4044,7 +4044,6 @@ Engine.new = function()
         return self
     end
 
-    local Unit = {}
     Unit.new = function(player, unitId, x, y, face)
         local status, val = xpcall(_Unit.new, Log.Error, player.createUnit(unitId, x, y, face))
         if status then return val end
@@ -4186,7 +4185,7 @@ Engine.new = function()
             if status then return val end
         end
 
-        local eventDispatcher = EventDispatcher(
+        local eventDispatcher = EventDispatcher.new(
             {"on_destroy", "on_clear", "on_foreach", "on_append", "on_remove"}
         )
         self.bind = eventDispatcher.bind
@@ -4242,7 +4241,6 @@ Engine.new = function()
         return self
     end
 
-    local Group = {}
     Group.new = function(groupList)
         local status, val = xpcall(_Group.new, Log.Error, groupList)
         if status then return val end
@@ -4371,7 +4369,7 @@ Engine.new = function()
             end
         end
 
-        local eventDispatcher = EventDispatcher(
+        local eventDispatcher = EventDispatcher.new(
             {"on_use", "on_drop", "on_pickup", "on_stack", "on_destroy"}
         )
         self.bind = eventDispatcher.bind
@@ -4425,7 +4423,7 @@ Engine.new = function()
         setmetatable(self, mt)
 
         do
-            Trigger()
+            Trigger.new()
             .registerDeathEvent(handle)
             .addAction(
                 function()
@@ -4438,7 +4436,6 @@ Engine.new = function()
         return self
     end
 
-    local Item = {}
     Item.new = function(itemId, x, y)
         local status, val = xpcall(_Item.new, Log.Error, CreateItem(itemId, x, y))
         if status then return val end
@@ -4550,16 +4547,16 @@ Engine.new = function()
 
     -- Interface [Object API]
     local IEngine = {}
-    IEngine.Trigger = Trigger
-    IEngine.EventDispatcher = EventDispatcher
-    IEngine.Effect = Effect
+    IEngine.Trigger = Trigger.new
+    IEngine.EventDispatcher = EventDispatcher.new
+    IEngine.Effect = Effect.new
     IEngine.Player = Player
     IEngine.Easing = Easing
     IEngine.Window = Window
-    IEngine.Clock = Clock
-    IEngine.SoundLoader = SoundLoader
-    IEngine.Unit = Unit
-    IEngine.Item = Item
+    IEngine.Clock = Clock.new
+    IEngine.SoundLoader = SoundLoader.new
+    IEngine.Unit = Unit.new
+    IEngine.Item = Item.new
 
     -- Interface [Unit API]
     IEngine.GetTriggerUnit = GetTriggerUnit
