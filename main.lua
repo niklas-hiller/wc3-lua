@@ -5,6 +5,7 @@ Engine.new = function()
     -- Objects
     local _ConfigurationBase = {}
     local _Configuration = {}
+    local Configuration
     local _Logger = {}
     local _Indexer = {}
     local _EventDispatcher = {}
@@ -71,7 +72,9 @@ Engine.new = function()
         function mt.__newindex(table, index, value)
             if index == "Global" then
                 Global = value
-                on_change()
+                if on_change ~= nil then
+                    on_change()
+                end
             else
                 print("[CONFIG ERROR] Unknown attribute '" .. index .. "'.")
             end
@@ -102,7 +105,7 @@ Engine.new = function()
             local self = {}
             local mt = {}
 
-            local Transparency = _ConfigurationField.new(_Effects.refreshAll)
+            local Transparency = _ConfigurationField.new(_Effect.refreshAll)
 
             function mt.__newindex(table, index, value)
                 if index == "Transparency" then
@@ -113,7 +116,7 @@ Engine.new = function()
             end
     
             function mt.__index(table, index)
-                if index == "transparency" then
+                if index == "Transparency" then
                     return Transparency
                 else
                     print("[CONFIG ERROR] Unknown attribute '" .. index .. "'.")
@@ -195,8 +198,6 @@ Engine.new = function()
 
         return self
     end
-    
-    local Configuration = _Configuration.new()
 
     _Logger.new = function(LogLevel)
         local self = {}
@@ -5495,6 +5496,8 @@ Engine.new = function()
         return self.Player[playerId]
     end
 
+    Configuration = _Configuration.new()
+
     -- Interface [Object API]
     local IEngine = {}
     IEngine.Trigger = Trigger.new
@@ -5507,6 +5510,7 @@ Engine.new = function()
     IEngine.SoundLoader = SoundLoader
     IEngine.Unit = Unit.new
     IEngine.Log = Log
+    IEngine.Configuration = Configuration
     -- IEngine.Item = Item.new
 
     -- Interface [Unit API]
@@ -6398,6 +6402,7 @@ _Abilities.Wolf.new = function(IEngine)
                 summonUnit.skin = 'h00I'
                 summonUnit.addAbility('Aloc')
                 summonUnit.invulnerable = true
+                summonUnit.attackspeed = unit.attackspeed * 3.0
                 summonUnit.bind("on_attack",
                     function(source, target)
                         local rad = math.atan(target.y - source.y, target.x - source.x)
@@ -6410,7 +6415,7 @@ _Abilities.Wolf.new = function(IEngine)
                 summonUnit.bind("on_damage_pre",
                     function(source, target, attack)
                         BlzSetEventDamage(0)
-                        unit.damageTarget(target, unit.damage * 2.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
+                        unit.damageTarget(target, unit.damage * 300.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
                     end
                 )
                 --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
@@ -6518,6 +6523,7 @@ _Abilities.Bear.new = function(IEngine)
                 summonUnit.skin = 'h00H'
                 summonUnit.addAbility('Aloc')
                 summonUnit.invulnerable = true
+                summonUnit.attackspeed = unit.attackspeed * 1.0
                 summonUnit.bind("on_attack",
                     function(source, target)
                         local rad = math.atan(target.y - source.y, target.x - source.x)
@@ -6530,7 +6536,7 @@ _Abilities.Bear.new = function(IEngine)
                 summonUnit.bind("on_damage_pre",
                     function(source, target, attack)
                         BlzSetEventDamage(0)
-                        unit.damageTarget(target, unit.damage * 2.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
+                        unit.damageTarget(target, unit.damage * 1000.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
                     end
                 )
                 --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
@@ -6634,10 +6640,11 @@ _Abilities.Boar.new = function(IEngine)
                 summonUnit.skin = 'h00J'
                 summonUnit.addAbility('Aloc')
                 summonUnit.invulnerable = true
+                summonUnit.attackspeed = unit.attackspeed * 1.5
                 summonUnit.bind("on_damage_pre",
                     function(source, target, attack)
                         BlzSetEventDamage(0)
-                        unit.damageTarget(target, unit.damage * 2.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
+                        unit.damageTarget(target, unit.damage * 100.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
                     end
                 )
                 --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
@@ -8279,7 +8286,7 @@ _Abilities.Hurricane_Constellation.new = function(IEngine)
                                             stompEffect.y = newY
                                             stompEffect.z = z
                                             stompEffect.create().destroy()
-                                            unit.damageTarget(target, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                            unit.damageTarget(target, unit.damage * 75., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                             delayTable[i][target] = 0
                                         end
                                     end
@@ -8351,7 +8358,7 @@ _Abilities.Blizzard.new = function(IEngine)
                                     function()
                                         local target = IEngine.GetFilterUnit()
                                         if unit.isEnemy(target) then
-                                            unit.damageTarget(target, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                            unit.damageTarget(target, unit.damage * 250., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                         end
                                     end
                                 )
@@ -8417,7 +8424,7 @@ _Abilities.Uncontrollable_Flames.new = function(IEngine)
                             function()
                                 local target = IEngine.GetFilterUnit()
                                 if unit.isEnemy(target) then
-                                    unit.damageTarget(target, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                    unit.damageTarget(target, unit.damage * 500., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                 end
                             end
                         )
@@ -9152,22 +9159,22 @@ xpcall(function()
                 end
             )
 
-            player.bind("on_message",
-                function(player, message)
-                    local alpha = S2I(SubString(message, 7, StringLength(message)))
-                    if alpha > 255 then
-                        alpha = 255
-                    elseif alpha < 0 then
-                        alpha = 0
-                    end
-                    Configuration.User(GetTriggerPlayer().id).Effects.Transparency.Global = alpha
-                    print("Executed " .. message)
-                end
-            ).setCondition(
-                function(player, message)
-                    return SubString(message, 0, 6) == "-alpha"
-                end
-            )
+            -- player.bind("on_message",
+            --     function(player, message)
+            --         local alpha = S2I(SubString(message, 7, StringLength(message)))
+            --         if alpha > 255 then
+            --             alpha = 255
+            --         elseif alpha < 0 then
+            --             alpha = 0
+            --         end
+            --         Framework.Configuration.User(player.id).Effects.Transparency.Global = alpha
+            --         print("Executed " .. message)
+            --     end
+            -- ).setCondition(
+            --     function(player, message)
+            --         return SubString(message, 0, 6) == "-alpha"
+            --     end
+            -- )
 
             
 

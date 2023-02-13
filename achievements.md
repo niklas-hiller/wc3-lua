@@ -212,21 +212,42 @@ Ability 4
 ## ELEMENTS
 Ability 1
 - Set: ELEMENTS
-- Name: 
-- Description: 
+- Name: Hurricane Constellation
+- Description: 75x per tick
 
 Ability 2
 - Set: ELEMENTS
-- Name: 
-- Description: 
+- Name: Blizzard
+- Description: 250x per shard
 
 Ability 3
 - Set: ELEMENTS
-- Name: 
-- Description: 
+- Name: Uncontrollable Flames
+- Description: 500x per stomp
 
 Ability 4
 - Set: ELEMENTS
+- Name: 
+- Description: 
+
+## ELEMENTS
+Ability 1
+- Set: SUMMONER
+- Name: Boar
+- Description: 100x Damage and 1.5x Attack Speed
+
+Ability 2
+- Set: SUMMONER
+- Name: Wolf
+- Description: 300x Damage and 3.0x Attack Speed
+
+Ability 3
+- Set: SUMMONER
+- Name: Bear
+- Description: 1000x Damage and 1.0x Attack Speed
+
+Ability 4
+- Set: SUMMONER
 - Name: 
 - Description: 
 
