@@ -3,6 +3,8 @@ Engine.new = function()
     local self = {}
 
     -- Objects
+    local _ConfigurationBase = {}
+    local _Configuration = {}
     local _Logger = {}
     local _Indexer = {}
     local _EventDispatcher = {}
@@ -37,6 +39,164 @@ Engine.new = function()
         HIGH,
         DEBUG
     }
+
+    local InvokerTable = {}
+    InvokerTable.new = function(on_change)
+        local protectedTable = {}
+        local on_change = on_change
+        local metaTable = {
+            __index = function (t,k)
+                return protectedTable[k]
+            end,
+            __newindex = function (t,k,v)
+                protectedTable[k] = v
+                if on_change ~= nil then
+                    on_change(k,v)
+                end
+            end
+        }
+
+        return setmetatable({},metaTable)
+    end
+
+    local _ConfigurationField = {}
+    _ConfigurationField.new = function(on_change)
+        local self = {}
+        local mt = {}
+        local on_change = on_change
+
+        local Global = 1.0
+        local Key = InvokerTable.new(on_change)
+
+        function mt.__newindex(table, index, value)
+            if index == "Global" then
+                Global = value
+                on_change()
+            else
+                print("[CONFIG ERROR] Unknown attribute '" .. index .. "'.")
+            end
+        end
+        
+        function mt.__index(table, index)
+            if index == "Global" then
+                return Global
+            elseif index == "Key" then
+                return Key
+            else
+                print("[CONFIG ERROR] Unknown attribute '" .. index .. "'.")
+            end
+        end
+        
+        setmetatable(self, mt)
+
+        return self
+    end
+
+    -- This Configuration is used for configurations that apply to SPECIFIC players
+    _ConfigurationBase.new = function()
+        local self = {}
+        local mt = {}
+
+        local _Effects = {}
+        _Effects.new = function()
+            local self = {}
+            local mt = {}
+
+            local Transparency = _ConfigurationField.new(_Effects.refreshAll)
+
+            function mt.__newindex(table, index, value)
+                if index == "Transparency" then
+                    Transparency.Global = value
+                else
+                    print("[CONFIG ERROR] Unknown attribute '" .. index .. "'.")
+                end
+            end
+    
+            function mt.__index(table, index)
+                if index == "transparency" then
+                    return Transparency
+                else
+                    print("[CONFIG ERROR] Unknown attribute '" .. index .. "'.")
+                end
+            end
+    
+            setmetatable(self, mt)
+
+            return self
+        end
+        local Effects = _Effects.new()
+
+        function mt.__newindex(table, index, value)
+            print("[CONFIG ERROR] Unknown attribute '" .. index .. "'.")
+        end
+
+        function mt.__index(table, index)
+            if index == "Effects" then
+                return Effects
+            else
+                print("[CONFIG ERROR] Unknown attribute '" .. index .. "'.")
+            end
+        end
+
+        setmetatable(self, mt)
+
+        return self
+    end
+
+    -- This Configuration references to the Global and User Configuration
+    _Configuration.new = function()
+        local self = {}
+        local mt = {}
+
+        local globalConfiguration = _ConfigurationBase.new()
+        local userConfiguration = {}
+        for pID = 0, 27 do
+            userConfiguration[pID] = _ConfigurationBase.new()
+        end
+
+        local _Users = {}
+        _Users.new = function()
+            local self = {}
+            local mt = {}
+
+            function mt.__newindex(table, index, value)
+                print("[CONFIG ERROR] Read-only!.")
+            end
+    
+            function mt.__index(table, index)
+                return userConfiguration[GetPlayerId(GetLocalPlayer())][index]
+            end
+    
+            setmetatable(self, mt)
+    
+            return self
+        end
+        local Users = _Users.new()
+
+        function mt.__newindex(table, index, value)
+            print("[CONFIG ERROR] Read-only!.")
+        end
+
+        function mt.__index(table, index)
+            if index == "Global" then
+                return globalConfiguration
+            elseif index == "Users" then
+                return Users
+            else
+                print("[CONFIG ERROR] Unknown attribute '" .. index .. "'.")
+            end
+        end
+
+        self.User = function(playerId)
+            return userConfiguration[playerId]
+        end
+
+        setmetatable(self, mt)
+
+        return self
+    end
+    
+    local Configuration = _Configuration.new()
 
     _Logger.new = function(LogLevel)
         local self = {}
@@ -880,6 +1040,12 @@ Engine.new = function()
         if status then return val end
     end
 
+    _Effect.Active = {} -- List of all effects that have a handle
+    _Effect.refreshAll = function()
+        for _, effect in pairs(_Effect.Active) do
+            effect.alpha = effect.alpha -- Refreshes alpha
+        end
+    end
     _Effect.new = function()
         local self = {}
         local handle = nil
@@ -897,8 +1063,17 @@ Engine.new = function()
         local yaw = 0.
         local pitch = 0.
         local roll = 0.
+        local customId = nil
         local current
         local mt = {}
+
+        local factoredAlpha = function()
+            local factor = Configuration.Users.Effects.Transparency.Global
+            if customId ~= nil and Configuration.Users.Effects.Transparency.Key[customId] then
+                factor = Configuration.Users.Effects.Transparency.Key[customId]
+            end
+            return alpha * factor
+        end
 
         function mt.__newindex(table, index, value)
             if index == "model" then
@@ -940,7 +1115,7 @@ Engine.new = function()
             elseif index == "alpha" then
                 alpha = value
                 if handle ~= nil then
-                    BlzSetSpecialEffectAlpha(handle, alpha)
+                    BlzSetSpecialEffectAlpha(handle, factoredAlpha())
                 end
             elseif index == "scale" then
                 scale = value
@@ -972,6 +1147,8 @@ Engine.new = function()
                 if handle ~= nil then
                     BlzSetSpecialEffectRoll(handle, roll)
                 end
+            elseif index == "customId" then
+                customId = value
             else
                 Log.Error("Unknown attribute '" .. index .. "'.")
             end
@@ -1010,6 +1187,8 @@ Engine.new = function()
                 return handle
             elseif index == "current" then
                 return current
+            elseif index == "customId" then
+                return customId
             else
                 Log.Error("Unknown attribute '" .. index .. "'.")
             end
@@ -1020,7 +1199,7 @@ Engine.new = function()
                 self.on_create()
                 handle = AddSpecialEffectTarget(model, unit.handle, point)
                 BlzSetSpecialEffectColor(handle, red, green, blue)
-                BlzSetSpecialEffectAlpha(handle, alpha)
+                BlzSetSpecialEffectAlpha(handle, factoredAlpha())
                 BlzSetSpecialEffectTimeScale(handle, timeScale)
             else
                 Log.Error("Effect already is created, please destroy first.")
@@ -1040,6 +1219,7 @@ Engine.new = function()
         self.unbind = eventDispatcher.unbind
 
         function self._on_create()
+            table.insert(_Effect.Active, self)
             eventDispatcher.dispatch("on_create", self)
         end
 
@@ -1049,6 +1229,12 @@ Engine.new = function()
         end
 
         function self._on_destroy()
+            for index, effect in pairs(_Effect.Active) do
+                if effect == self then
+                    table.remove(_Effect.Active, index)
+                    break
+                end
+            end
             eventDispatcher.dispatch("on_destroy", self)
         end
 
@@ -1063,7 +1249,7 @@ Engine.new = function()
                 handle = AddSpecialEffect(model, x, y)
                 BlzSetSpecialEffectZ(handle, z)
                 BlzSetSpecialEffectColor(handle, red, green, blue)
-                BlzSetSpecialEffectAlpha(handle, alpha)
+                BlzSetSpecialEffectAlpha(handle, factoredAlpha())
                 BlzSetSpecialEffectScale(handle, scale)
                 BlzSetSpecialEffectHeight(handle, height)
                 BlzSetSpecialEffectTimeScale(handle, timeScale)
@@ -4312,6 +4498,8 @@ Engine.new = function()
                     if alpha + change > 255 then
                         alpha = 255
                         clock.unschedule(triggeringSchedule)
+                        clock.stop()
+                        clock = nil
                     else
                         alpha = alpha + change
                     end
@@ -4340,6 +4528,8 @@ Engine.new = function()
                     if alpha + change <= 0 then
                         alpha = 0
                         clock.unschedule(triggeringSchedule)
+                        clock.stop()
+                        clock = nil
                     else
                         alpha = alpha + change
                     end
@@ -5551,8 +5741,8 @@ _Abilities.Dodge.new = function(IEngine)
                     local y2 = source.owner.mouse.y
                     local dx = x2 - x
                     local dy = y2 - y
-                    local distance = SquareRoot(dx * dx + dy * dy)
-                    local a = Atan2(y2 - y, x2 - x)
+                    local distance = math.sqrt(dx * dx + dy * dy)
+                    local a = math.atan(y2 - y, x2 - x)
                     local distanceMax = source.ms * 2
                     local distanceMin = source.ms / 2
                     local maximumDashDuration = 0.25
@@ -5966,10 +6156,10 @@ _Abilities.Demon_Control.new = function(IEngine)
                         local tz = unit.z + 50.
                         local dx = tx - cx
                         local dy = ty - cy
-                        local dist = SquareRoot(dx * dx + dy * dy)
+                        local dist = math.sqrt(dx * dx + dy * dy)
                         if dist > 1. then
                             local increment = 1. + 1.2 * dist / 70
-                            local rad = Atan2(ty - cy, tx - cx)
+                            local rad = math.atan(ty - cy, tx - cx)
                             demonEffect.x = cx + increment * math.cos(rad)
                             demonEffect.y = cy + increment * math.sin(rad)
                         else
@@ -5986,7 +6176,7 @@ _Abilities.Demon_Control.new = function(IEngine)
                         else
                             demonEffect.z = tz
                         end
-                        demonEffect.yaw = Atan2(unit.y - cy, unit.x - cx)
+                        demonEffect.yaw = math.atan(unit.y - cy, unit.x - cx)
                     end, 0.005
                 )
             end
@@ -6205,12 +6395,12 @@ _Abilities.Wolf.new = function(IEngine)
                 local x = unit.x + distance * math.cos(rad)
                 local y = unit.y + distance * math.sin(rad)
                 summonUnit = unit.owner.createUnit('unit', x, y, bj_RADTODEG * rad)
-                summonUnit.skin = ''
+                summonUnit.skin = 'h00I'
                 summonUnit.addAbility('Aloc')
                 summonUnit.invulnerable = true
                 summonUnit.bind("on_attack",
                     function(source, target)
-                        local rad = Atan2(target.y - source.y, target.x - source.x)
+                        local rad = math.atan(target.y - source.y, target.x - source.x)
                         bloodEffect.x = source.x + 140. * math.cos(rad)
                         bloodEffect.y = source.y + 140. * math.sin(rad)
                         bloodEffect.yaw = rad
@@ -6242,7 +6432,7 @@ _Abilities.Wolf.new = function(IEngine)
                     local uy = unit.y
                     local dx = tx - ux
                     local dy = ty - uy
-                    local dist = SquareRoot(dx * dx + dy * dy)
+                    local dist = math.sqrt(dx * dx + dy * dy)
                     if dist > 800. then
                         local otherDist = math.random(400, 600)
                         local rad = math.random(0., math.pi * 2)
@@ -6252,10 +6442,14 @@ _Abilities.Wolf.new = function(IEngine)
                     else
                         local dx = tx - cx
                         local dy = ty - cy
-                        local dist = SquareRoot(dx * dx + dy * dy)
+                        local dist = math.sqrt(dx * dx + dy * dy)
                         if dist > 1. then
-                            local rad = Atan2(dy, dx)
+                            local rad = math.atan(dy, dx)
                             local increment = 200 + 200 * 0.03 * dist / 70
+                            if increment > 500 then
+                                increment = 500
+                                summonUnit.teleportTo(tx, ty)
+                            end
                             summonUnit.ms = increment
                         elseif GetRandomInt(0, 1000) == 1 then
                             local otherDist = math.random(400, 700)
@@ -6321,12 +6515,12 @@ _Abilities.Bear.new = function(IEngine)
                 local x = unit.x + distance * math.cos(rad)
                 local y = unit.y + distance * math.sin(rad)
                 summonUnit = unit.owner.createUnit('unit', x, y, bj_RADTODEG * rad)
-                summonUnit.skin = ''
+                summonUnit.skin = 'h00H'
                 summonUnit.addAbility('Aloc')
                 summonUnit.invulnerable = true
                 summonUnit.bind("on_attack",
                     function(source, target)
-                        local rad = Atan2(target.y - source.y, target.x - source.x)
+                        local rad = math.atan(target.y - source.y, target.x - source.x)
                         bloodEffect.x = source.x + 140. * math.cos(rad)
                         bloodEffect.y = source.y + 140. * math.sin(rad)
                         bloodEffect.yaw = rad
@@ -6358,7 +6552,7 @@ _Abilities.Bear.new = function(IEngine)
                     local uy = unit.y
                     local dx = tx - ux
                     local dy = ty - uy
-                    local dist = SquareRoot(dx * dx + dy * dy)
+                    local dist = math.sqrt(dx * dx + dy * dy)
                     if dist > 800. then
                         local otherDist = math.random(400, 600)
                         local rad = math.random(0., math.pi * 2)
@@ -6368,10 +6562,14 @@ _Abilities.Bear.new = function(IEngine)
                     else
                         local dx = tx - cx
                         local dy = ty - cy
-                        local dist = SquareRoot(dx * dx + dy * dy)
+                        local dist = math.sqrt(dx * dx + dy * dy)
                         if dist > 1. then
-                            local rad = Atan2(dy, dx)
+                            local rad = math.atan(dy, dx)
                             local increment = 200 + 200 * 0.03 * dist / 70
+                            if increment > 500 then
+                                increment = 500
+                                summonUnit.teleportTo(tx, ty)
+                            end
                             summonUnit.ms = increment
                         elseif GetRandomInt(0, 1000) == 1 then
                             local otherDist = math.random(400, 700)
@@ -6433,7 +6631,7 @@ _Abilities.Boar.new = function(IEngine)
                 local x = unit.x + distance * math.cos(rad)
                 local y = unit.y + distance * math.sin(rad)
                 summonUnit = unit.owner.createUnit('unit', x, y, bj_RADTODEG * rad)
-                summonUnit.skin = ''
+                summonUnit.skin = 'h00J'
                 summonUnit.addAbility('Aloc')
                 summonUnit.invulnerable = true
                 summonUnit.bind("on_damage_pre",
@@ -6460,7 +6658,7 @@ _Abilities.Boar.new = function(IEngine)
                     local uy = unit.y
                     local dx = tx - ux
                     local dy = ty - uy
-                    local dist = SquareRoot(dx * dx + dy * dy)
+                    local dist = math.sqrt(dx * dx + dy * dy)
                     if dist > 800. then
                         local otherDist = math.random(400, 600)
                         local rad = math.random(0., math.pi * 2)
@@ -6470,10 +6668,14 @@ _Abilities.Boar.new = function(IEngine)
                     else
                         local dx = tx - cx
                         local dy = ty - cy
-                        local dist = SquareRoot(dx * dx + dy * dy)
+                        local dist = math.sqrt(dx * dx + dy * dy)
                         if dist > 1. then
-                            local rad = Atan2(dy, dx)
+                            local rad = math.atan(dy, dx)
                             local increment = 200 + 200 * 0.03 * dist / 70
+                            if increment > 500 then
+                                increment = 500
+                                summonUnit.teleportTo(tx, ty)
+                            end
                             summonUnit.ms = increment
                         elseif GetRandomInt(0, 1000) == 1 then
                             local otherDist = math.random(400, 700)
@@ -6553,7 +6755,7 @@ _Abilities.Reapers.new = function(IEngine)
                     
                     summonUnit.bind("on_attack",
                         function(source, target)
-                            local rad = Atan2(target.y - source.y, target.x - source.x)
+                            local rad = math.atan(target.y - source.y, target.x - source.x)
                             slashEffect.x = source.x + 50. * math.cos(rad)
                             slashEffect.y = source.y + 50. * math.sin(rad)
                             slashEffect.yaw = rad
@@ -6592,7 +6794,7 @@ _Abilities.Reapers.new = function(IEngine)
                         local uy = unit.y
                         local dx = tx - ux
                         local dy = ty - uy
-                        local dist = SquareRoot(dx * dx + dy * dy)
+                        local dist = math.sqrt(dx * dx + dy * dy)
                         
                         if dist > 800. then
                             local otherDist = math.random(400, 600)
@@ -6603,9 +6805,9 @@ _Abilities.Reapers.new = function(IEngine)
                         else
                             local dx = tx - cx
                             local dy = ty - cy
-                            local dist = SquareRoot(dx * dx + dy * dy)
+                            local dist = math.sqrt(dx * dx + dy * dy)
                             if dist > 1. then
-                                local rad = Atan2(dy, dx)
+                                local rad = math.atan(dy, dx)
                                 local increment = 200 + 200 * 0.03 * dist / 70
                                 if increment > 500 then
                                     increment = 500
@@ -6736,7 +6938,7 @@ _Abilities.Reapers.new = function(IEngine)
                         local uy = unit.y
                         local dx = tx - ux
                         local dy = ty - uy
-                        local dist = SquareRoot(dx * dx + dy * dy)
+                        local dist = math.sqrt(dx * dx + dy * dy)
                         if dist > 800. then
                             local otherDist = math.random(400, 600)
                             local rad = math.random(0., math.pi * 2)
@@ -6746,9 +6948,9 @@ _Abilities.Reapers.new = function(IEngine)
                         else
                             local dx = tx - cx
                             local dy = ty - cy
-                            local dist = SquareRoot(dx * dx + dy * dy)
+                            local dist = math.sqrt(dx * dx + dy * dy)
                             if dist > 1. then
-                                local rad = Atan2(dy, dx)
+                                local rad = math.atan(dy, dx)
                                 local increment = 200 + 200 * 0.03 * dist / 70
                                 if increment > 500 then
                                     increment = 500
@@ -6810,7 +7012,7 @@ _Abilities.Reapers.new = function(IEngine)
                         function(source, target)
                             casting = true
                             BlzUnitInterruptAttack(source.handle)
-                            local rad = Atan2(target.y - source.y, target.x - source.x)
+                            local rad = math.atan(target.y - source.y, target.x - source.x)
                             local x = source.x
                             local y = source.y
                             source.playAnimation(4)
@@ -6882,7 +7084,7 @@ _Abilities.Reapers.new = function(IEngine)
                         local uy = unit.y
                         local dx = tx - ux
                         local dy = ty - uy
-                        local dist = SquareRoot(dx * dx + dy * dy)
+                        local dist = math.sqrt(dx * dx + dy * dy)
                         if dist > 800. then
                             local otherDist = math.random(400, 600)
                             local rad = math.random(0., math.pi * 2)
@@ -6892,9 +7094,9 @@ _Abilities.Reapers.new = function(IEngine)
                         else
                             local dx = tx - cx
                             local dy = ty - cy
-                            local dist = SquareRoot(dx * dx + dy * dy)
+                            local dist = math.sqrt(dx * dx + dy * dy)
                             if dist > 1. then
-                                local rad = Atan2(dy, dx)
+                                local rad = math.atan(dy, dx)
                                 local increment = 200 + 200 * 0.03 * dist / 70
                                 if increment > 500 then
                                     increment = 500
@@ -6966,9 +7168,9 @@ _Abilities.Soul_Steal.new = function(IEngine)
                         function(triggeringClock, triggeringSchedule)
                             local dx = unit.x - bulletEffect.x
                             local dy = unit.y - bulletEffect.y
-                            local dist = SquareRoot(dx * dx + dy * dy)
+                            local dist = math.sqrt(dx * dx + dy * dy)
                             if dist > 5. then
-                                local rad = Atan2(dy, dx)
+                                local rad = math.atan(dy, dx)
                                 bulletEffect.x = bulletEffect.x + 5. * math.cos(rad)
                                 bulletEffect.y = bulletEffect.y + 5. * math.sin(rad)
                                 bulletEffect.z = unit.z
@@ -7586,8 +7788,8 @@ _Abilities.Sacred_Storm.new = function(IEngine)
                         -- Declare new distance and radians between caster and laser
                         local dx = orangeX - ux
                         local dy = orangeY - uy
-                        casterLaserDist = SquareRoot(dx * dx + dy * dy)
-                        casterLaserRad = Atan2(dy, dx)
+                        casterLaserDist = math.sqrt(dx * dx + dy * dy)
+                        casterLaserRad = math.atan(dy, dx)
 
                         -- If laser travelled expected distance
                         if currentDist >= targetDist then
@@ -7600,8 +7802,8 @@ _Abilities.Sacred_Storm.new = function(IEngine)
                             -- Declare new expected distance and target radians
                             local dx = targetX - orangeX
                             local dy = targetY - orangeY
-                            targetDist = SquareRoot(dx * dx + dy * dy)
-                            targetRad = Atan2(dy, dx)
+                            targetDist = math.sqrt(dx * dx + dy * dy)
+                            targetRad = math.atan(dy, dx)
 
                             currentDist = 0
                         end
@@ -7673,8 +7875,8 @@ _Abilities.Sacred_Storm.new = function(IEngine)
                         -- Declare new distance and radians between caster and laser
                         local dx = blueX - ux
                         local dy = blueY - uy
-                        casterLaserDist = SquareRoot(dx * dx + dy * dy)
-                        casterLaserRad = Atan2(dy, dx)
+                        casterLaserDist = math.sqrt(dx * dx + dy * dy)
+                        casterLaserRad = math.atan(dy, dx)
 
                         -- If laser travelled expected distance
                         if currentDist >= targetDist then
@@ -7687,8 +7889,8 @@ _Abilities.Sacred_Storm.new = function(IEngine)
                             -- Declare new expected distance and target radians
                             local dx = targetX - blueX
                             local dy = targetY - blueY
-                            targetDist = SquareRoot(dx * dx + dy * dy)
-                            targetRad = Atan2(dy, dx)
+                            targetDist = math.sqrt(dx * dx + dy * dy)
+                            targetRad = math.atan(dy, dx)
 
                             currentDist = 0
                         end
@@ -7724,10 +7926,10 @@ _Abilities.Sacred_Storm.new = function(IEngine)
 
                         local dx = orangeX - blueX
                         local dy = orangeY - blueY
-                        local dist = SquareRoot(dx * dx + dy * dy)
+                        local dist = math.sqrt(dx * dx + dy * dy)
 
                         if dist < 500 then
-                            local rad = Atan2(dy, dx)
+                            local rad = math.atan(dy, dx)
                             local newX = blueX + (dist / 2) * math.cos(rad)
                             local newY = blueY + (dist / 2) * math.sin(rad)
                             if laserDark == nil then
@@ -8950,7 +9152,26 @@ xpcall(function()
                 end
             )
 
+            player.bind("on_message",
+                function(player, message)
+                    local alpha = S2I(SubString(message, 7, StringLength(message)))
+                    if alpha > 255 then
+                        alpha = 255
+                    elseif alpha < 0 then
+                        alpha = 0
+                    end
+                    Configuration.User(GetTriggerPlayer().id).Effects.Transparency.Global = alpha
+                    print("Executed " .. message)
+                end
+            ).setCondition(
+                function(player, message)
+                    return SubString(message, 0, 6) == "-alpha"
+                end
+            )
+
             
+
+            -- native BlzSetSpecialEffectAlpha                    takes effect whichEffect, integer alpha returns nothing
 
             --[[
             -- Default Abilities
