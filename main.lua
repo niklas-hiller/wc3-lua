@@ -5676,6 +5676,114 @@ _Abilities.Dodge.new = function(IEngine)
     return self
 end
 
+_Abilities.Magma_Constellation = {}
+_Abilities.Magma_Constellation.new = function(IEngine)
+    local self = {}
+    local events = {}
+    local clock = IEngine.Clock()
+    local hitEffect = IEngine.Effect()
+    hitEffect.model = "Effects\\Firebolt.mdx"
+    hitEffect.scale = 1.0
+    local stompEffect = IEngine.Effect()
+    stompEffect.model = "Effects\\Stomp_Effect.mdx"
+    stompEffect.scale = 0.7
+    local group = CreateGroup()
+
+    function self.apply(unit)
+        if events.unit == nil then
+            local boltEffect = {}
+            local delayTable = {}
+            for i = 1, 5 do
+                boltEffect[i] = IEngine.Effect()
+                boltEffect[i].model = "Effects\\Firebolt.mdx"
+                boltEffect[i].scale = 2.0
+                delayTable[i] = {}
+            end
+            local count = 0
+            local increment = math.pi * 2 / 50. -- / 200.
+            local span = math.pi * 2 / 5.
+            clock.schedule_interval(
+                function(triggeringClock, triggeringSchedule)
+                    if count < 200 then
+                        count = count + 1
+                    else
+                        count = 0
+                    end
+                    for i = 1, 5 do
+                        local x = unit.x + 350. * math.cos(count * increment + i * span)
+                        local y = unit.y + 350. * math.sin(count * increment + i * span)
+                        local z = unit.z + 75.
+                        boltEffect[i].x = x
+                        boltEffect[i].y = y
+                        boltEffect[i].z = z
+                        for k, v in pairs(delayTable[i]) do
+                            delayTable[i][k] = v + 1
+                        end
+                        GroupEnumUnitsInRange(group, x, y, 150., 
+                            Filter(
+                                function()
+                                    local target = IEngine.GetFilterUnit()
+                                    if unit.isEnemy(target) then
+                                        if delayTable[i][target] == nil then
+                                            delayTable[i][target] = 100
+                                        end
+                                        if delayTable[i][target] >= 100 then
+                                            local dist = math.random(0., 30.)
+                                            local rad = math.random(0., math.pi * 2)
+                                            local newX = x + dist * math.cos(rad)
+                                            local newY = y + dist * math.sin(rad)
+                                            hitEffect.x = newX
+                                            hitEffect.y = newY
+                                            hitEffect.z = z
+                                            hitEffect.create().destroy()
+                                            stompEffect.x = newX
+                                            stompEffect.y = newY
+                                            stompEffect.z = z
+                                            stompEffect.create().destroy()
+                                            unit.damageTarget(target, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                            delayTable[i][target] = 0
+                                        end
+                                    end
+                                end
+                            )
+                        )
+                    end
+                end, 0.01
+            ).setCondition(
+                function(triggeringClock, triggeringSchedule)
+                    if --[[unit.hasAbility('A005')]] true then
+                        for i = 1, 5 do
+                            if boltEffect[i].handle == nil then
+                                boltEffect[i].create()
+                            end
+                        end
+                        
+                        return true
+                    else
+                        for i = 1, 5 do
+                            if boltEffect[i].handle ~= nil then
+                                boltEffect[i].create()
+                            end
+                        end
+                        return false
+                    end
+                end
+            )
+        end
+    end
+
+    function self.remove(unit)
+        if events.unit ~= nil then
+            unit.unbind(events.unit)
+            events.unit = nil
+        end
+    end
+
+    clock.start()
+
+    return self
+end
+
 _Abilities.Blade_Dance = {}
 _Abilities.Blade_Dance.new = function(IEngine)
     local self = {}
@@ -7901,43 +8009,51 @@ _Abilities.I_Am_Atomic.new = function(IEngine)
     return self
 end
 
-_Abilities.Magma_Constellation = {}
-_Abilities.Magma_Constellation.new = function(IEngine)
+_Abilities.Hurricane_Constellation = {}
+_Abilities.Hurricane_Constellation.new = function(IEngine)
     local self = {}
-    local events = {}
-    local clock = IEngine.Clock()
-    local hitEffect = IEngine.Effect()
-    hitEffect.model = "Effects\\Firebolt.mdx"
-    hitEffect.scale = 1.0
-    local stompEffect = IEngine.Effect()
-    stompEffect.model = "Effects\\Stomp_Effect.mdx"
-    stompEffect.scale = 0.7
+    local _eventHolder = {}
     local group = CreateGroup()
 
+    local stompEffect = IEngine.Effect()
+    stompEffect.model = "Effects\\Wind Blast.mdx"
+    stompEffect.scale = 0.7
+    
+    local amount = 7
+
     function self.apply(unit)
-        if events.unit == nil then
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
+
+        do
             local boltEffect = {}
             local delayTable = {}
-            for i = 1, 5 do
+
+            for i = 1, amount do
                 boltEffect[i] = IEngine.Effect()
-                boltEffect[i].model = "Effects\\Firebolt.mdx"
-                boltEffect[i].scale = 2.0
+                boltEffect[i].model = "Effects\\Windstorm.mdx"
+                boltEffect[i].scale = 1.0
+                boltEffect[i].create()
                 delayTable[i] = {}
             end
+
             local count = 0
-            local increment = math.pi * 2 / 50. -- / 200.
-            local span = math.pi * 2 / 5.
-            clock.schedule_interval(
+            local increment = math.pi * 2 / 500.
+            local span = math.pi * 2 / amount
+
+            eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
-                    if count < 200 then
+                    if count < 500 then
                         count = count + 1
                     else
                         count = 0
                     end
-                    for i = 1, 5 do
-                        local x = unit.x + 350. * math.cos(count * increment + i * span)
-                        local y = unit.y + 350. * math.sin(count * increment + i * span)
-                        local z = unit.z + 75.
+                    for i = 1, amount do
+                        local x = unit.x + 650. * math.cos(count * increment + i * span)
+                        local y = unit.y + 650. * math.sin(count * increment + i * span)
+                        local z = unit.z
                         boltEffect[i].x = x
                         boltEffect[i].y = y
                         boltEffect[i].z = z
@@ -7957,10 +8073,6 @@ _Abilities.Magma_Constellation.new = function(IEngine)
                                             local rad = math.random(0., math.pi * 2)
                                             local newX = x + dist * math.cos(rad)
                                             local newY = y + dist * math.sin(rad)
-                                            hitEffect.x = newX
-                                            hitEffect.y = newY
-                                            hitEffect.z = z
-                                            hitEffect.create().destroy()
                                             stompEffect.x = newX
                                             stompEffect.y = newY
                                             stompEffect.z = z
@@ -7974,95 +8086,25 @@ _Abilities.Magma_Constellation.new = function(IEngine)
                         )
                     end
                 end, 0.01
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if --[[unit.hasAbility('A005')]] true then
-                        for i = 1, 5 do
-                            if boltEffect[i].handle == nil then
-                                boltEffect[i].create()
-                            end
-                        end
-                        
-                        return true
-                    else
-                        for i = 1, 5 do
-                            if boltEffect[i].handle ~= nil then
-                                boltEffect[i].create()
-                            end
-                        end
-                        return false
-                    end
-                end
             )
+
+            eventHolder.cleanup = function()
+                for i = 1, amount do
+                    boltEffect[i].destroy()
+                end
+            end
         end
+
+        _eventHolder[unit] = eventHolder
     end
 
     function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
+        if _eventHolder[unit] == nil then
+            return
         end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
     end
-
-    clock.start()
-
-    return self
-end
-
-_Abilities.Uncontrollable_Flames = {}
-_Abilities.Uncontrollable_Flames.new = function(IEngine)
-    local self = {}
-    local events = {}
-    local clock = IEngine.Clock()
-    local explodeEffect = IEngine.Effect()
-    explodeEffect.scale = 1.3
-    explodeEffect.model = "Effects\\Pillar of Flame Orange.mdx"
-    local stompEffect = IEngine.Effect()
-    stompEffect.model = "Effects\\Stomp_Effect.mdx"
-    stompEffect.scale = 0.7
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local count = 0
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    local dist = math.random(100, 300)
-                    local rad = math.random(0., math.pi * 2)
-                    local x = unit.x + dist * math.cos(rad)
-                    local y = unit.y + dist * math.sin(rad)
-                    explodeEffect.x = x
-                    explodeEffect.y = y
-                    explodeEffect.create().destroy()
-                    stompEffect.x = x
-                    stompEffect.y = y
-                    stompEffect.create().destroy()
-                    GroupEnumUnitsInRange(group, x, y, 150., 
-                        Filter(
-                            function()
-                                local target = IEngine.GetFilterUnit()
-                                if unit.isEnemy(target) then
-                                    unit.damageTarget(target, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                                end
-                            end
-                        )
-                    )
-                end, 0.05 -- 0.10
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    return true --unit.hasAbility('A002')
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
 
     return self
 end
@@ -8070,8 +8112,9 @@ end
 _Abilities.Blizzard = {}
 _Abilities.Blizzard.new = function(IEngine)
     local self = {}
-    local events = {}
-    local clock = IEngine.Clock()
+    local _eventHolder = {}
+    local group = CreateGroup()
+
     local hailEffect = IEngine.Effect()
     hailEffect.scale = 1.3
     hailEffect.model = "Effects\\Blizzard II.mdx"
@@ -8080,9 +8123,14 @@ _Abilities.Blizzard.new = function(IEngine)
     explodeEffect.scale = 0.7
     
     function self.apply(unit)
-        if events.unit == nil then
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
+
+        do
             local count = 0
-            clock.schedule_interval(
+            eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
                     local dist = math.random(350., 650.)
                     local rad = math.random(0., math.pi * 2)
@@ -8091,7 +8139,7 @@ _Abilities.Blizzard.new = function(IEngine)
                     hailEffect.x = x
                     hailEffect.y = y
                     hailEffect.create().destroy()
-                    clock.schedule_once(
+                    triggeringClock.schedule_once(
                         function(triggeringClock, triggeringSchedule)
                             explodeEffect.x = x
                             explodeEffect.y = y
@@ -8108,152 +8156,144 @@ _Abilities.Blizzard.new = function(IEngine)
                             )
                         end, 0.9
                     )
-                end, 0.05 -- 0.10
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    return true --unit.hasAbility('A002')
-                end
+                end, 0.10
             )
         end
+
+        _eventHolder[unit] = eventHolder
     end
 
     function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
+        if _eventHolder[unit] == nil then
+            return
         end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
     end
-
-    clock.start()
 
     return self
 end
 
-_Abilities.Hurricane_Constellation = {}
-_Abilities.Hurricane_Constellation.new = function(IEngine)
+_Abilities.Uncontrollable_Flames = {}
+_Abilities.Uncontrollable_Flames.new = function(IEngine)
     local self = {}
-    local events = {}
-    local clock = IEngine.Clock()
-    local stompEffect = IEngine.Effect()
-    stompEffect.model = "Effects\\Wind Blast.mdx"
-    stompEffect.scale = 0.7
+    local _eventHolder = {}
     local group = CreateGroup()
-    local amount = 7
 
+    local explodeEffect = IEngine.Effect()
+    explodeEffect.scale = 1.3
+    explodeEffect.model = "Effects\\Pillar of Flame Orange.mdx"
+    local stompEffect = IEngine.Effect()
+    stompEffect.model = "Effects\\Stomp_Effect.mdx"
+    stompEffect.scale = 0.7
+    
     function self.apply(unit)
-        if events.unit == nil then
-            local boltEffect = {}
-            local delayTable = {}
-            for i = 1, amount do
-                boltEffect[i] = IEngine.Effect()
-                boltEffect[i].model = "Effects\\Windstorm.mdx"
-                boltEffect[i].scale = 1.0
-                delayTable[i] = {}
-            end
-            local count = 0
-            local increment = math.pi * 2 / 500.
-            local span = math.pi * 2 / amount
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    if count < 500 then
-                        count = count + 1
-                    else
-                        count = 0
-                    end
-                    for i = 1, amount do
-                        local x = unit.x + 650. * math.cos(count * increment + i * span)
-                        local y = unit.y + 650. * math.sin(count * increment + i * span)
-                        local z = unit.z
-                        boltEffect[i].x = x
-                        boltEffect[i].y = y
-                        boltEffect[i].z = z
-                        for k, v in pairs(delayTable[i]) do
-                            delayTable[i][k] = v + 1
-                        end
-                        IEngine.Group
-                            .inRange(x, y, 150.)
-                            .filter(
-                                function(group, target)
-                                    return unit.isEnemy(target)
-                                end
-                            )
-                            .forEach(
-                                function(group, target)
-                                    if delayTable[i][target] == nil then
-                                        delayTable[i][target] = 100
-                                    end
-                                    if delayTable[i][target] >= 100 then
-                                        local dist = math.random(0., 30.)
-                                        local rad = math.random(0., math.pi * 2)
-                                        local newX = x + dist * math.cos(rad)
-                                        local newY = y + dist * math.sin(rad)
-                                        stompEffect.x = newX
-                                        stompEffect.y = newY
-                                        stompEffect.z = z
-                                        stompEffect.create().destroy()
-                                        unit.damageTarget(target, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                                        delayTable[i][target] = 0
-                                    end
-                                end
-                            )
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
 
-                        -- GroupEnumUnitsInRange(group, x, y, 150., 
-                        --     Filter(
-                        --         function()
-                        --             local target = IEngine.GetFilterUnit()
-                        --             if unit.isEnemy(target) then
-                        --                 if delayTable[i][target] == nil then
-                        --                     delayTable[i][target] = 100
-                        --                 end
-                        --                 if delayTable[i][target] >= 100 then
-                        --                     local dist = math.random(0., 30.)
-                        --                     local rad = math.random(0., math.pi * 2)
-                        --                     local newX = x + dist * math.cos(rad)
-                        --                     local newY = y + dist * math.sin(rad)
-                        --                     stompEffect.x = newX
-                        --                     stompEffect.y = newY
-                        --                     stompEffect.z = z
-                        --                     stompEffect.create().destroy()
-                        --                     unit.damageTarget(target, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                        --                     delayTable[i][target] = 0
-                        --                 end
-                        --             end
-                        --         end
-                        --     )
-                        -- )
-                    end
-                end, 0.01
-            ).setCondition(
+        do
+            local count = 0
+            eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
-                    if --[[unit.hasAbility('A005')]] true then
-                        for i = 1, amount do
-                            if boltEffect[i].handle == nil then
-                                boltEffect[i].create()
+                    local dist = math.random(100, 300)
+                    local rad = math.random(0., math.pi * 2)
+                    local x = unit.x + dist * math.cos(rad)
+                    local y = unit.y + dist * math.sin(rad)
+
+                    explodeEffect.x = x
+                    explodeEffect.y = y
+                    explodeEffect.create().destroy()
+
+                    stompEffect.x = x
+                    stompEffect.y = y
+                    stompEffect.create().destroy()
+
+                    GroupEnumUnitsInRange(group, x, y, 150., 
+                        Filter(
+                            function()
+                                local target = IEngine.GetFilterUnit()
+                                if unit.isEnemy(target) then
+                                    unit.damageTarget(target, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                end
                             end
-                        end
-                        
-                        return true
-                    else
-                        for i = 1, amount do
-                            if boltEffect[i].handle ~= nil then
-                                boltEffect[i].create()
-                            end
-                        end
-                        return false
-                    end
-                end
+                        )
+                    )
+                end, 0.10
             )
         end
+
+        _eventHolder[unit] = eventHolder
     end
 
     function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
+        if _eventHolder[unit] == nil then
+            return
         end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
     end
 
-    clock.start()
+    return self
+end
+
+_Abilities.Black_Hole = {}
+_Abilities.Black_Hole.new = function(IEngine)
+    local self = {}
+    local _eventHolder = {}
+    local group = CreateGroup()
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
+
+        do
+            
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    return self
+end
+
+_Abilities.Template = {}
+_Abilities.Template.new = function(IEngine)
+    local self = {}
+    local _eventHolder = {}
+    local group = CreateGroup()
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
+
+        do
+            -- Code goes here
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
 
     return self
 end
@@ -8295,7 +8335,7 @@ Abilities.new = function(IEngine)
     self.Blizzard = _Abilities.Blizzard.new(IEngine)
     self.Uncontrollable_Flames = _Abilities.Uncontrollable_Flames.new(IEngine)
 
-    -- self.Black_Hole = _Abilities.Black_Hole.new(IEngine)
+    self.Black_Hole = _Abilities.Black_Hole.new(IEngine)
 
     -- DESTROYER
     self.Interceptor = _Abilities.Interceptor.new(IEngine)
