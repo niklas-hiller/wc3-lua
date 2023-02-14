@@ -227,10 +227,10 @@ Ability 3
 
 Ability 4
 - Set: ELEMENTS
-- Name: 
-- Description: 
+- Name: Black Hole
+- Description: 2000x per second
 
-## ELEMENTS
+## SUMMONER
 Ability 1
 - Set: SUMMONER
 - Name: Boar
@@ -248,7 +248,7 @@ Ability 3
 
 Ability 4
 - Set: SUMMONER
-- Name: 
+- Name: Reapers
 - Description: 
 
 # FIRST BOSS PASSIVES

@@ -236,10 +236,10 @@ Engine.new = function()
 
     _Indexer.new = function()
         local self = {}
-        local handles = {}
+        local objects = {}
 
         function self._add(object, handle)
-            handles[object] = handle
+            objects[handle] = object
             return handle
         end
 
@@ -248,13 +248,12 @@ Engine.new = function()
             if status then return val end
         end
 
-        function self._find(_handle)
-            for object, handle in pairs(handles) do
-                if handle == _handle then
-                    return object
-                end
+        function self._find(handle)
+            local object = objects[handle]
+            if object ~= nil then
+                return object
             end
-            Log.Warn("Indexer detected unknown handle! (" .. GetHandleId(_handle) .. ")")
+            Log.Warn("Indexer detected unknown handle! (" .. handle .. ")")
         end
 
         self.find = function(handle)
@@ -1073,7 +1072,7 @@ Engine.new = function()
             if customId ~= nil and Configuration.Users.Effects.Transparency.Key[customId] then
                 factor = Configuration.Users.Effects.Transparency.Key[customId]
             end
-            return alpha * factor
+            return math.floor(alpha * factor)
         end
 
         function mt.__newindex(table, index, value)
@@ -2069,8 +2068,10 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT DEATH] ...")
-                    GetTriggerUnit().owner.on_unit_death(GetTriggerUnit())
-                    GetTriggerUnit().on_death()
+                    local triggerUnit = GetTriggerUnit()
+
+                    triggerUnit.owner.on_unit_death(triggerUnit)
+                    triggerUnit.on_death()
                 end
             )
 
@@ -2113,10 +2114,13 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT ATTACK] ...")
-                    GetAttacker().owner.on_unit_attack(GetAttacker(), GetTriggerUnit())
-                    GetAttacker().on_attack(GetTriggerUnit())
-                    GetTriggerUnit().owner.on_unit_attacked(GetAttacker(), GetTriggerUnit())
-                    GetTriggerUnit().on_attacked(GetAttacker())
+                    local attacker = GetAttacker()
+                    local attacked = GetTriggerUnit()
+
+                    attacker.owner.on_unit_attack(attacker, attacked)
+                    attacker.on_attack(attacked)
+                    attacked.owner.on_unit_attacked(attacker, attacked)
+                    attacked.on_attacked(attacker)
                 end
             )
 
@@ -2125,8 +2129,10 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT LEVEL] ...")
-                    GetTriggerUnit().owner.on_unit_level(GetTriggerUnit())
-                    GetTriggerUnit().on_level()
+                    local triggerUnit = GetTriggerUnit()
+
+                    triggerUnit.owner.on_unit_level(triggerUnit)
+                    triggerUnit.on_level()
                 end
             )
 
@@ -2135,8 +2141,10 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT SKILL] ...")
-                    GetTriggerUnit().owner.on_unit_skill(GetTriggerUnit(), GetLearnedSkill())
-                    GetTriggerUnit().on_skill(GetLearnedSkill())
+                    local triggerUnit = GetTriggerUnit()
+
+                    triggerUnit.owner.on_unit_skill(triggerUnit, GetLearnedSkill())
+                    triggerUnit.on_skill(GetLearnedSkill())
                 end
             )
 
@@ -2145,8 +2153,10 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT DROP ITEM] ...")
-                    GetTriggerUnit().owner.on_unit_drop_item(GetTriggerUnit(), GetManipulatedItem())
-                    GetTriggerUnit().on_drop_item(GetManipulatedItem())
+                    local triggerUnit = GetTriggerUnit()
+
+                    triggerUnit.owner.on_unit_drop_item(triggerUnit, GetManipulatedItem())
+                    triggerUnit.on_drop_item(GetManipulatedItem())
                     -- GetManipulatedItem().on_drop(GetTriggerUnit())
                 end
             )
@@ -2156,8 +2166,10 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT PICKUP ITEM] ...")
-                    GetTriggerUnit().owner.on_unit_pickup_item(GetTriggerUnit(), GetManipulatedItem())
-                    GetTriggerUnit().on_pickup_item(GetManipulatedItem())
+                    local triggerUnit = GetTriggerUnit()
+
+                    triggerUnit.owner.on_unit_pickup_item(triggerUnit, GetManipulatedItem())
+                    triggerUnit.on_pickup_item(GetManipulatedItem())
                     -- GetManipulatedItem().on_pickup(GetTriggerUnit())
                 end
             )
@@ -2167,8 +2179,10 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT USE ITEM] ...")
-                    GetTriggerUnit().owner.on_unit_use_item(GetTriggerUnit(), GetManipulatedItem())
-                    GetTriggerUnit().on_use_item(GetManipulatedItem())
+                    local triggerUnit = GetTriggerUnit()
+                    
+                    triggerUnit.owner.on_unit_use_item(triggerUnit, GetManipulatedItem())
+                    triggerUnit.on_use_item(GetManipulatedItem())
                     -- GetManipulatedItem().on_use(GetTriggerUnit())
                 end
             )
@@ -2178,9 +2192,11 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT STACK ITEM] ...")
-                    GetTriggerUnit().owner.on_unit_stack_item(GetTriggerUnit(), GetManipulatedItem())
-                    GetTriggerUnit().on_stack_item(GetManipulatedItem())
-                    -- GetManipulatedItem().on_stack(GetTriggerUnit())
+                    local triggerUnit = GetTriggerUnit()
+
+                    triggerUnit.owner.on_unit_stack_item(triggerUnit, GetManipulatedItem())
+                    triggerUnit.on_stack_item(GetManipulatedItem())
+                    -- GetManipulatedItem().on_stack(triggerUnit)
                 end
             )
 
@@ -2189,8 +2205,11 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT SPELL CHANNEL] ...")
-                    GetTriggerUnit().owner.on_unit_spell_channel(GetTriggerUnit(), GetSpellObject())
-                    GetTriggerUnit().on_spell_channel(GetSpellObject())
+                    local triggerUnit = GetTriggerUnit()
+                    local spellObject = GetSpellObject()
+
+                    triggerUnit.owner.on_unit_spell_channel(triggerUnit, spellObject)
+                    triggerUnit.on_spell_channel(spellObject)
                 end
             )
 
@@ -2199,8 +2218,11 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT SPELL CAST] ...")
-                    GetTriggerUnit().owner.on_unit_spell_cast(GetTriggerUnit(), GetSpellObject())
-                    GetTriggerUnit().on_spell_cast(GetSpellObject())
+                    local triggerUnit = GetTriggerUnit()
+                    local spellObject = GetSpellObject()
+
+                    triggerUnit.owner.on_unit_spell_cast(triggerUnit, spellObject)
+                    triggerUnit.on_spell_cast(spellObject)
                 end
             )
 
@@ -2209,8 +2231,11 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT SPELL EFFECT] ...")
-                    GetTriggerUnit().owner.on_unit_spell_effect(GetTriggerUnit(), GetSpellObject())
-                    GetTriggerUnit().on_spell_effect(GetSpellObject())
+                    local triggerUnit = GetTriggerUnit()
+                    local spellObject = GetSpellObject()
+
+                    triggerUnit.owner.on_unit_spell_effect(triggerUnit, spellObject)
+                    triggerUnit.on_spell_effect(spellObject)
                 end
             )
 
@@ -2219,8 +2244,11 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT SPELL FINISH] ...")
-                    GetTriggerUnit().owner.on_unit_spell_finish(GetTriggerUnit(), GetSpellObject())
-                    GetTriggerUnit().on_spell_finish(GetSpellObject())
+                    local triggerUnit = GetTriggerUnit()
+                    local spellObject = GetSpellObject()
+
+                    triggerUnit.owner.on_unit_spell_finish(triggerUnit, spellObject)
+                    triggerUnit.on_spell_finish(spellObject)
                 end
             )
 
@@ -2229,8 +2257,11 @@ Engine.new = function()
             .addAction(
                 function()
                     Log.Debug("[UNIT SPELL END] ...")
-                    GetTriggerUnit().owner.on_unit_spell_end(GetTriggerUnit(), GetSpellObject())
-                    GetTriggerUnit().on_spell_end(GetSpellObject())
+                    local triggerUnit = GetTriggerUnit()
+                    local spellObject = GetSpellObject()
+
+                    triggerUnit.owner.on_unit_spell_end(triggerUnit, spellObject)
+                    triggerUnit.on_spell_end(spellObject)
                 end
             )
         end
@@ -3790,7 +3821,7 @@ Engine.new = function()
     -- Engine Clock
     _Clock.new = function()
         local self = {}
-        local handle = Indexer.add(self, CreateTimer())
+        local handle = CreateTimer()
         local schedule_list = {}
         self.running = false
 
@@ -5005,18 +5036,11 @@ Engine.new = function()
             - destroy()     -> destroys a group
             - forEach()     -> performs a given action for all units in group
     --]]
-    _Group.new = function(groupList)
+    _Group.new = function()
         local self = {}
         local units = {}
         local mt = {}
-
-        if groupList then
-            for group in groupList do
-                for unit in group.units do
-                    self.append(unit)
-                end
-            end
-        end
+        local handle = CreateGroup()
 
         function self._append(unit)
             for index, value in ipairs(units) do
@@ -5050,6 +5074,48 @@ Engine.new = function()
             if status then return val end
         end
 
+        function self._inRange(x, y, range)
+            units = {}
+            GroupEnumUnitsInRange(handle, x, y, range, Filter(
+                function()
+                    table.insert(units, GetFilterUnit())
+                end
+            ))
+            return self
+        end
+
+        self.inRange = function(x, y, range)
+            local status, val = xpcall(self._inRange, Log.Error, x, y, range)
+            if status then return val end
+        end
+
+        function self._inRangeFiltered(x, y, range, filter)
+            units = {}
+            GroupEnumUnitsInRange(handle, x, y, range, Filter(
+                function()
+                    local filterUnit = GetFilterUnit()
+                    if filter(group, filterUnit) then
+                        table.insert(units, filterUnit)
+                    end
+                end
+            ))
+            return self
+        end
+
+        self.inRangeFiltered = function(x, y, range, filter)
+            local status, val = xpcall(self._inRangeFiltered, Log.Error, x, y, range, filter)
+            if status then return val end
+        end
+
+        function self._getRandom()
+            return units[math.random(#units)]
+        end
+
+        self.getRandom = function()
+            local status, val = xpcall(self._getRandom, Log.Error)
+            if status then return val end
+        end
+
         function self._inGroup(unit)
             for index, value in ipairs(units) do
                 if value == unit then
@@ -5069,21 +5135,23 @@ Engine.new = function()
                 return units
             elseif index == "size" then
                 local count = 0
-                for _ in pairs(units) do count = count + 1 end
+                for index, unit in ipairs(units) do count = count + 1 end
                 return count
             else
                 Log.Error("Unknown attribute '" .. index .. "'.")
             end
         end
 
+        -- currently wont work
         function self.__sub(group)
             newGroup = _Group.new({self, group})
-            for unit in group.units do
+            for index, unit in ipairs(group.unit) do
                 newGroup.remove(unit)
             end
             return newGroup
         end
 
+        -- currently wont work
         function self.__add(group)
             return _Group.new(
                 {self, group}
@@ -5110,15 +5178,16 @@ Engine.new = function()
             if status then return val end
         end
 
-        function self._forEach(action, ...)
+        function self._forEach(action)
             self.on_foreach()
-            for unit in units do
-                action(group, unit, ...)
+            for index, unit in ipairs(units) do
+                action(self, unit)
             end
+            return self
         end
 
-        self.forEach = function(action, ...)
-            local status, val = xpcall(self._forEach, Log.Error, action, ...)
+        self.forEach = function(action)
+            local status, val = xpcall(self._forEach, Log.Error, action)
             if status then return val end
         end
 
@@ -5178,8 +5247,8 @@ Engine.new = function()
         return self
     end
 
-    Group.new = function(groupList)
-        local status, val = xpcall(_Group.new, Log.Error, groupList)
+    Group.new = function()
+        local status, val = xpcall(_Group.new, Log.Error)
         if status then return val end
     end
 
@@ -5511,6 +5580,7 @@ Engine.new = function()
     IEngine.Unit = Unit.new
     IEngine.Log = Log
     IEngine.Configuration = Configuration
+    IEngine.Group = Group.new
     -- IEngine.Item = Item.new
 
     -- Interface [Unit API]
@@ -5626,7 +5696,8 @@ _Abilities = {}
 _Abilities.Sword_Slash = {}
 _Abilities.Sword_Slash.new = function(IEngine)
     local self = {}
-    local events = {}
+    local _eventHolder = {}
+    local group = IEngine.Group()
 
     local bloodEffect = IEngine.Effect()
     bloodEffect.scale = 0.3
@@ -5665,8 +5736,13 @@ _Abilities.Sword_Slash.new = function(IEngine)
     end
 
     function self.apply(unit)
-        if events.unit == nil then
-            unit.bind("on_damage_after",
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
+
+        do
+            eventHolder.event = unit.bind("on_damage_after",
                 function(source, target, attack)
                     local rad = source.face * bj_DEGTORAD
                     local x = source.x + 75. * math.cos(rad)
@@ -5704,17 +5780,20 @@ _Abilities.Sword_Slash.new = function(IEngine)
                 end
             ).setCondition(
                 function(source, target, attack)
-                    return attack.isAttack
+                    return attack.isAttack and source == unit
                 end
             )
         end
+
+        _eventHolder[unit] = eventHolder
     end
 
     function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
+        if _eventHolder[unit] == nil then
+            return
         end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
     end
 
     return self
@@ -5723,18 +5802,24 @@ end
 _Abilities.Dodge = {}
 _Abilities.Dodge.new = function(IEngine)
     local self = {}
-    local clock = IEngine.Clock()
-    clock.start()
+    local _eventHolder = {}
+    local group = IEngine.Group()
+
     local effect = IEngine.Effect()
     effect.model = "Effects\\Dash.mdx"
     effect.scale = 0.3
+
     local aoeEffect = IEngine.Effect()
     aoeEffect.model = "Effects\\Stomp_Effect.mdx"
-    local events = {}
 
     function self.apply(unit)
-        if events.unit == nil then
-            events.unit = unit.bind("on_spell_effect",
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
+
+        do
+            eventHolder.event = unit.bind("on_spell_effect",
                 function(source, spell)
                     local withBlink = true
                     local withAoE = true
@@ -5771,12 +5856,12 @@ _Abilities.Dodge.new = function(IEngine)
                     -- INT Scaling Blink Effect
                     if withBlink then
                         source.fadeOut(dashDuration / 4)
-                        clock.schedule_once(
+                        eventHolder.clock.schedule_once(
                             function(triggeringClock, triggeringSchedule)
                                 source.fadeIn(dashDuration)
                             end, dashDuration / 4
                         )
-                        clock.schedule_interval(
+                        eventHolder.clock.schedule_interval(
                             function(triggeringClock, triggeringSchedule)
                                 local tempUnit = source.owner.createUnit('hpea', unit.x, unit.y, bj_RADTODEG * a)
                                 tempUnit.skin = source.skin
@@ -5785,7 +5870,7 @@ _Abilities.Dodge.new = function(IEngine)
                                 tempUnit.x = unit.x
                                 tempUnit.y = unit.y
                                 tempUnit.playAnimation('walk')
-                                clock.schedule_once(
+                                triggeringClock.schedule_once(
                                     function(triggeringClock, triggeringSchedule)
                                         tempUnit.remove()
                                     end, 0.2
@@ -5814,12 +5899,12 @@ _Abilities.Dodge.new = function(IEngine)
                         )
                     else
                         source.fadeOut(dashDuration / 2)
-                        clock.schedule_once(
+                        eventHolder.clock.schedule_once(
                             function(triggeringClock, triggeringSchedule)
                                 source.fadeIn(dashDuration)
                             end, dashDuration / 2
                         )     
-                        clock.schedule_interval(
+                        eventHolder.clock.schedule_interval(
                             function(triggeringClock, triggeringSchedule)
                                 local tempUnit = source.owner.createUnit('hpea', unit.x, unit.y, bj_RADTODEG * a)
                                 tempUnit.skin = source.skin
@@ -5828,7 +5913,7 @@ _Abilities.Dodge.new = function(IEngine)
                                 tempUnit.x = unit.x
                                 tempUnit.y = unit.y
                                 tempUnit.playAnimation('walk')
-                                clock.schedule_once(
+                                triggeringClock.schedule_once(
                                     function(triggeringClock, triggeringSchedule)
                                         tempUnit.remove()
                                     end, 0.2
@@ -5854,17 +5939,20 @@ _Abilities.Dodge.new = function(IEngine)
                 end
             ).setCondition(
                 function(source, spell)
-                    return spell.id == FourCC('AEVA')
+                    return spell.id == FourCC('AEVA') and source == unit
                 end
             )
         end
+
+        _eventHolder[unit] = eventHolder
     end
 
     function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
+        if _eventHolder[unit] == nil then
+            return
         end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
     end
 
     return self
@@ -5881,7 +5969,7 @@ _Abilities.Magma_Constellation.new = function(IEngine)
     local stompEffect = IEngine.Effect()
     stompEffect.model = "Effects\\Stomp_Effect.mdx"
     stompEffect.scale = 0.7
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     function self.apply(unit)
         if events.unit == nil then
@@ -5913,15 +6001,15 @@ _Abilities.Magma_Constellation.new = function(IEngine)
                         for k, v in pairs(delayTable[i]) do
                             delayTable[i][k] = v + 1
                         end
-                        GroupEnumUnitsInRange(group, x, y, 150., 
-                            Filter(
-                                function()
-                                    local target = IEngine.GetFilterUnit()
-                                    if unit.isEnemy(target) then
-                                        if delayTable[i][target] == nil then
-                                            delayTable[i][target] = 100
+                        group
+                            .inRange(x, y, 150.)
+                            .forEach(
+                                function(group, enumUnit)
+                                    if unit.isEnemy(enumUnit) then
+                                        if delayTable[i][enumUnit] == nil then
+                                            delayTable[i][enumUnit] = 100
                                         end
-                                        if delayTable[i][target] >= 100 then
+                                        if delayTable[i][enumUnit] >= 100 then
                                             local dist = math.random(0., 30.)
                                             local rad = math.random(0., math.pi * 2)
                                             local newX = x + dist * math.cos(rad)
@@ -5934,13 +6022,12 @@ _Abilities.Magma_Constellation.new = function(IEngine)
                                             stompEffect.y = newY
                                             stompEffect.z = z
                                             stompEffect.create().destroy()
-                                            unit.damageTarget(target, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                                            delayTable[i][target] = 0
+                                            unit.damageTarget(enumUnit, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                            delayTable[i][enumUnity] = 0
                                         end
                                     end
                                 end
                             )
-                        )
                     end
                 end, 0.01
             ).setCondition(
@@ -5982,7 +6069,7 @@ _Abilities.Blade_Dance = {}
 _Abilities.Blade_Dance.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local bladeEffect = IEngine.Effect()
     bladeEffect.model = "Effects\\Ephemeral Slash Purple.mdx"
@@ -6005,22 +6092,22 @@ _Abilities.Blade_Dance.new = function(IEngine)
                     bladeEffect.timeScale = math.random(0.8, 1.3)
                     bladeEffect.yaw = math.random(0., math.pi * 2)
                     bladeEffect.create().destroy()
-                    GroupEnumUnitsInRange(group, unit.x, unit.y, 150., 
-                        Filter(
-                            function()
-                                local target = IEngine.GetFilterUnit()
-                                if target.hp <= 1 then
+
+                    group
+                        .inRange(unit.x, unit.y, 150.)
+                        .forEach(
+                            function(group, enumUnit)
+                                if enumUnit.hp <= 1 then
                                     return
                                 end
-                                if unit.isEnemy(target) then
-                                    bloodEffect.x = target.x
-                                    bloodEffect.y = target.y
+                                if unit.isEnemy(enumUnit) then
+                                    bloodEffect.x = enumUnit.x
+                                    bloodEffect.y = enumUnit.y
                                     bloodEffect.create().destroy()
-                                    unit.damageTarget(target, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
+                                    unit.damageTarget(enumUnit, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
                                 end
                             end
                         )
-                    )
                 end, 0.05
             )
         end
@@ -6043,7 +6130,7 @@ _Abilities.Blink_Strike = {}
 _Abilities.Blink_Strike.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local casterEffect = IEngine.Effect()
     casterEffect.scale = 0.8
@@ -6063,27 +6150,21 @@ _Abilities.Blink_Strike.new = function(IEngine)
                 function(source, target, attack)
                     local x = source.x
                     local y = source.y
-                    GroupEnumUnitsInRange(group, x, y, 1200.,
-                        Filter(
-                            function()
-                                local enumUnit = IEngine.GetFilterUnit()
-                                if enumUnit.hp <= 1 then
+                    local target = group
+                        .inRangeFiltered(x, y, 1200.,
+                            function(group, filterUnit)
+                                if filterUnit.hp <= 1 then
                                     return false
                                 end
-                                if unit.isEnemy(enumUnit) then
-                                    return true
+                                if not unit.isEnemy(filterUnit) then
+                                    return false
                                 end
-                                return false
+                                return true
                             end
-                        )
-                    )
-                    local size = BlzGroupGetSize(group)
-                    if size == 0 then
+                        ).getRandom()
+                    if target == nil then
                         return
                     end
-                    
-                    local target = IEngine.BlzGroupUnitAt(group, GetRandomInt(0, size - 1))
-                    GroupClear(group)
 
                     local x2 = target.x
                     local y2 = target.y
@@ -6130,7 +6211,7 @@ _Abilities.Demon_Control = {}
 _Abilities.Demon_Control.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local roarEffect = IEngine.Effect()
     roarEffect.model = "Abilities\\Spells\\Undead\\UnholyFrenzyAOE\\UnholyFrenzyAOETarget.mdl"
@@ -6238,7 +6319,7 @@ _Abilities.Shadow_Strike = {}
 _Abilities.Shadow_Strike.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local disappearEffect = IEngine.Effect()
     disappearEffect.scale = 0.7
@@ -6258,25 +6339,19 @@ _Abilities.Shadow_Strike.new = function(IEngine)
                 function(source, target, attack)
                     local x = source.x
                     local y = source.y
-                    GroupEnumUnitsInRange(group, x, y, 1200.,
-                        Filter(
-                            function()
-                                local enumUnit = IEngine.GetFilterUnit()
-                                if unit.isEnemy(enumUnit) and enumUnit.hp > 0 then
+                    local target = group
+                        .inRangeFiltered(x, y, 1200.,
+                            function(group, filterUnit)
+                                if unit.isEnemy(filterUnit) and filterUnit.hp > 0 then
                                     return true
                                 end
                                 return false
                             end
-                        )
-                    )
-                    local size = BlzGroupGetSize(group)
-                    if size == 0 then
+                        ).getRandom()
+                    if target == nil then
                         return
                     end
                     
-                    local target = IEngine.BlzGroupUnitAt(group, GetRandomInt(0, size - 1))
-                    GroupClear(group)
-
                     local x2 = target.x
                     local y2 = target.y
                     local a = math.random(0., math.pi * 2)
@@ -6379,7 +6454,7 @@ _Abilities.Wolf = {}
 _Abilities.Wolf.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local bloodEffect = IEngine.Effect()
     bloodEffect.model = "Objects\\Spawnmodels\\Human\\HumanBlood\\HumanBloodLarge0.mdl"
@@ -6500,7 +6575,7 @@ _Abilities.Bear = {}
 _Abilities.Bear.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local bloodEffect = IEngine.Effect()
     bloodEffect.model = "Objects\\Spawnmodels\\Human\\HumanBlood\\HumanBloodLarge0.mdl"
@@ -6621,7 +6696,7 @@ _Abilities.Boar = {}
 _Abilities.Boar.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
     
     function self.apply(unit)
         if _eventHolder[unit] ~= nil then
@@ -6728,7 +6803,7 @@ _Abilities.Reapers = {}
 _Abilities.Reapers.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
     
     function self.apply(unit)
         if _eventHolder[unit] ~= nil then
@@ -6891,16 +6966,15 @@ _Abilities.Reapers.new = function(IEngine)
                                                 explodeEffect.x = x2
                                                 explodeEffect.y = y2
                                                 explodeEffect.create().destroy()
-                                                GroupEnumUnitsInRange(group, x2, y2, 150., 
-                                                    Filter(
-                                                        function()
-                                                            local target = IEngine.GetFilterUnit()
-                                                            if unit.isEnemy(target) then
-                                                                unit.damageTarget(target, unit.damage * 30., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                                group
+                                                    .inRange(x2, y2, 150.)
+                                                    .forEach(
+                                                        function(group, enumUnit)
+                                                            if unit.isEnemy(enumUnit) then
+                                                                unit.damageTarget(enumUnit, unit.damage * 30., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                                             end
                                                         end
                                                     )
-                                                )
                                             end
                                             if dist >= 500 then
                                                 triggeringClock.unschedule(triggeringSchedule)
@@ -7037,19 +7111,18 @@ _Abilities.Reapers.new = function(IEngine)
                                             local y2 = y + dist * sinRes
                                             source.x = x2
                                             source.y = y2
-                                            GroupEnumUnitsInRange(group, x2, y2, 150., 
-                                                Filter(
-                                                    function()
-                                                        local target = IEngine.GetFilterUnit()
-                                                        if unit.isEnemy(target) then
-                                                            bloodEffect.x = target.x
-                                                            bloodEffect.y = target.y
+                                            group
+                                                .inRange(x2, y2, 150.)
+                                                .forEach(
+                                                    function(group, enumUnit)
+                                                        if unit.isEnemy(enumUnit) then
+                                                            bloodEffect.x = enumUnit.x
+                                                            bloodEffect.y = enumUnit.y
                                                             bloodEffect.create().destroy()
-                                                            unit.damageTarget(target, unit.damage, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                                            unit.damageTarget(enumUnit, unit.damage, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                                         end
                                                     end
                                                 )
-                                            )
                                             if progress >= 1. then
                                                 casting = false
                                                 source.playAnimation("stand")
@@ -7275,7 +7348,7 @@ _Abilities.Impale = {}
 _Abilities.Impale.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local impaleEffect = IEngine.Effect()
     impaleEffect.scale = 1.0
@@ -7294,24 +7367,23 @@ _Abilities.Impale.new = function(IEngine)
                     count = count + 1
                     if count >= 60 then
                         count = 0
-                        GroupEnumUnitsInRange(group, unit.x, unit.y, 850., 
-                            Filter(
-                                function()
-                                    local target = IEngine.GetFilterUnit()
-                                    if target.hp <= 1 then
+                        group
+                            .inRange(unit.x, unit.y, 850.)
+                            .forEach(
+                                function(group, enumUnit)
+                                    if enumUnit.hp <= 1 then
                                         return
                                     end
 
-                                    if unit.isEnemy(target) then
-                                        impaleEffect.x = target.x
-                                        impaleEffect.y = target.y
+                                    if unit.isEnemy(enumUnit) then
+                                        impaleEffect.x = enumUnit.x
+                                        impaleEffect.y = enumUnit.y
                                         impaleEffect.create().destroy()
-                                        unit.damageTarget(target, unit.damage * 50., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                                        unit.damageTarget(enumUnit, unit.damage * 50., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
                                         unit.hp = unit.hp + (0.03 * unit.maxhp)
                                     end
                                 end
                             )
-                        )
                     end
                 end, 0.05
             )
@@ -7335,7 +7407,7 @@ _Abilities.Judgement = {}
 _Abilities.Judgement.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local impaleEffect = IEngine.Effect()
     impaleEffect.scale = 1.0
@@ -7370,20 +7442,19 @@ _Abilities.Judgement.new = function(IEngine)
                                     impaleEffect.x = x2
                                     impaleEffect.y = y2
                                     impaleEffect.create().destroy()
-                                    GroupEnumUnitsInRange(group, x2, y2, 100., 
-                                        Filter(
-                                            function()
-                                                local target = IEngine.GetFilterUnit()
-                                                if target.hp <= 1 then
+                                    group
+                                        .inRange(x2, y2, 100.)
+                                        .forEach(
+                                            function(group, enumUnit)
+                                                if enumUnit.hp <= 1 then
                                                     return
                                                 end
 
-                                                if source.isEnemy(target) then
-                                                    source.damageTarget(target, source.damage * 100., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                                if source.isEnemy(enumUnit) then
+                                                    source.damageTarget(enumUnit, source.damage * 100., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                                 end
                                             end
                                         )
-                                    )
                                 end
                                 if dist >= totalDistance then
                                     triggeringClock.unschedule(triggeringSchedule)
@@ -7417,7 +7488,7 @@ _Abilities.Overload = {}
 _Abilities.Overload.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local explodeEffect = IEngine.Effect()
     explodeEffect.scale = 1.0
@@ -7447,20 +7518,19 @@ _Abilities.Overload.new = function(IEngine)
                                     explodeEffect.x = x2
                                     explodeEffect.y = y2
                                     explodeEffect.create().destroy()
-                                    GroupEnumUnitsInRange(group, x2, y2, 150., 
-                                        Filter(
-                                            function()
-                                                local target = IEngine.GetFilterUnit()
-                                                if target.hp <= 1 then
+                                    group
+                                        .inRange(x2, y2, 150.)
+                                        .forEach(
+                                            function(group, enumUnit)
+                                                if enumUnit.hp <= 1 then
                                                     return
                                                 end
                                                 
-                                                if caster.isEnemy(target) then
-                                                    caster.damageTarget(target, caster.damage * 100., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                                if caster.isEnemy(enumUnit) then
+                                                    caster.damageTarget(enumUnit, caster.damage * 100., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                                 end
                                             end
                                         )
-                                    )
                                 end
                                 if dist >= 500 then
                                     triggeringClock.unschedule(triggeringSchedule)
@@ -7494,7 +7564,7 @@ _Abilities.Heaven_Justice = {}
 _Abilities.Heaven_Justice.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local explodeEffect = IEngine.Effect()
     explodeEffect.scale = 1.3
@@ -7566,22 +7636,21 @@ _Abilities.Heaven_Justice.new = function(IEngine)
                                                     afterEffect.x = x2
                                                     afterEffect.y = y2
                                                     afterEffect.create().destroy()
-                                                    GroupEnumUnitsInRange(group, x2, y2, 150., 
-                                                        Filter(
-                                                            function()
-                                                                local target = IEngine.GetFilterUnit()
-                                                                if target.hp <= 1 then
+                                                    group
+                                                        .inRange(x2, y2, 150.)
+                                                        .forEach(
+                                                            function(group, enumUnit)
+                                                                if enumUnit.hp <= 1 then
                                                                     return
                                                                 end
                                                                 
-                                                                if unit.isEnemy(target) then
-                                                                    unit.damageTarget(target, unit.damage * 2500., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                                                if unit.isEnemy(enumUnit) then
+                                                                    unit.damageTarget(enumUnit, unit.damage * 2500., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                                                 else
-                                                                    target.hp = target.hp + 0.2 * unit.maxhp
+                                                                    enumUnit.hp = enumUnit.hp + 0.2 * unit.maxhp
                                                                 end
                                                             end
                                                         )
-                                                    )
                                                 end, 1.05
                                             )
                                         end
@@ -7670,7 +7739,7 @@ _Abilities.Interceptor = {}
 _Abilities.Interceptor.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local explodeEffect = IEngine.Effect()
     explodeEffect.scale = 2.0
@@ -7694,16 +7763,15 @@ _Abilities.Interceptor.new = function(IEngine)
                     explodeEffect.create().destroy()
                     triggeringClock.schedule_once(
                         function(triggeringClock, triggeringSchedule)
-                            GroupEnumUnitsInRange(group, x, y, 150., 
-                                Filter(
-                                    function()
-                                        local target = IEngine.GetFilterUnit()
-                                        if unit.isEnemy(target) then
-                                            unit.damageTarget(target, unit.damage * 100.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
+                            group
+                                .inRange(x, y, 150.)
+                                .forEach(
+                                    function(group, enumUnit)
+                                        if unit.isEnemy(enumUnit) then
+                                            unit.damageTarget(enumUnit, unit.damage * 100.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
                                         end
                                     end
                                 )
-                            )
                         end, 0.1
                     )
                 end, 0.1
@@ -7729,7 +7797,7 @@ _Abilities.Sacred_Storm = {}
 _Abilities.Sacred_Storm.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local explodeEffect = IEngine.Effect()
     explodeEffect.model = "Effects\\Gravity Storm.mdx"
@@ -7815,16 +7883,15 @@ _Abilities.Sacred_Storm.new = function(IEngine)
                             currentDist = 0
                         end
 
-                        GroupEnumUnitsInRange(group, orangeX, orangeY, 250., 
-                            Filter(
-                                function()
-                                    local target = IEngine.GetFilterUnit()
-                                    if unit.isEnemy(target) then
-                                        unit.damageTarget(target, unit.damage * 0.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
+                        group
+                            .inRange(orangeX, orangeY, 250.)
+                            .forEach(
+                                function(group, enumUnit)
+                                    if unit.isEnemy(enumUnit) then
+                                        unit.damageTarget(enumUnit, unit.damage * 0.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
                                     end
                                 end
                             )
-                        )
                     end, 0.01
                 )
 
@@ -7902,16 +7969,15 @@ _Abilities.Sacred_Storm.new = function(IEngine)
                             currentDist = 0
                         end
 
-                        GroupEnumUnitsInRange(group, blueX, blueY, 250., 
-                            Filter(
-                                function()
-                                    local target = IEngine.GetFilterUnit()
-                                    if unit.isEnemy(target) then
-                                        unit.damageTarget(target, unit.damage * 0.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
+                        group
+                            .inRange(blueX, blueY, 250.)
+                            .forEach(
+                                function(group, enumUnit)
+                                    if unit.isEnemy(enumUnit) then
+                                        unit.damageTarget(enumUnit, unit.damage * 0.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
                                     end
                                 end
                             )
-                        )
                     end, 0.01
                 )
 
@@ -7960,16 +8026,15 @@ _Abilities.Sacred_Storm.new = function(IEngine)
                                 explodeEffect.x = explosionX
                                 explodeEffect.y = explosionY
                                 explodeEffect.create().destroy()
-                                GroupEnumUnitsInRange(group, explosionX, explosionY, 150., 
-                                    Filter(
-                                        function()
-                                            local target = IEngine.GetFilterUnit()
-                                            if unit.isEnemy(target) then
-                                                unit.damageTarget(target, unit.damage * 40.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
+                                group
+                                    .inRange(explosionX, explosionY, 150.)
+                                    .forEach(
+                                        function(group, enumUnit)
+                                            if unit.isEnemy(enumUnit) then
+                                                unit.damageTarget(enumUnit, unit.damage * 40.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
                                             end
                                         end
                                     )
-                                )
                             end
                         elseif laserDark ~= nil then
                             laserDark.destroy()
@@ -8005,7 +8070,7 @@ _Abilities.Kingdom_Come = {}
 _Abilities.Kingdom_Come.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local explodeEffect = IEngine.Effect()
     explodeEffect.model = "Effects\\Kingdom Come.mdx"
@@ -8043,16 +8108,15 @@ _Abilities.Kingdom_Come.new = function(IEngine)
                     triggeringClock.schedule_interval(
                         function(triggeringClock, triggeringSchedule)
                             currentTime = currentTime + tickrate
-                            GroupEnumUnitsInRange(group, x, y, 200. * scale, 
-                                Filter(
-                                    function()
-                                        local target = IEngine.GetFilterUnit()
-                                        if unit.isEnemy(target) then
-                                            unit.damageTarget(target, unit.damage * damage_per_tick, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
+                            group
+                                .inRange(x, y, 200. * scale)
+                                .forEach(
+                                    function(group, enumUnit)
+                                        if unit.isEnemy(enumUnit) then
+                                            unit.damageTarget(enumUnit, unit.damage * damage_per_tick, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
                                         end
                                     end
                                 )
-                            )
                             if currentTime >= totalTime then
                                 triggeringClock.unschedule(triggeringSchedule)
                             end
@@ -8080,7 +8144,7 @@ _Abilities.I_Am_Atomic = {}
 _Abilities.I_Am_Atomic.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     function self.apply(unit)
         if _eventHolder[unit] ~= nil then
@@ -8179,16 +8243,15 @@ _Abilities.I_Am_Atomic.new = function(IEngine)
                                         triggeringClock.unschedule(triggeringSchedule)
                                     end
 
-                                    GroupEnumUnitsInRange(group, explosionX, explosionY, 300 + 2200. * (currentDuration / totalDuration), 
-                                        Filter(
-                                            function()
-                                                local target = IEngine.GetFilterUnit()
-                                                if unit.isEnemy(target) then
-                                                    unit.damageTarget(target, unit.damage * damage_per_tick, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
+                                    group
+                                        .inRange(explosionX, explosionY, 300 + 2200. * (currentDuration / totalDuration))
+                                        .forEach(
+                                            function(group, enumUnit)
+                                                if unit.isEnemy(enumUnit) then
+                                                    unit.damageTarget(enumUnit, unit.damage * damage_per_tick, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
                                                 end
                                             end
                                         )
-                                    )
                                 end, tickrate
                             )
                         end, 5.0
@@ -8222,7 +8285,7 @@ _Abilities.Hurricane_Constellation = {}
 _Abilities.Hurricane_Constellation.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local stompEffect = IEngine.Effect()
     stompEffect.model = "Effects\\Wind Blast.mdx"
@@ -8269,15 +8332,15 @@ _Abilities.Hurricane_Constellation.new = function(IEngine)
                         for k, v in pairs(delayTable[i]) do
                             delayTable[i][k] = v + 1
                         end
-                        GroupEnumUnitsInRange(group, x, y, 150., 
-                            Filter(
-                                function()
-                                    local target = IEngine.GetFilterUnit()
-                                    if unit.isEnemy(target) then
-                                        if delayTable[i][target] == nil then
-                                            delayTable[i][target] = 100
+                        group
+                            .inRange(x, y, 150.)
+                            .forEach(
+                                function(group, enumUnit)
+                                    if unit.isEnemy(enumUnit) then
+                                        if delayTable[i][enumUnit] == nil then
+                                            delayTable[i][enumUnit] = 100
                                         end
-                                        if delayTable[i][target] >= 100 then
+                                        if delayTable[i][enumUnit] >= 100 then
                                             local dist = math.random(0., 30.)
                                             local rad = math.random(0., math.pi * 2)
                                             local newX = x + dist * math.cos(rad)
@@ -8286,13 +8349,12 @@ _Abilities.Hurricane_Constellation.new = function(IEngine)
                                             stompEffect.y = newY
                                             stompEffect.z = z
                                             stompEffect.create().destroy()
-                                            unit.damageTarget(target, unit.damage * 75., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                                            delayTable[i][target] = 0
+                                            unit.damageTarget(enumUnit, unit.damage * 75., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                            delayTable[i][enumUnit] = 0
                                         end
                                     end
                                 end
                             )
-                        )
                     end
                 end, 0.01
             )
@@ -8322,7 +8384,7 @@ _Abilities.Blizzard = {}
 _Abilities.Blizzard.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local hailEffect = IEngine.Effect()
     hailEffect.scale = 1.3
@@ -8353,16 +8415,15 @@ _Abilities.Blizzard.new = function(IEngine)
                             explodeEffect.x = x
                             explodeEffect.y = y
                             explodeEffect.create().destroy()
-                            GroupEnumUnitsInRange(group, x, y, 150., 
-                                Filter(
-                                    function()
-                                        local target = IEngine.GetFilterUnit()
-                                        if unit.isEnemy(target) then
-                                            unit.damageTarget(target, unit.damage * 250., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                            group
+                                .inRange(x, y, 150.)
+                                .forEach(
+                                    function(group, enumUnit)
+                                        if unit.isEnemy(enumUnit) then
+                                            unit.damageTarget(enumUnit, unit.damage * 250., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                         end
                                     end
                                 )
-                            )
                         end, 0.9
                     )
                 end, 0.10
@@ -8387,7 +8448,7 @@ _Abilities.Uncontrollable_Flames = {}
 _Abilities.Uncontrollable_Flames.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
 
     local explodeEffect = IEngine.Effect()
     explodeEffect.scale = 1.3
@@ -8419,16 +8480,15 @@ _Abilities.Uncontrollable_Flames.new = function(IEngine)
                     stompEffect.y = y
                     stompEffect.create().destroy()
 
-                    GroupEnumUnitsInRange(group, x, y, 150., 
-                        Filter(
-                            function()
-                                local target = IEngine.GetFilterUnit()
-                                if unit.isEnemy(target) then
-                                    unit.damageTarget(target, unit.damage * 500., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                    group
+                        .inRange(x, y, 150.)
+                        .forEach(
+                            function(group, enumUnit)
+                                if unit.isEnemy(enumUnit) then
+                                    unit.damageTarget(enumUnit, unit.damage * 500., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                 end
                             end
                         )
-                    )
                 end, 0.10
             )
         end
@@ -8451,7 +8511,7 @@ _Abilities.Black_Hole = {}
 _Abilities.Black_Hole.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
     
     function self.apply(unit)
         if _eventHolder[unit] ~= nil then
@@ -8460,7 +8520,169 @@ _Abilities.Black_Hole.new = function(IEngine)
         local eventHolder = EventHolder.new(IEngine)
 
         do
-            
+            -- Purple
+            do
+                local blackholes = {}
+                local spawnInterval = 3.0
+                local totalDuration = 10.0
+                local tickrate = 0.01
+                local range = 700.
+                local damageRange = 250.
+                local damageFactor = 20.
+                local minDist = 150.
+                local maxDist = 1200.
+                local change = 1.0 -- < 0 for push, > 0 for pull
+                local lowestDistanceFactor = 0.6
+                local highestDistanceFactor = 3.0
+                local distanceFactor =(highestDistanceFactor - lowestDistanceFactor) / range
+                local maxBlackholes = math.ceil(totalDuration / spawnInterval)
+                for index = 1, maxBlackholes, 1 do
+                    local blackhole = IEngine.Effect()
+                    blackhole.model = "Effects\\Void Rift Purple.mdx"
+                    blackhole.scale = 1.2
+                    blackholes[index] = blackhole
+                end
+                local currentIndex = 1
+                eventHolder.schedule = eventHolder.clock.schedule_interval(
+                    function(triggeringClock, triggeringSchedule)
+                        local ux = unit.x
+                        local uy = unit.y
+                        local dist = math.random(minDist, maxDist)
+                        local rad = math.random(0., math.pi * 2)
+                        local blackholeX = ux + dist * math.cos(rad)
+                        local blackholeY = uy + dist * math.sin(rad)
+
+                        local blackhole = blackholes[currentIndex]
+                        blackhole.x = blackholeX
+                        blackhole.y = blackholeY
+                        blackhole.create()
+
+                        local currentDuration = 0.
+                        triggeringClock.schedule_interval(
+                            function(triggeringClock, triggeringSchedule)
+                                currentDuration = currentDuration + tickrate
+                                -- Pull/Push enemies
+                                group
+                                    .inRange(blackholeX, blackholeY, range)
+                                    .forEach(
+                                        function(group, enumUnit)
+                                            if not unit.isEnemy(enumUnit) then
+                                                return
+                                            end
+                                            local dx = blackholeX - enumUnit.x
+                                            local dy = blackholeY - enumUnit.y
+                                            local dist = math.sqrt(dx * dx + dy * dy)
+                                            local distanceFactor = highestDistanceFactor - distanceFactor * dist
+                                            local rad = math.atan(dy, dx)
+                                            enumUnit.x = enumUnit.x + (change * distanceFactor) * math.cos(rad)
+                                            enumUnit.y = enumUnit.y + (change * distanceFactor) * math.sin(rad)
+                                            if dist > damageRange then
+                                                return
+                                            end
+                                            unit.damageTarget(enumUnit, unit.damage * damageFactor, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
+                                        end
+                                    )
+                                if currentDuration >= totalDuration then
+                                    blackhole.destroy()
+                                    triggeringClock.unschedule(triggeringSchedule)
+                                end
+                            end, tickrate
+                        )
+                        currentIndex = currentIndex + 1
+                        if currentIndex > maxBlackholes then
+                            currentIndex = 1
+                        end
+                    end, spawnInterval
+                )
+    
+                eventHolder.cleanup = function()
+                    for _, blackhole in pairs(blackholes) do
+                        blackhole.destroy()
+                    end
+                end
+            end
+
+            -- Orange
+            do
+                local blackholes = {}
+                local spawnInterval = 3.0
+                local totalDuration = 10.0
+                local tickrate = 0.01
+                local range = 700.
+                local damageRange = 250.
+                local damageFactor = 20.
+                local minDist = 150.
+                local maxDist = 1200.
+                local change = -1.0 -- < 0 for push, > 0 for pull
+                local lowestDistanceFactor = 0.6
+                local highestDistanceFactor = 3.0
+                local distanceFactor =(highestDistanceFactor - lowestDistanceFactor) / range
+                local maxBlackholes = math.ceil(totalDuration / spawnInterval)
+                for index = 1, maxBlackholes, 1 do
+                    local blackhole = IEngine.Effect()
+                    blackhole.model = "Effects\\Void Rift Orange.mdx"
+                    blackhole.scale = 1.2
+                    blackholes[index] = blackhole
+                end
+                local currentIndex = 1
+                eventHolder.schedule = eventHolder.clock.schedule_interval(
+                    function(triggeringClock, triggeringSchedule)
+                        local ux = unit.x
+                        local uy = unit.y
+                        local dist = math.random(minDist, maxDist)
+                        local rad = math.random(0., math.pi * 2)
+                        local blackholeX = ux + dist * math.cos(rad)
+                        local blackholeY = uy + dist * math.sin(rad)
+
+                        local blackhole = blackholes[currentIndex]
+                        blackhole.x = blackholeX
+                        blackhole.y = blackholeY
+                        blackhole.create()
+
+                        local currentDuration = 0.
+                        triggeringClock.schedule_interval(
+                            function(triggeringClock, triggeringSchedule)
+                                currentDuration = currentDuration + tickrate
+                                -- Pull/Push enemies
+                                group
+                                    .inRange(blackholeX, blackholeY, range)
+                                    .forEach(
+                                        function(group, enumUnit)
+                                            if not unit.isEnemy(enumUnit) then
+                                                return
+                                            end
+                                            local dx = blackholeX - enumUnit.x
+                                            local dy = blackholeY - enumUnit.y
+                                            local dist = math.sqrt(dx * dx + dy * dy)
+                                            local distanceFactor = highestDistanceFactor - distanceFactor * dist
+                                            local rad = math.atan(dy, dx)
+                                            enumUnit.x = enumUnit.x + (change * distanceFactor) * math.cos(rad)
+                                            enumUnit.y = enumUnit.y + (change * distanceFactor) * math.sin(rad)
+                                            if dist > damageRange then
+                                                return
+                                            end
+                                            unit.damageTarget(enumUnit, unit.damage * damageFactor, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
+                                        end
+                                    )
+                                if currentDuration >= totalDuration then
+                                    blackhole.destroy()
+                                    triggeringClock.unschedule(triggeringSchedule)
+                                end
+                            end, tickrate
+                        )
+                        currentIndex = currentIndex + 1
+                        if currentIndex > maxBlackholes then
+                            currentIndex = 1
+                        end
+                    end, spawnInterval
+                )
+    
+                eventHolder.cleanup = function()
+                    for _, blackhole in pairs(blackholes) do
+                        blackhole.destroy()
+                    end
+                end
+            end
         end
 
         _eventHolder[unit] = eventHolder
@@ -8481,7 +8703,7 @@ _Abilities.Template = {}
 _Abilities.Template.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
-    local group = CreateGroup()
+    local group = IEngine.Group()
     
     function self.apply(unit)
         if _eventHolder[unit] ~= nil then
@@ -8525,7 +8747,7 @@ Abilities.new = function(IEngine)
 
     self.Shadow_Strike = _Abilities.Shadow_Strike.new(IEngine)
 
-    -- SUMMONER
+    -- SUMMONER (Currently disabled)
     self.Wolf = _Abilities.Wolf.new(IEngine)
     self.Bear = _Abilities.Bear.new(IEngine)
     self.Boar = _Abilities.Boar.new(IEngine)
@@ -9021,6 +9243,10 @@ xpcall(function()
                 end
             )
 
+            -- Default Abilities
+            Ability.Sword_Slash.apply(unit)
+            Ability.Dodge.apply(unit)
+
             -- DESTROYER
             -- Ability.Interceptor.apply(unit)
             -- Ability.Sacred_Storm.apply(unit)
@@ -9048,7 +9274,7 @@ xpcall(function()
             player.bind("on_message",
                 function(player, message)
                     local whichAbility = StringCase(SubString(message, 5, StringLength(message)), false)
-                    -- SUMMONER (Check boar, wolf and bear)
+                    -- SUMMONER (Currently disabled)
                     if whichAbility == 'boar' then
                         Ability.Boar.apply(unit)
                     elseif whichAbility == 'wolf' then
@@ -9105,7 +9331,7 @@ xpcall(function()
             player.bind("on_message",
                 function(player, message)
                     local whichAbility = StringCase(SubString(message, 8, StringLength(message)), false)
-                    -- SUMMONER (Check boar, wolf and bear)
+                    -- SUMMONER (Currently disabled)
                     if whichAbility == 'boar' then
                         Ability.Boar.remove(unit)
                     elseif whichAbility == 'wolf' then
@@ -9181,9 +9407,6 @@ xpcall(function()
             -- native BlzSetSpecialEffectAlpha                    takes effect whichEffect, integer alpha returns nothing
 
             --[[
-            -- Default Abilities
-            Ability.Sword_Slash.apply(unit)
-            Ability.Dodge.apply(unit)
 
             -- 100 INT
             Ability.Magma_Constellation.apply(unit)
