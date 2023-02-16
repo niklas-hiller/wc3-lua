@@ -1773,7 +1773,7 @@ Engine.new = function()
 
         local eventDispatcher = EventDispatcher.new(
             {"on_leave", "on_message", "on_sync", "on_createUnit",
-             "on_unit_death",
+             "on_unit_select", "on_unit_deselect", "on_unit_death",
              "on_unit_damage_pre", "on_unit_damaged_pre", "on_unit_damage_after", "on_unit_damaged_after", 
              "on_unit_attack", "on_unit_attacked",
              "on_unit_level", "on_unit_skill",
@@ -1816,6 +1816,24 @@ Engine.new = function()
 
         self.on_createUnit = function(unit)
             local status, val = xpcall(self._on_createUnit, Log.Error, unit)
+            if status then return val end
+        end
+
+        function self._on_unit_select(selected)
+            eventDispatcher.dispatch("on_unit_select", self, selected)
+        end
+
+        self.on_unit_select = function(selected)
+            local status, val = xpcall(self._on_unit_select, Log.Error, selected)
+            if status then return val end
+        end
+
+        function self._on_unit_deselect(deselected)
+            eventDispatcher.dispatch("on_unit_deselect", self, deselected)
+        end
+
+        self.on_unit_deselect = function(deselected)
+            local status, val = xpcall(self._on_unit_deselect, Log.Error, deselected)
             if status then return val end
         end
 
@@ -2060,6 +2078,32 @@ Engine.new = function()
                         end
                         self.on_sync(syncHandler[id], full)
                     end
+                end
+            )
+
+            Trigger.new()
+            .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_SELECTED)
+            .addAction(
+                function()
+                    Log.Debug("[UNIT SELECTED] ...")
+                    local triggerPlayer = GetTriggerPlayer()
+                    local triggerUnit = GetTriggerUnit()
+
+                    triggerPlayer.on_unit_select(triggerUnit)
+                    triggerUnit.on_selected(triggerPlayer)
+                end
+            )
+
+            Trigger.new()
+            .registerPlayerUnitEvent(self, EVENT_PLAYER_UNIT_DESELECTED)
+            .addAction(
+                function()
+                    Log.Debug("[UNIT DESELECTED] ...")
+                    local triggerPlayer = GetTriggerPlayer()
+                    local triggerUnit = GetTriggerUnit()
+
+                    triggerPlayer.on_unit_deselect(triggerUnit)
+                    triggerUnit.on_deselected(triggerPlayer)
                 end
             )
 
@@ -4802,7 +4846,8 @@ Engine.new = function()
         end
 
         local eventDispatcher = EventDispatcher.new(
-            {"on_death", "on_remove", 
+            {"on_selected", "on_deselected",
+             "on_death", "on_remove", 
              "on_damage_pre", "on_damaged_pre", "on_damage_after", "on_damaged_after", 
              "on_attack", "on_attacked",
              "on_exp", "on_level", "on_skill",
@@ -4812,6 +4857,24 @@ Engine.new = function()
         )
         self.bind = eventDispatcher.bind
         self.unbind = eventDispatcher.unbind
+
+        function self._on_deselected(deselector)
+            eventDispatcher.dispatch("_on_deselected", deselector, self)
+        end
+
+        self.on_deselected = function(deselector)
+            local status, val = xpcall(self._on_deselected, Log.Error, deselector, self)
+            if status then return val end
+        end
+
+        function self._on_selected(selector)
+            eventDispatcher.dispatch("on_selected", selector, self)
+        end
+
+        self.on_selected = function(selector)
+            local status, val = xpcall(self._on_selected, Log.Error, selector)
+            if status then return val end
+        end
 
         function self._on_death()
             eventDispatcher.dispatch("on_death", self)
@@ -9143,9 +9206,36 @@ xpcall(function()
     Ability = Abilities.new(Framework)
 
     local neutralPlayer = Framework.Player(PLAYER_NEUTRAL_PASSIVE)
+    
     local teleporter = neutralPlayer.createUnit('hTel', GetRectCenterX(gg_rct_Teleporter), GetRectCenterY(gg_rct_Teleporter), 270.) 
     teleporter.skin = 'hPai'
     teleporter.invulnerable = true
+
+    local orbSkins = {
+        [1] = 'h00Q', -- Light
+        [2] = 'h00M', -- Poison
+        [3] = 'h00O', -- Dragon
+        [4] = 'h00P', -- Darkness
+        [5] = 'h00L', -- Ice
+        [6] = 'h00N'  -- Fire
+    }
+
+    local orbs = {}
+    for i = 1, 6, 1 do
+        local rad = i * 2 * math.pi / 6
+        local x = Framework.Player(0).startPositionX + 500. * math.cos(rad)
+        local y = Framework.Player(0).startPositionY + 500. * math.sin(rad)
+        local orb = neutralPlayer.createUnit('hOrb', x, y, 270.)
+        orb.skin = orbSkins[i]
+        orb.invulnerable = true
+        orb.visible = false
+        orb.bind("on_selected", 
+            function(selectedBy, selectedUnit)
+                -- Calculate ability
+            end
+        )
+        orbs[i] = orb
+    end
 
     local areas = {
         ['I000'] = Area.new(Framework, gg_rct_Bottom_Left_Room_BL),
@@ -9382,6 +9472,30 @@ xpcall(function()
             ).setCondition(
                 function(player, message)
                     return SubString(message, 0, 7) == "-remove"
+                end
+            )
+
+            player.bind("on_message",
+                function(player, message)
+                    local whichAbility = StringCase(SubString(message, 6, StringLength(message)), false)
+                    if whichAbility == '1' then
+                        orbs[1].visible = true
+                    elseif whichAbility == '2' then
+                        orbs[2].visible = true
+                    elseif whichAbility == '3' then
+                        orbs[3].visible = true
+                    elseif whichAbility == '4' then
+                        orbs[4].visible = true
+                    elseif whichAbility == '5' then
+                        orbs[5].visible = true
+                    elseif whichAbility == '6' then
+                        orbs[6].visible = true
+                    end
+                    print("Executed " .. message)
+                end
+            ).setCondition(
+                function(player, message)
+                    return SubString(message, 0, 5) == "-dead"
                 end
             )
 
