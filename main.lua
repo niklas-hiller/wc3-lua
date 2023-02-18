@@ -6115,7 +6115,7 @@ _Abilities.Magma_Constellation.new = function(IEngine)
                                             stompEffect.z = z
                                             stompEffect.create().destroy()
                                             unit.damageTarget(enumUnit, unit.damage * 75., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                                            delayTable[i][enumUnity] = 0
+                                            delayTable[i][enumUnit] = 0
                                         end
                                     end
                                 end
@@ -9036,6 +9036,7 @@ AttributeSystem.new = function(unit)
     --local informationAbility = BlzGetUnitAbility(unit.handle, FourCC('AATR'))
     local skillPoints = SKILL_POINTS_BASE + (unit.level - 1) * SKILL_POINTS_PER_LEVEL
 
+    local BASE_ATTACK = 10
     local BASE_ATTACKSPEED = 0.7
     local BASE_MOVEMENTSPEED = 270
     local BASE_HEALTH = 100
@@ -9134,6 +9135,9 @@ AttributeSystem.new = function(unit)
         local HEALTH_FACTOR = 0.02
         local ARMOR_FACTOR = 1
 
+        -- NO CATEGORY
+        unit.damage = BASE_ATTACK + damageStacks
+
         -- STR related
         -- Calculated on damage
 
@@ -9189,17 +9193,25 @@ AttributeSystem.new = function(unit)
         end
     )
 
-    unit.bind("on_attack",
-        function(source, target)
+    unit.bind("on_damage_after",
+        function(source, target, damageObject)
             damageStacks = damageStacks + 1
-            unit.damage = unit.damage + 1
+            self.updateStats()
+        end
+    ).setCondition(
+        function(source, target, damageObject)
+            return source == unit
         end
     )
 
-    unit.bind("on_attacked",
-        function(source, target)
+    unit.bind("on_damaged_after",
+        function(source, target, damageObject)
             healthStacks = healthStacks + 1
             self.updateStats()
+        end
+    ).setCondition(
+        function(source, target, damageObject)
+            return target == unit
         end
     )
 
