@@ -212,7 +212,7 @@ Aeon
 ## Harmony
 Ability 1
 - Path: Harmony
-- Name: Hurricane Constellation
+- Name: Magma Constellation
 - Description: 75x per tick
 
 Ability 2
@@ -272,109 +272,50 @@ Aeon
 - Name: 
 - Description: 
 
-# FIRST BOSS PASSIVES
-
-Ability 1
-- Path: DEMON
-- Description: You have blades rotating around you
-
-Ability 2
-- Path: ELEMENTS
-- Description: You have a hurricane surrounding you
-
-Ability 3
-- Path: SUMMONER
-- Description: You receive a boar summon
-
-# SECOND BOSS PASSIVES
-
-Ability 1
-- Path: DEMON
-- Description: You have Blink Strike
-
-Ability 2
-- Path: HOLY
-- Description: You unlock Impale
-
-Ability 3
-- Path: SUMMONER
-- Description: You receive a wolf summon
-
-# THIRD BOSS PASSIVES
-
-Ability 1
-- Path: DESTROYER
-- Description: You get rockets from sky (interceptor shell)
-
-Ability 2
-- Path: HOLY
-- Description: You unlock Judgement
-
-Ability 3
-- Path: SUMMONER
-- Description: You receive a bear summon
-
-# FOURTH BOSS PASSIVES
-
-Ability 1
-- Path: DEMON
-- Description: You have a demon following you, casting each few attacks
-
-Ability 2
-- Path: HOLY
-- Description: You unlock Overload
-
-Ability 3 (CONDITIONAL -> SUMMONER set)
-- SUMMONER (SPECIAL)
-- Description: Your boar, wolf and bear are replaced with reapers
-
-# FIFTH BOSS PASSIVES
-
-Ability 1 (CONDITIONAL -> HOLY set)
-- HOLY (SPECIAL)
-- Description: You summon an angel each few seconds that deals holy damage to nearby enemies
-
-Ability 2
-- Path: ELEMENTS
-- Description: You have a blizzard around you
-
-Ability 3
-- Path: DESTROYER
-- Description: You have a laser (sacred storm)
-
-# SIXTH BOSS PASSIVES
-
-Ability 1 (CONDITIONAL -> DEMON set)
-- DEMON (SPECIAL)
-- Description: You unlock shadow strike
-
-Ability 2
-- Path: ELEMENTS
-- Description: You have fire stomps around you
-
-Ability 3
-- DESTROYER
-- Description: You have a sword falling from sky (Kindom come)
-
-
-
-
-
-
-# Notes
+# Path
 Available:
 - Destruction
-    - Damage
+    - Category: Damage
+    - Abilities:
+        - Interceptor
+        - Sacred Storm
+        - Kingdom Come
+        - [AEON] I am Atomic
 - Preservation
-    - Tank
+    - Category: Tank
+    - Abilities:
+        - Impale
+        - Moon Halo
+        - Overload
+        - [AEON] Heaven Justice
 - Nihility
-    - Fast
+    - Category: Fast
+    - Abilities:
+        - Blade Dance
+        - Blink Strike
+        - Demon Control
+        - [AEON] Shadow Strike
 - Harmony
-    - Magic
+    - Category: Magic
+    - Abilities:
+        - Magma Constellation
+        - Blizzard
+        - Uncontrollable Flames
+        - [AEON] Black Hole
 - Erudition
-    - Summon
+    - Category: Summon
+    - Abilities
+        - Not implemented
+        - Not implemented
+        - Not implemented
+        - [AEON] Not implemented
 - Hunt
-    - ?
+    - Category: Lifesteal
+    - Abilities
+        - Not implemented
+        - Not implemented
+        - Not implemented
+        - [AEON] Not implemented
 
 Assigned:
 - A = Harmony
