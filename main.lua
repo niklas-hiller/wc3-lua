@@ -1726,7 +1726,7 @@ Engine.new = function()
             end
             syncHandler[count] = identifier
             syncValue[count] = 0
-            if GetLocalPlayer() == self then
+            if GetLocalPlayer() == handle then
                 local part = {}
                 local current = 0
                 local totalSync = 0
@@ -4499,6 +4499,12 @@ Engine.new = function()
                 else 
                     return GetUnitLevel(handle)
                 end
+            elseif index == "skillPoints" then
+                if IsHeroUnitId(GetUnitTypeId(handle)) then
+                    return GetHeroSkillPoints(handle)
+                else
+                    Log.Error("Can't retrieve Skill Points of non-hero units.")
+                end
             elseif index == "pause" then
                 return IsUnitPause(handle)
             elseif index == "food" then
@@ -5152,6 +5158,21 @@ Engine.new = function()
             if status then return val end
         end
 
+        function self._inRect(rect)
+            units = {}
+            GroupEnumUnitsInRect(handle, rect, Filter(
+                function()
+                    table.insert(units, GetFilterUnit())
+                end
+            ))
+            return self
+        end
+
+        self.inRect = function(rect)
+            local status, val = xpcall(self._inRect, Log.Error, rect)
+            if status then return val end
+        end
+
         function self._inRangeFiltered(x, y, range, filter)
             units = {}
             GroupEnumUnitsInRange(handle, x, y, range, Filter(
@@ -5180,7 +5201,7 @@ Engine.new = function()
         end
 
         function self._inGroup(unit)
-            for index, value in ipairs(units) do
+            for _, value in ipairs(units) do
                 if value == unit then
                     return true
                 end
@@ -8846,18 +8867,39 @@ Abilities.new = function(IEngine)
     return self
 end
 
+AreaConfiguration = {}
+AreaConfiguration.new = function(disabled)
+    local self = {}
+
+    self.disabled = disabled or false
+    self.creepSkin = 'h007'
+    self.creepDamage = 20
+    self.creepAttackspeed = 1.0
+    self.creepMovementspeed = 340
+    self.creepHealth = 500
+    self.creepLimit = 150
+
+    self.bossSkin = 'h000'
+    self.bossDamage = 1000
+    self.bossAttackspeed = 0.7
+    self.bossMovementspeed = 380
+    self.bossHealth = 30000
+
+    return self
+end
+
 Area = {}
-Area.new = function(IEngine, rect)
+Area.new = function(IEngine, rect, configuration)
     local self = {}
     local mt = {}
 
     local clock = IEngine.Clock()
+    local group = IEngine.Group()
     local enemyPlayer = IEngine.Player(PLAYER_NEUTRAL_AGGRESSIVE)
-    local playerUnits = {}
+    
     local killcount = 0
     local bossSpawned = false
     local bossSpawnDisabled = false
-    local UPPER_LIMIT = 150
     local BOSS_SPAWN_AMOUNT = 1000
 
     self.x = GetRectCenterX(rect)
@@ -8866,8 +8908,6 @@ Area.new = function(IEngine, rect)
     self.minY = GetRectMinY(rect)
     self.maxX = GetRectMaxX(rect)
     self.maxY = GetRectMaxY(rect)
-
-    self.maxUnits = 12
 
     function mt.__newindex(table, index, value)
         if index == "killcount" then
@@ -8891,15 +8931,15 @@ Area.new = function(IEngine, rect)
     end
 
     function self.killAllEnemies()
-        GroupEnumUnitsInRect(CreateGroup(), rect, 
-            Filter(
-                function()
-                    if IEngine.GetFilterUnit().owner == enemyPlayer then
-                        IEngine.GetFilterUnit().kill()
+        group
+            .inRect(rect)
+            .forEach(
+                function(group, enumUnit)
+                    if enumUnit.owner == enemyPlayer then
+                        enumUnit.kill()
                     end
                 end
             )
-        )
     end
 
     function self.spawnBoss()
@@ -8916,18 +8956,17 @@ Area.new = function(IEngine, rect)
         return math.random(self.minY + 1000., self.maxY - 1000.)
     end
 
-    function self.getRandomPlayerUnit()
-        return playerUnits[math.random(#playerUnits)]
-    end
-
     function self.spawnUnit()
         if bossSpawned then
             return
         end
         local unit = enemyPlayer.createUnit('unit', self.getRandomX(), self.getRandomY(), math.random(0, 360))
-        unit.skin = 'uaco'
-        unit.maxhp = 20000
-        unit.hp = 20000
+        unit.skin = configuration.creepSkin
+        unit.damage = configuration.creepDamage
+        unit.attackspeed = configuration.creepAttackspeed
+        unit.ms = configuration.creepMovementSpeed
+        unit.maxhp = configuration.creepHealth
+        unit.hp = configuration.creepHealth
         
         unit.bind("on_death",
             function(unit)
@@ -8945,15 +8984,16 @@ Area.new = function(IEngine, rect)
     end
 
     function self.contains(unit)
-        for _, v in ipairs(playerUnits) do
-            if v == unit then 
-                return true 
-            end
-        end
-        return false
+        return group
+            .inRect(rect)
+            .inGroup(unit)
     end
 
     function self.enter(unit)
+        if configuration.disabled then
+            print("Area is currently disabled.")
+            return
+        end
         if self.contains(unit) then
             return
         end
@@ -8967,30 +9007,20 @@ Area.new = function(IEngine, rect)
             self.maxX - change, self.minY + change
         )
         unit.owner.setCameraPosition(self.x, self.y)
-
-        table.insert(playerUnits, unit)
     end
 
     function self.reset()
         self.killAllEnemies()
-        for _ = 0, UPPER_LIMIT, 1 do
+        for _ = 0, configuration.creepLimit, 1 do
             self.spawnUnit()
         end
     end
 
-    clock.schedule_interval(
-        function(clock, schedule)
-            for index, value in ipairs(playerUnits) do
-                if value.x < self.minX or value.x > self.maxX or value.y < self.minY or value.y > self.maxY then
-                    table.remove(playerUnits, index)
-                end
-            end
-        end, 0.1
-    )
-
     setmetatable(self, mt)
 
-    self.reset()
+    if (not configuration.disabled) then
+        self.reset()
+    end
 
     clock.start()
 
@@ -9021,17 +9051,18 @@ AttributeSystem.new = function(unit)
     local agi = 0
     local int = 0
 
-    local bonusStr = 7
-    local bonusVit = 0
-    local bonusAgi = -10
-    local bonusInt = 2
+    local bonusStr = 0 -- Used for items & passives later on
+    local bonusVit = 0 -- Used for items & passives later on
+    local bonusAgi = 0 -- Used for items & passives later on
+    local bonusInt = 0 -- Used for items & passives later on
 
+    local damageStacks = 0
     local healthStacks = 0
 
-    while GetHeroSkillPoints(unit.handle) > skillPoints do
+    while unit.skillPoints > skillPoints do
         UnitModifySkillPoints(unit.handle, -1)
     end
-    while GetHeroSkillPoints(unit.handle) < skillPoints do
+    while unit.skillPoints < skillPoints do
         UnitModifySkillPoints(unit.handle, 1)
     end
 
@@ -9039,10 +9070,10 @@ AttributeSystem.new = function(unit)
         function(unit)
             skillPoints = skillPoints + SKILL_POINTS_PER_LEVEL
             --print("Current Skill Points: " .. skillPoints)
-            while GetHeroSkillPoints(unit.handle) > skillPoints do
+            while unit.skillPoints > skillPoints do
                 UnitModifySkillPoints(unit.handle, -1)
             end
-            while GetHeroSkillPoints(unit.handle) < skillPoints do
+            while unit.skillPoints < skillPoints do
                 UnitModifySkillPoints(unit.handle, 1)
             end
         end
@@ -9126,7 +9157,7 @@ AttributeSystem.new = function(unit)
 
     function self.updateVisual()
         local tooltip = BlzGetAbilityExtendedTooltip(FourCC('AATR'), 0)
-        if GetLocalPlayer() == unit.owner.handle then
+        if unit.owner.isLocal() then
             tooltip = 
                 self.statString('str') .. "\n" ..
                 self.statString('vit') .. "\n" ..
@@ -9143,7 +9174,7 @@ AttributeSystem.new = function(unit)
             --local currentLevel = BlzGetAbilityIntegerField(ability, ABILITY_IF_LEVELS)
             --print(currentLevel)
             --BlzSetAbilityIntegerField(ability, ABILITY_IF_LEVELS, currentLevel + 1)
-            if GetUnitAbilityLevel(unit.handle, abilityId) == 2 then
+            if unit.getAbilityLevel(abilityId) == 2 then
                 DecUnitAbilityLevel(unit.handle, abilityId)
             end
             skillPoints = skillPoints - 1
@@ -9165,6 +9196,7 @@ AttributeSystem.new = function(unit)
 
     unit.bind("on_attack",
         function(source, target)
+            damageStacks = damageStacks + 1
             unit.damage = unit.damage + 1
         end
     )
@@ -9211,39 +9243,151 @@ xpcall(function()
     teleporter.skin = 'hPai'
     teleporter.invulnerable = true
 
-    local orbSkins = {
-        [1] = 'h00Q', -- Light
-        [2] = 'h00M', -- Poison
-        [3] = 'h00O', -- Dragon
-        [4] = 'h00P', -- Darkness
-        [5] = 'h00L', -- Ice
-        [6] = 'h00N'  -- Fire
+    local orbMetaData = {
+        [1] = {
+            ["base"] = 'hAS1',
+            ["skin"] = 'h00Q', -- Light
+            ["abil"] = 'APB1',
+            ["abilities"] = {
+                [1] = {
+                    ["code"] = Ability.Blade_Dance,
+                    ["shop"] = 'IA11'
+                },
+                [2] = {
+                    ["code"] = Ability.Hurricane_Constellation,
+                    ["shop"] = 'IA12'
+                },
+                [3] = {
+                    ["code"] = Ability.Boar,
+                    ["shop"] = 'IA13'
+                }, -- Disabled
+            }
+        },
+        [2] = {
+            ["base"] = 'hAS2',
+            ["skin"] = 'h00M', -- Poison
+            ["abil"] = 'APB2',
+            ["abilities"] = {
+                [1] = {
+                    ["code"] = Ability.Blink_Strike,
+                    ["shop"] = 'IA21'
+                },
+                [2] = {
+                    ["code"] = Ability.Impale,
+                    ["shop"] = 'IA22'
+                },
+                [3] = {
+                    ["code"] = Ability.Wolf,
+                    ["shop"] = 'IA23'
+                }, -- Disabled
+            }
+        },
+        [3] = {
+            ["base"] = 'hAS3',
+            ["skin"] = 'h00O', -- Dragon
+            ["abil"] = 'APB3',
+            ["abilities"] = {
+                [1] = {
+                    ["code"] = Ability.Interceptor,
+                    ["shop"] = 'IA31'
+                },
+                [2] = {
+                    ["code"] = Ability.Judgement,
+                    ["shop"] = 'IA32'
+                },
+                [3] = {
+                    ["code"] = Ability.Bear,
+                    ["shop"] = 'IA33'
+                }, -- Disabled
+            }
+        },
+        [4] = {
+            ["base"] = 'hAS4',
+            ["skin"] = 'h00P', -- Darkness
+            ["abil"] = 'APB4',
+            ["abilities"] = {
+                [1] = {
+                    ["code"] = Ability.Demon_Control,
+                    ["shop"] = 'IA41'
+                },
+                [2] = {
+                    ["code"] = Ability.Overload,
+                    ["shop"] = 'IA42'
+                },
+                [3] = {
+                    ["code"] = Ability.Reapers,
+                    ["shop"] = 'IA43'
+                }, -- Disabled
+            }
+        },
+        [5] = {
+            ["base"] = 'hAS5',
+            ["skin"] = 'h00L', -- Ice
+            ["abil"] = 'APB5',
+            ["abilities"] = {
+                [1] = {
+                    ["code"] = Ability.Heaven_Justice,
+                    ["shop"] = 'IA51'
+                },
+                [2] = {
+                    ["code"] = Ability.Blizzard,
+                    ["shop"] = 'IA52'
+                },
+                [3] = {
+                    ["code"] = Ability.Sacred_Storm,
+                    ["shop"] = 'IA53'
+                },
+            }
+        },
+        [6] = {
+            ["base"] = 'hAS6',
+            ["skin"] = 'h00N', -- Fire
+            ["abil"] = 'APB6',
+            ["abilities"] = {
+                [1] = {
+                    ["code"] = Ability.Shadow_Strike,
+                    ["shop"] = 'IA61'
+                },
+                [2] = {
+                    ["code"] = Ability.Uncontrollable_Flames,
+                    ["shop"] = 'IA62'
+                },
+                [3] = {
+                    ["code"] = Ability.Kingdom_Come,
+                    ["shop"] = 'IA63'
+                },
+            }
+        }
     }
 
     local orbs = {}
-    for i = 1, 6, 1 do
-        local rad = i * 2 * math.pi / 6
+    for index, orbMeta in ipairs(orbMetaData) do
+        local rad = index * 2 * math.pi / 6
         local x = Framework.Player(0).startPositionX + 500. * math.cos(rad)
         local y = Framework.Player(0).startPositionY + 500. * math.sin(rad)
-        local orb = neutralPlayer.createUnit('hOrb', x, y, 270.)
-        orb.skin = orbSkins[i]
+        local orb = Framework.Player(PLAYER_NEUTRAL_PASSIVE).createUnit(orbMeta['base'], x, y, 270.)
+        orb.skin = orbMeta['skin']
         orb.invulnerable = true
-        orb.visible = false
-        orb.bind("on_selected", 
-            function(selectedBy, selectedUnit)
-                -- Calculate ability
-            end
-        )
-        orbs[i] = orb
+        orb.visible = false -- Set to true when required boss dies
+        orbs[index] = orb
     end
 
+    local areaConfigurations = {
+        [1] = AreaConfiguration.new(false),
+        [2] = AreaConfiguration.new(true),
+        [3] = AreaConfiguration.new(true),
+        [4] = AreaConfiguration.new(true),
+        [5] = AreaConfiguration.new(true),
+        [6] = AreaConfiguration.new(true)
+    }
+
     local areas = {
-        ['I000'] = Area.new(Framework, gg_rct_Bottom_Left_Room_BL),
-        ['I001'] = Area.new(Framework, gg_rct_Bottom_Left_Room_BR),
-        ['I002'] = Area.new(Framework, gg_rct_Bottom_Left_Room_TL),
-        ['I003'] = Area.new(Framework, gg_rct_Bottom_Right_Room_BL),
-        ['I004'] = Area.new(Framework, gg_rct_Bottom_Right_Room_BR),
-        ['I005'] = Area.new(Framework, gg_rct_Bottom_Right_Room_TR)
+        ['I000'] = Area.new(Framework, gg_rct_Bottom_Left_Room_BL, areaConfigurations[1]),
+        ['I001'] = Area.new(Framework, gg_rct_Bottom_Left_Room_BR, areaConfigurations[2]),
+        ['I002'] = Area.new(Framework, gg_rct_Bottom_Left_Room_TL, areaConfigurations[3]),
+        ['I003'] = Area.new(Framework, gg_rct_Bottom_Right_Room_BL, areaConfigurations[4]),
+        ['I004'] = Area.new(Framework, gg_rct_Bottom_Right_Room_BR, areaConfigurations[5]),
+        ['I005'] = Area.new(Framework, gg_rct_Bottom_Right_Room_TR, areaConfigurations[6])
     }
 
     local MAX_PLAYERS = 8
@@ -9275,6 +9419,49 @@ xpcall(function()
 
             -- Init Attribute System
             local attributeSys = AttributeSystem.new(unit)
+
+            local abilitySelection = {}
+            for index, orb in ipairs(orbMetaData) do
+                for _, ability in ipairs(orb["abilities"]) do
+                    unit.bind("on_pickup_item",
+                        function(unit, item)
+                            -- Store Item Metadata and then Delete Item
+                            local name = BlzGetItemTooltip(item)
+                            local description = BlzGetItemExtendedTooltip(item)
+                            local icon = BlzGetItemIconPath(item)
+                            RemoveItem(item)
+
+                            -- Conditions
+                            if (abilitySelection[index] ~= nil) then
+                                print("You already selected an ability from this boss.")
+                                return
+                            end
+
+                            -- Store current ability data
+                            local _name = BlzGetAbilityTooltip(FourCC(orb['abil']), 0)
+                            local _description = BlzGetAbilityExtendedTooltip(FourCC(orb['abil']), 0)
+                            local _icon = BlzGetAbilityIcon(FourCC(orb['abil']))
+                            -- Update for local
+                            if unit.owner.isLocal() then
+                                _name = name
+                                _description = description
+                                _icon = icon
+                            end
+                            -- Update ability
+                            BlzSetAbilityTooltip(FourCC(orb['abil']), _name, 0)
+                            BlzSetAbilityExtendedTooltip(FourCC(orb['abil']), _description, 0)
+                            BlzSetAbilityIcon(FourCC(orb['abil']), _icon)
+
+                            abilitySelection[index] = ability
+                            ability["code"].apply(unit)
+                        end
+                    ).setCondition(
+                        function(unit, item)
+                            return GetItemTypeId(item) == FourCC(ability["shop"])
+                        end
+                    )
+                end
+            end
 
             for itemId, area in pairs(areas) do
                 unit.bind("on_pickup_item",
