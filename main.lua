@@ -9250,6 +9250,87 @@ xpcall(function()
     teleporter.skin = 'hPai'
     teleporter.invulnerable = true
 
+    local aeonRequirements = {
+        [1] = {
+            ["name"] = "Destruction",
+            ["description"] = "You chose the path of "
+            .. "|cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r.",
+            ["icon"] = "ReplaceableTextures/CommandButtons/BTNDestructionPath.blp",
+            ["unlocks"] = Ability.I_Am_Atomic,
+            ["requires"] = {
+                [1] = Ability.Interceptor,
+                [2] = Ability.Sacred_Storm,
+                [3] = Ability.Kingdom_Come
+            },
+            ["disabled"] = false
+        },
+        [2] = {
+            ["name"] = "Preservation",
+            ["description"] = "You chose the path of "
+            .. "|cffa9e8f9P|r|cff9de0f5r|r|cff91d8f2e|r|cff86d0efs|r|cff7ac9ebe|r|cff6fc1e8r|r|cff62b9e4v|r|cff57b1e1a|r|cff4ba9det|r|cff40a2dai|r|cff349ad7o|r|cff2892d4n|r.",
+            ["icon"] = "ReplaceableTextures/CommandButtons/BTNPreservationPath.blp",
+            ["unlocks"] = Ability.Heaven_Justice,
+            ["requires"] = {
+                [1] = Ability.Impale,
+                [2] = Ability.Judgement,
+                [3] = Ability.Overload
+            },
+            ["disabled"] = false
+        },
+        [3] = {
+            ["name"] = "Nihility",
+            ["description"] = "You chose the path of "
+            .. "|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r.",
+            ["icon"] = "ReplaceableTextures/CommandButtons/BTNNihilityPath.blp",
+            ["unlocks"] = Ability.Shadow_Strike,
+            ["requires"] = {
+                [1] = Ability.Blade_Dance,
+                [2] = Ability.Blink_Strike,
+                [3] = Ability.Demon_Control
+            },
+            ["disabled"] = false
+        },
+        [4] = {
+            ["name"] = "Harmony",
+            ["description"] = "You chose the path of "
+            .. "|cffff0000H|r|cffaa0054a|r|cff5500a9r|r|cff0000fem|r|cff0054aao|r|cff00a955n|r|cff00fe00y|r.",
+            ["icon"] = "ReplaceableTextures/CommandButtons/BTNHarmonyPath.blp",
+            ["unlocks"] = Ability.Black_Hole,
+            ["requires"] = {
+                [1] = Ability.Magma_Constellation,
+                [2] = Ability.Blizzard,
+                [3] = Ability.Uncontrollable_Flames
+            },
+            ["disabled"] = false
+        },
+        [5] = {
+            ["name"] = "Erudition",
+            ["description"] = "You chose the path of "
+            .. "|cffbcbcf6E|r|cffafaeefr|r|cffa2a0e8u|r|cff9592e1d|r|cff8783dai|r|cff7a75d3t|r|cff6d67cci|r|cff6059c6o|r|cff534bbfn|r.",
+            ["icon"] = "ReplaceableTextures/CommandButtons/BTNEruditionPath.blp",
+            ["unlocks"] = nil,
+            ["requires"] = {
+                [1] = nil,
+                [2] = nil,
+                [3] = nil
+            },
+            ["disabled"] = true
+        },
+        [6] = {
+            ["name"] = "Hunt",
+            ["description"] = "You chose the path of "
+            .. "|cffaae5b7H|r|cff89daa9u|r|cff69d09bn|r|cff49c68et|r.",
+            ["icon"] = "ReplaceableTextures/CommandButtons/BTNHuntPath.blp",
+            ["unlocks"] = nil,
+            ["requires"] = {
+                [1] = nil,
+                [2] = nil,
+                [3] = nil
+            },
+            ["disabled"] = true
+        }
+    }
+
     local orbMetaData = {
         [1] = {
             ["base"] = 'hAS1',
@@ -9446,6 +9527,7 @@ xpcall(function()
             local attributeSys = AttributeSystem.new(unit)
 
             local abilitySelection = {}
+            local pathChosen = nil
             for index, orb in ipairs(orbMetaData) do
                 for _, ability in ipairs(orb["abilities"]) do
                     unit.bind("on_pickup_item",
@@ -9481,8 +9563,54 @@ xpcall(function()
                             BlzSetAbilityExtendedTooltip(FourCC(orb['abil']), _description, 0)
                             BlzSetAbilityIcon(FourCC(orb['abil']), _icon)
 
-                            abilitySelection[index] = ability
+                            abilitySelection[index] = ability["code"]
                             ability["code"].apply(unit)
+
+                            if pathChosen ~= nil then
+                                return
+                            end
+
+                            -- Check for Aeon
+                            for _, aeon in ipairs(aeonRequirements) do
+                                if aeon['disabled'] then
+                                    goto continue
+                                end
+                                local criteriaFulfilled = true
+                                for _, requirement in ipairs(aeon['requires']) do
+                                    local found = false
+                                    for _, unlockedAbility in pairs(abilitySelection) do
+                                        if unlockedAbility == requirement then 
+                                            found = true
+                                            break
+                                        end
+                                    end
+                                    if not found then
+                                        criteriaFulfilled = false
+                                        break
+                                    end
+                                end
+                                if criteriaFulfilled then
+                                    print("You've chosen the Path '" .. aeon['name'] .. "'")
+                                    pathChosen = aeon
+                                    aeon['unlocks'].apply(unit)
+
+                                    -- Store current ability data
+                                    local _name = BlzGetAbilityTooltip(FourCC('ASBA'), 0)
+                                    local _description = BlzGetAbilityExtendedTooltip(FourCC('ASBA'), 0)
+                                    local _icon = BlzGetAbilityIcon(FourCC('ASBA'))
+                                    -- Update for local
+                                    if unit.owner.isLocal() then
+                                        _name = aeon['name']
+                                        _description = aeon['description']
+                                        _icon = aeon['icon']
+                                    end
+                                    -- Update ability
+                                    BlzSetAbilityTooltip(FourCC('ASBA'), _name, 0)
+                                    BlzSetAbilityExtendedTooltip(FourCC('ASBA'), _description, 0)
+                                    BlzSetAbilityIcon(FourCC('ASBA'), _icon)
+                                end
+                                ::continue::
+                            end
                         end
                     ).setCondition(
                         function(unit, item)
