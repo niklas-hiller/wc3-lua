@@ -8893,6 +8893,7 @@ Area.new = function(IEngine, rect, configuration)
     local self = {}
     local mt = {}
 
+    self.configuration = configuration
     local clock = IEngine.Clock()
     local group = IEngine.Group()
     local enemyPlayer = IEngine.Player(PLAYER_NEUTRAL_AGGRESSIVE)
@@ -8961,12 +8962,12 @@ Area.new = function(IEngine, rect, configuration)
             return
         end
         local unit = enemyPlayer.createUnit('unit', self.getRandomX(), self.getRandomY(), math.random(0, 360))
-        unit.skin = configuration.creepSkin
-        unit.damage = configuration.creepDamage
-        unit.attackspeed = configuration.creepAttackspeed
-        unit.ms = configuration.creepMovementSpeed
-        unit.maxhp = configuration.creepHealth
-        unit.hp = configuration.creepHealth
+        unit.skin = self.configuration.creepSkin
+        unit.damage = self.configuration.creepDamage
+        unit.attackspeed = self.configuration.creepAttackspeed
+        unit.ms = self.configuration.creepMovementspeed
+        unit.maxhp = self.configuration.creepHealth
+        unit.hp = self.configuration.creepHealth
         
         unit.bind("on_death",
             function(unit)
