@@ -1,4 +1,4 @@
-# HEADSTART
+# HEADSTART (Currently disabled)
 
 Ability 1
 - Condition: Use your first 100 skill points exclusively on STR
@@ -20,7 +20,7 @@ Ability 4
 - Effect: You unlock magma constellation (stars rotate around you) -> +1 Star for each 100 INT
 - Negative: You are now forever stuck on 100 HP and 0 Armor
 
-# HYBRID
+# HYBRID (Currently disabled)
 
 Ability 1
 - Condition: Use your first 500 skill points evenly on STR & VIT
@@ -52,7 +52,7 @@ Ability 6
 - Effect: Each attack on the same enemy increases magical damage by 5% (stacks infinitely)
 - Negative: Each attack on the same enemy increases damage taken from that enemy by 10% (stacks infinitely)
 
-# FULL
+# FULL (Currently disabled)
 
 Ability 1
 - Condition: Use your first 500 skill points exclusively on STR
@@ -74,7 +74,7 @@ Ability 4
 - Effect: Your Magma Constellation is twice as fast and double the size & range. Also deal 4x damage.
 - Negative: All 60 seconds a random debuff is applied. (60 seconds duration)
 
-# COMBAT ABILITIES
+# COMBAT ABILITIES (Currently disabled)
 
 Ability 1
 - Condition: Receive attacks continuously for an hour from the same enemy.
@@ -120,13 +120,7 @@ Ability 11
 - Condition: Heal by more than 1.000.000.000 HP
 - Effect: Excessive heal is converted to shield, up to 500% of your hp.
 
-# COMBAT ABILITY (SPECIAL)
-
-Ability 1
-- Condition: Deal 100.000 times damage with magma constellation
-- Effect: Gain a second circle, with the same amount of stars
-
-# DASH UPGRADES
+# DASH UPGRADES (Currently disabled)
 
 Ability 1
 - Condition: Have more than 100 STR.
@@ -144,7 +138,7 @@ Ability 4
 - Condition: Have more than 100 INT.
 - Effect: Your dash now blinks at 0.25 distance to 0.75 distance
 
-# SET ABILITIES
+# PATHS
 
 ## Destruction
 Ability 1
@@ -272,7 +266,7 @@ Aeon
 - Name: 
 - Description: 
 
-# Path
+## Path
 Available:
 - Destruction
     - Category: Damage
