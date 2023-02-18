@@ -5893,8 +5893,8 @@ _Abilities.Dodge.new = function(IEngine)
     effect.model = "Effects\\Dash.mdx"
     effect.scale = 0.3
 
-    local aoeEffect = IEngine.Effect()
-    aoeEffect.model = "Effects\\Stomp_Effect.mdx"
+    -- local aoeEffect = IEngine.Effect()
+    -- aoeEffect.model = "Effects\\Stomp_Effect.mdx"
 
     function self.apply(unit)
         if _eventHolder[unit] ~= nil then
@@ -5905,8 +5905,8 @@ _Abilities.Dodge.new = function(IEngine)
         do
             eventHolder.event = unit.bind("on_spell_effect",
                 function(source, spell)
-                    local withBlink = true
-                    local withAoE = true
+                    --local withBlink = true
+                    --local withAoE = true
 
                     local x = source.x
                     local y = source.y
@@ -5916,7 +5916,7 @@ _Abilities.Dodge.new = function(IEngine)
                     local dy = y2 - y
                     local distance = math.sqrt(dx * dx + dy * dy)
                     local a = math.atan(y2 - y, x2 - x)
-                    local distanceMax = source.ms * 2
+                    local distanceMax = 400 + source.ms
                     local distanceMin = source.ms / 2
                     local maximumDashDuration = 0.25
                     local interval = 0.005
@@ -5938,88 +5938,88 @@ _Abilities.Dodge.new = function(IEngine)
                     dashEffect.model = "Effects\\Windwalk Blue Soul.mdx"
                     source.attachEffect(dashEffect, "origin")
                     -- INT Scaling Blink Effect
-                    if withBlink then
-                        source.fadeOut(dashDuration / 4)
-                        eventHolder.clock.schedule_once(
-                            function(triggeringClock, triggeringSchedule)
-                                source.fadeIn(dashDuration)
-                            end, dashDuration / 4
-                        )
-                        eventHolder.clock.schedule_interval(
-                            function(triggeringClock, triggeringSchedule)
-                                local tempUnit = source.owner.createUnit('hpea', unit.x, unit.y, bj_RADTODEG * a)
-                                tempUnit.skin = source.skin
-                                tempUnit.addAbility('Aloc')
-                                tempUnit.setVertexColor(55, 55, 55, 65)
-                                tempUnit.x = unit.x
-                                tempUnit.y = unit.y
-                                tempUnit.playAnimation('walk')
-                                triggeringClock.schedule_once(
-                                    function(triggeringClock, triggeringSchedule)
-                                        tempUnit.remove()
-                                    end, 0.2
-                                )
-                                traveledDistance = traveledDistance + speed
-                                if traveledDistance >= distance * 0.25 and traveledDistance < distance * 0.5 then
-                                    traveledDistance = distance * 0.75
-                                    unit.teleportTo(unit.x + (distance * 0.5) * math.cos(a), unit.y + (distance * 0.5) * math.sin(a))
-                                else
-                                    unit.x = unit.x + speed * math.cos(a)
-                                    unit.y = unit.y + speed * math.sin(a)
-                                end
-                                -- -0.5 because of error range
-                                if traveledDistance >= distance - 0.5 then
-                                    -- STR Scaling AoE Effect
-                                    if withAoE then
-                                        aoeEffect.x = unit.x
-                                        aoeEffect.y = unit.y
-                                        aoeEffect.z = unit.z
-                                        aoeEffect.create().destroy()
-                                    end
-                                    dashEffect.destroy()
-                                    triggeringClock.unschedule(triggeringSchedule)
-                                end
-                            end, interval
-                        )
-                    else
-                        source.fadeOut(dashDuration / 2)
-                        eventHolder.clock.schedule_once(
-                            function(triggeringClock, triggeringSchedule)
-                                source.fadeIn(dashDuration)
-                            end, dashDuration / 2
-                        )     
-                        eventHolder.clock.schedule_interval(
-                            function(triggeringClock, triggeringSchedule)
-                                local tempUnit = source.owner.createUnit('hpea', unit.x, unit.y, bj_RADTODEG * a)
-                                tempUnit.skin = source.skin
-                                tempUnit.addAbility('Aloc')
-                                tempUnit.setVertexColor(55, 55, 55, 65)
-                                tempUnit.x = unit.x
-                                tempUnit.y = unit.y
-                                tempUnit.playAnimation('walk')
-                                triggeringClock.schedule_once(
-                                    function(triggeringClock, triggeringSchedule)
-                                        tempUnit.remove()
-                                    end, 0.2
-                                )
+                    --if withBlink then
+                    source.fadeOut(dashDuration / 4)
+                    eventHolder.clock.schedule_once(
+                        function(triggeringClock, triggeringSchedule)
+                            source.fadeIn(dashDuration)
+                        end, dashDuration / 4
+                    )
+                    eventHolder.clock.schedule_interval(
+                        function(triggeringClock, triggeringSchedule)
+                            local tempUnit = source.owner.createUnit('hpea', unit.x, unit.y, bj_RADTODEG * a)
+                            tempUnit.skin = source.skin
+                            tempUnit.addAbility('Aloc')
+                            tempUnit.setVertexColor(55, 55, 55, 65)
+                            tempUnit.x = unit.x
+                            tempUnit.y = unit.y
+                            tempUnit.playAnimation('walk')
+                            triggeringClock.schedule_once(
+                                function(triggeringClock, triggeringSchedule)
+                                    tempUnit.remove()
+                                end, 0.2
+                            )
+                            traveledDistance = traveledDistance + speed
+                            if traveledDistance >= distance * 0.25 and traveledDistance < distance * 0.5 then
+                                traveledDistance = distance * 0.75
+                                unit.teleportTo(unit.x + (distance * 0.5) * math.cos(a), unit.y + (distance * 0.5) * math.sin(a))
+                            else
                                 unit.x = unit.x + speed * math.cos(a)
                                 unit.y = unit.y + speed * math.sin(a)
-                                traveledDistance = traveledDistance + speed
-                                -- -0.5 because of error range
-                                if traveledDistance >= distance - 0.5 then
-                                    -- STR Scaling AoE Effect
-                                    if withAoE then
-                                        aoeEffect.x = unit.x
-                                        aoeEffect.y = unit.y
-                                        aoeEffect.z = unit.z
-                                        aoeEffect.create().destroy()
-                                    end
-                                    dashEffect.destroy()
-                                    triggeringClock.unschedule(triggeringSchedule)
-                                end
-                            end, interval
-                        )
-                    end
+                            end
+                            -- -0.5 because of error range
+                            if traveledDistance >= distance - 0.5 then
+                                -- STR Scaling AoE Effect
+                                -- if withAoE then
+                                --     aoeEffect.x = unit.x
+                                --     aoeEffect.y = unit.y
+                                --     aoeEffect.z = unit.z
+                                --     aoeEffect.create().destroy()
+                                -- end
+                                dashEffect.destroy()
+                                triggeringClock.unschedule(triggeringSchedule)
+                            end
+                        end, interval
+                    )
+                    --else
+                    --    source.fadeOut(dashDuration / 2)
+                    --    eventHolder.clock.schedule_once(
+                    --        function(triggeringClock, triggeringSchedule)
+                    --            source.fadeIn(dashDuration)
+                    --        end, dashDuration / 2
+                    --    )     
+                    --    eventHolder.clock.schedule_interval(
+                    --        function(triggeringClock, triggeringSchedule)
+                    --            local tempUnit = source.owner.createUnit('hpea', unit.x, unit.y, bj_RADTODEG * a)
+                    --            tempUnit.skin = source.skin
+                    --            tempUnit.addAbility('Aloc')
+                    --            tempUnit.setVertexColor(55, 55, 55, 65)
+                    --            tempUnit.x = unit.x
+                    --            tempUnit.y = unit.y
+                    --            tempUnit.playAnimation('walk')
+                    --            triggeringClock.schedule_once(
+                    --                function(triggeringClock, triggeringSchedule)
+                    --                    tempUnit.remove()
+                    --                end, 0.2
+                    --            )
+                    --            unit.x = unit.x + speed * math.cos(a)
+                    --            unit.y = unit.y + speed * math.sin(a)
+                    --            traveledDistance = traveledDistance + speed
+                    --            -- -0.5 because of error range
+                    --            if traveledDistance >= distance - 0.5 then
+                    --                -- STR Scaling AoE Effect
+                    --                if withAoE then
+                    --                    aoeEffect.x = unit.x
+                    --                    aoeEffect.y = unit.y
+                    --                    aoeEffect.z = unit.z
+                    --                    aoeEffect.create().destroy()
+                    --                end
+                    --                dashEffect.destroy()
+                    --                triggeringClock.unschedule(triggeringSchedule)
+                    --            end
+                    --        end, interval
+                    --    )
+                    --end
                 end
             ).setCondition(
                 function(source, spell)
