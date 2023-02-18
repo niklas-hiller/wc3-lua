@@ -6045,37 +6045,45 @@ end
 _Abilities.Magma_Constellation = {}
 _Abilities.Magma_Constellation.new = function(IEngine)
     local self = {}
-    local events = {}
-    local clock = IEngine.Clock()
+    local _eventHolder = {}
+    local group = IEngine.Group()
+
     local hitEffect = IEngine.Effect()
     hitEffect.model = "Effects\\Firebolt.mdx"
     hitEffect.scale = 1.0
     local stompEffect = IEngine.Effect()
     stompEffect.model = "Effects\\Stomp_Effect.mdx"
     stompEffect.scale = 0.7
-    local group = IEngine.Group()
 
     function self.apply(unit)
-        if events.unit == nil then
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
+
+        do
             local boltEffect = {}
             local delayTable = {}
-            for i = 1, 5 do
+            local amount = 5
+            for i = 1, amount do
                 boltEffect[i] = IEngine.Effect()
                 boltEffect[i].model = "Effects\\Firebolt.mdx"
                 boltEffect[i].scale = 2.0
+                boltEffect[i].create()
                 delayTable[i] = {}
             end
+
             local count = 0
-            local increment = math.pi * 2 / 50. -- / 200.
-            local span = math.pi * 2 / 5.
-            clock.schedule_interval(
+            local increment = math.pi * 2 / 200
+            local span = math.pi * 2 / amount
+            eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
                     if count < 200 then
                         count = count + 1
                     else
                         count = 0
                     end
-                    for i = 1, 5 do
+                    for i = 1, amount do
                         local x = unit.x + 350. * math.cos(count * increment + i * span)
                         local y = unit.y + 350. * math.sin(count * increment + i * span)
                         local z = unit.z + 75.
@@ -6106,7 +6114,7 @@ _Abilities.Magma_Constellation.new = function(IEngine)
                                             stompEffect.y = newY
                                             stompEffect.z = z
                                             stompEffect.create().destroy()
-                                            unit.damageTarget(enumUnit, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                            unit.damageTarget(enumUnit, unit.damage * 75., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                             delayTable[i][enumUnity] = 0
                                         end
                                     end
@@ -6114,37 +6122,25 @@ _Abilities.Magma_Constellation.new = function(IEngine)
                             )
                     end
                 end, 0.01
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if --[[unit.hasAbility('A005')]] true then
-                        for i = 1, 5 do
-                            if boltEffect[i].handle == nil then
-                                boltEffect[i].create()
-                            end
-                        end
-                        
-                        return true
-                    else
-                        for i = 1, 5 do
-                            if boltEffect[i].handle ~= nil then
-                                boltEffect[i].create()
-                            end
-                        end
-                        return false
-                    end
-                end
             )
+
+            eventHolder.cleanup = function()
+                for i = 1, amount do
+                    boltEffect[i].destroy()
+                end
+            end
         end
+
+        _eventHolder[unit] = eventHolder
     end
 
     function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
+        if _eventHolder[unit] == nil then
+            return
         end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
     end
-
-    clock.start()
 
     return self
 end
@@ -7428,6 +7424,105 @@ _Abilities.Grim_Reaper.new = function(IEngine)
 end
 ]]--
 
+-- _Abilities.Hurricane_Constellation = {}
+-- _Abilities.Hurricane_Constellation.new = function(IEngine)
+--     local self = {}
+--     local _eventHolder = {}
+--     local group = IEngine.Group()
+
+--     local stompEffect = IEngine.Effect()
+--     stompEffect.model = "Effects\\Wind Blast.mdx"
+--     stompEffect.scale = 0.7
+    
+--     local amount = 7
+
+--     function self.apply(unit)
+--         if _eventHolder[unit] ~= nil then
+--             return
+--         end
+--         local eventHolder = EventHolder.new(IEngine)
+
+--         do
+--             local boltEffect = {}
+--             local delayTable = {}
+
+--             for i = 1, amount do
+--                 boltEffect[i] = IEngine.Effect()
+--                 boltEffect[i].model = "Effects\\Windstorm.mdx"
+--                 boltEffect[i].scale = 1.0
+--                 boltEffect[i].create()
+--                 delayTable[i] = {}
+--             end
+
+--             local count = 0
+--             local increment = math.pi * 2 / 500.
+--             local span = math.pi * 2 / amount
+
+--             eventHolder.schedule = eventHolder.clock.schedule_interval(
+--                 function(triggeringClock, triggeringSchedule)
+--                     if count < 500 then
+--                         count = count + 1
+--                     else
+--                         count = 0
+--                     end
+--                     for i = 1, amount do
+--                         local x = unit.x + 650. * math.cos(count * increment + i * span)
+--                         local y = unit.y + 650. * math.sin(count * increment + i * span)
+--                         local z = unit.z
+--                         boltEffect[i].x = x
+--                         boltEffect[i].y = y
+--                         boltEffect[i].z = z
+--                         for k, v in pairs(delayTable[i]) do
+--                             delayTable[i][k] = v + 1
+--                         end
+--                         group
+--                             .inRange(x, y, 150.)
+--                             .forEach(
+--                                 function(group, enumUnit)
+--                                     if unit.isEnemy(enumUnit) then
+--                                         if delayTable[i][enumUnit] == nil then
+--                                             delayTable[i][enumUnit] = 100
+--                                         end
+--                                         if delayTable[i][enumUnit] >= 100 then
+--                                             local dist = math.random(0., 30.)
+--                                             local rad = math.random(0., math.pi * 2)
+--                                             local newX = x + dist * math.cos(rad)
+--                                             local newY = y + dist * math.sin(rad)
+--                                             stompEffect.x = newX
+--                                             stompEffect.y = newY
+--                                             stompEffect.z = z
+--                                             stompEffect.create().destroy()
+--                                             unit.damageTarget(enumUnit, unit.damage * 75., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+--                                             delayTable[i][enumUnit] = 0
+--                                         end
+--                                     end
+--                                 end
+--                             )
+--                     end
+--                 end, 0.01
+--             )
+
+--             eventHolder.cleanup = function()
+--                 for i = 1, amount do
+--                     boltEffect[i].destroy()
+--                 end
+--             end
+--         end
+
+--         _eventHolder[unit] = eventHolder
+--     end
+
+--     function self.remove(unit)
+--         if _eventHolder[unit] == nil then
+--             return
+--         end
+--         _eventHolder[unit].unbindAll()
+--         _eventHolder[unit] = nil
+--     end
+
+--     return self
+-- end
+
 _Abilities.Impale = {}
 _Abilities.Impale.new = function(IEngine)
     local self = {}
@@ -8365,105 +8460,6 @@ _Abilities.I_Am_Atomic.new = function(IEngine)
     return self
 end
 
-_Abilities.Hurricane_Constellation = {}
-_Abilities.Hurricane_Constellation.new = function(IEngine)
-    local self = {}
-    local _eventHolder = {}
-    local group = IEngine.Group()
-
-    local stompEffect = IEngine.Effect()
-    stompEffect.model = "Effects\\Wind Blast.mdx"
-    stompEffect.scale = 0.7
-    
-    local amount = 7
-
-    function self.apply(unit)
-        if _eventHolder[unit] ~= nil then
-            return
-        end
-        local eventHolder = EventHolder.new(IEngine)
-
-        do
-            local boltEffect = {}
-            local delayTable = {}
-
-            for i = 1, amount do
-                boltEffect[i] = IEngine.Effect()
-                boltEffect[i].model = "Effects\\Windstorm.mdx"
-                boltEffect[i].scale = 1.0
-                boltEffect[i].create()
-                delayTable[i] = {}
-            end
-
-            local count = 0
-            local increment = math.pi * 2 / 500.
-            local span = math.pi * 2 / amount
-
-            eventHolder.schedule = eventHolder.clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    if count < 500 then
-                        count = count + 1
-                    else
-                        count = 0
-                    end
-                    for i = 1, amount do
-                        local x = unit.x + 650. * math.cos(count * increment + i * span)
-                        local y = unit.y + 650. * math.sin(count * increment + i * span)
-                        local z = unit.z
-                        boltEffect[i].x = x
-                        boltEffect[i].y = y
-                        boltEffect[i].z = z
-                        for k, v in pairs(delayTable[i]) do
-                            delayTable[i][k] = v + 1
-                        end
-                        group
-                            .inRange(x, y, 150.)
-                            .forEach(
-                                function(group, enumUnit)
-                                    if unit.isEnemy(enumUnit) then
-                                        if delayTable[i][enumUnit] == nil then
-                                            delayTable[i][enumUnit] = 100
-                                        end
-                                        if delayTable[i][enumUnit] >= 100 then
-                                            local dist = math.random(0., 30.)
-                                            local rad = math.random(0., math.pi * 2)
-                                            local newX = x + dist * math.cos(rad)
-                                            local newY = y + dist * math.sin(rad)
-                                            stompEffect.x = newX
-                                            stompEffect.y = newY
-                                            stompEffect.z = z
-                                            stompEffect.create().destroy()
-                                            unit.damageTarget(enumUnit, unit.damage * 75., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                                            delayTable[i][enumUnit] = 0
-                                        end
-                                    end
-                                end
-                            )
-                    end
-                end, 0.01
-            )
-
-            eventHolder.cleanup = function()
-                for i = 1, amount do
-                    boltEffect[i].destroy()
-                end
-            end
-        end
-
-        _eventHolder[unit] = eventHolder
-    end
-
-    function self.remove(unit)
-        if _eventHolder[unit] == nil then
-            return
-        end
-        _eventHolder[unit].unbindAll()
-        _eventHolder[unit] = nil
-    end
-
-    return self
-end
-
 _Abilities.Blizzard = {}
 _Abilities.Blizzard.new = function(IEngine)
     local self = {}
@@ -8821,9 +8817,6 @@ Abilities.new = function(IEngine)
     self.Sword_Slash = _Abilities.Sword_Slash.new(IEngine)
     self.Dodge = _Abilities.Dodge.new(IEngine)
 
-    -- INT SPECIAL
-    self.Magma_Constellation = _Abilities.Magma_Constellation.new(IEngine)
-
     -- DEMON
     self.Blink_Strike = _Abilities.Blink_Strike.new(IEngine)
     self.Demon_Control = _Abilities.Demon_Control.new(IEngine)
@@ -8846,7 +8839,7 @@ Abilities.new = function(IEngine)
     self.Heaven_Justice = _Abilities.Heaven_Justice.new(IEngine)
 
     -- ELEMENTS
-    self.Hurricane_Constellation = _Abilities.Hurricane_Constellation.new(IEngine)
+    self.Magma_Constellation = _Abilities.Magma_Constellation.new(IEngine)
     self.Blizzard = _Abilities.Blizzard.new(IEngine)
     self.Uncontrollable_Flames = _Abilities.Uncontrollable_Flames.new(IEngine)
 
@@ -8863,6 +8856,7 @@ Abilities.new = function(IEngine)
     -- self.Grim_Reaper = _Abilities.Grim_Reaper.new(IEngine)
     -- self.Possessed = _Abilities.Possessed.new(IEngine)
     -- self.Temple_Knight = _Abilities.Temple_Knight.new(IEngine)
+    -- self.Hurricane_Constellation = _Abilities.Hurricane_Constellation.new(IEngine)
 
     return self
 end
@@ -9256,7 +9250,7 @@ xpcall(function()
                     ["disabled"] = false
                 },
                 [2] = {
-                    ["code"] = Ability.Hurricane_Constellation,
+                    ["code"] = Ability.Magma_Constellation,
                     ["shop"] = 'IA12',
                     ["disabled"] = false
                 },
@@ -9560,7 +9554,7 @@ xpcall(function()
             --Ability.Heaven_Justice.apply(unit)
 
             -- ELEMENTALIST
-            -- Ability.Hurricane_Constellation.apply(unit)
+            -- Ability.Magma_Constellation.apply(unit)
             -- Ability.Blizzard.apply(unit)
             -- Ability.Uncontrollable_Flames.apply(unit)
             -- Ability.Black_Hole.apply(unit)
@@ -9611,8 +9605,8 @@ xpcall(function()
                     elseif whichAbility == 'i am atomic' then
                         Ability.I_Am_Atomic.apply(unit)
                     -- ELEMENTS (tbd)
-                    elseif whichAbility == 'hurricane constellation' then
-                        Ability.Hurricane_Constellation.apply(unit)
+                    elseif whichAbility == 'magma constellation' then
+                        Ability.Magma_Constellation.apply(unit)
                     elseif whichAbility == 'blizzard' then
                         Ability.Blizzard.apply(unit)
                     elseif whichAbility == 'uncontrollable flames' then
@@ -9668,8 +9662,8 @@ xpcall(function()
                     elseif whichAbility == 'i am atomic' then
                         Ability.I_Am_Atomic.remove(unit)
                     -- ELEMENTS (tbd)
-                    elseif whichAbility == 'hurricane constellation' then
-                        Ability.Hurricane_Constellation.remove(unit)
+                    elseif whichAbility == 'magma constellation' then
+                        Ability.Magma_Constellation.remove(unit)
                     elseif whichAbility == 'blizzard' then
                         Ability.Blizzard.remove(unit)
                     elseif whichAbility == 'uncontrollable flames' then
