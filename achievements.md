@@ -146,161 +146,182 @@ Ability 4
 
 # SET ABILITIES
 
-## DESTROYER
+## Destruction
 Ability 1
-- Set: DESTROYER
+- Path: Destruction
 - Name: Missile Strike
 - Description: 100x
 
 Ability 2
-- Set: DESTROYER
+- Path: Destruction
 - Name: Orbital Strike
 - Description: 0.5 per tick (0.01) + 40.0x per explosion (0.2)
 
 Ability 3
-- Set: DESTROYER
+- Path: Destruction
 - Name: Sword of Destruction
 - Description: 250x / 1000x
 
-Ability 4
-- Set: DESTROYER
+Aeon
+- Path: Destruction
 - Name: I Am Atomic
 - Description: 20.000x
 
-## HOLY
+## Preservation
 Ability 1
-- Set: HOLY
+- Path: Preservation
 - Name: Impale
 - Description: 50x damage and 3% max hp heal per hit
 
 Ability 2
-- Set: HOLY
+- Path: Preservation
 - Name: Moon Halo
 - Description: 100x damage per laser
 
 Ability 3
-- Set: HOLY
+- Path: Preservation
 - Name: Overload
 - Description: 100x damage per laser
 
-Ability 4
-- Set: HOLY
+Aeon
+- Path: Preservation
 - Name: Michaels Blessing
 - Description: 2500x damage per laser to enemies and heal 20% max hp per laser to allies hit 
 
-## DEMON
+## Nihility
 Ability 1
-- Set: DEMON
+- Path: Nihility
 - Name: Blade Dance
 - Description: Deal 5x damage per tick (0.05)
 
 Ability 2
-- Set: DEMON
+- Path: Nihility
 - Name: Blink Strike
 - Description: Blinks to random nearby enemy within 1200 range and deals 20x damage
 
 Ability 3
-- Set: DEMON
+- Path: Nihility
 - Name: Demon Control
 - Description: Heal by 30% max hp every 50 attacks
 
-Ability 4
-- Set: DEMON
+Aeon
+- Path: Nihility
 - Name: Shadow Strike
 - Description: Spawn an illusion each attack, that copies you damage, attackspeed and blink strike
 
-## ELEMENTS
+## Harmony
 Ability 1
-- Set: ELEMENTS
+- Path: Harmony
 - Name: Hurricane Constellation
 - Description: 75x per tick
 
 Ability 2
-- Set: ELEMENTS
+- Path: Harmony
 - Name: Blizzard
 - Description: 250x per shard
 
 Ability 3
-- Set: ELEMENTS
+- Path: Harmony
 - Name: Uncontrollable Flames
 - Description: 500x per stomp
 
-Ability 4
-- Set: ELEMENTS
+Aeon
+- Path: Harmony
 - Name: Black Hole
 - Description: 2000x per second
 
-## SUMMONER
+## Erudition
 Ability 1
-- Set: SUMMONER
-- Name: Boar
-- Description: 100x Damage and 1.5x Attack Speed
+- Path: Erudition
+- Name: Reaper 1
+- Description: 
 
 Ability 2
-- Set: SUMMONER
-- Name: Wolf
-- Description: 300x Damage and 3.0x Attack Speed
+- Path: Erudition
+- Name: Reaper 2
+- Description: 
 
 Ability 3
-- Set: SUMMONER
-- Name: Bear
-- Description: 1000x Damage and 1.0x Attack Speed
+- Path: Erudition
+- Name: Reaper 3
+- Description: 
 
-Ability 4
-- Set: SUMMONER
-- Name: Reapers
+Aeon
+- Path: Erudition
+- Name: 
+- Description: 
+
+## Hunt
+Ability 1
+- Path: Hunt
+- Name: 
+- Description: 
+
+Ability 2
+- Path: Hunt
+- Name: 
+- Description: 
+
+Ability 3
+- Path: Hunt
+- Name: 
+- Description: 
+
+Aeon
+- Path: Hunt
+- Name: 
 - Description: 
 
 # FIRST BOSS PASSIVES
 
 Ability 1
-- Set: DEMON
+- Path: DEMON
 - Description: You have blades rotating around you
 
 Ability 2
-- Set: ELEMENTS
+- Path: ELEMENTS
 - Description: You have a hurricane surrounding you
 
 Ability 3
-- Set: SUMMONER
+- Path: SUMMONER
 - Description: You receive a boar summon
 
 # SECOND BOSS PASSIVES
 
 Ability 1
-- Set: DEMON
+- Path: DEMON
 - Description: You have Blink Strike
 
 Ability 2
-- Set: HOLY
+- Path: HOLY
 - Description: You unlock Impale
 
 Ability 3
-- Set: SUMMONER
+- Path: SUMMONER
 - Description: You receive a wolf summon
 
 # THIRD BOSS PASSIVES
 
 Ability 1
-- Set: DESTROYER
+- Path: DESTROYER
 - Description: You get rockets from sky (interceptor shell)
 
 Ability 2
-- Set: HOLY
+- Path: HOLY
 - Description: You unlock Judgement
 
 Ability 3
-- Set: SUMMONER
+- Path: SUMMONER
 - Description: You receive a bear summon
 
 # FOURTH BOSS PASSIVES
 
 Ability 1
-- Set: DEMON
+- Path: DEMON
 - Description: You have a demon following you, casting each few attacks
 
 Ability 2
-- Set: HOLY
+- Path: HOLY
 - Description: You unlock Overload
 
 Ability 3 (CONDITIONAL -> SUMMONER set)
@@ -314,11 +335,11 @@ Ability 1 (CONDITIONAL -> HOLY set)
 - Description: You summon an angel each few seconds that deals holy damage to nearby enemies
 
 Ability 2
-- Set: ELEMENTS
+- Path: ELEMENTS
 - Description: You have a blizzard around you
 
 Ability 3
-- Set: DESTROYER
+- Path: DESTROYER
 - Description: You have a laser (sacred storm)
 
 # SIXTH BOSS PASSIVES
@@ -328,9 +349,67 @@ Ability 1 (CONDITIONAL -> DEMON set)
 - Description: You unlock shadow strike
 
 Ability 2
-- Set: ELEMENTS
+- Path: ELEMENTS
 - Description: You have fire stomps around you
 
 Ability 3
 - DESTROYER
 - Description: You have a sword falling from sky (Kindom come)
+
+
+
+
+
+
+# Notes
+Available:
+- Destruction
+    - Damage
+- Preservation
+    - Tank
+- Nihility
+    - Fast
+- Harmony
+    - Magic
+- Erudition
+    - Summon
+- Hunt
+    - ?
+
+Assigned:
+- A = Harmony
+- B = Destruction
+- C = Preservation
+- D = Hunt
+- E = Nihility
+- F = Erudition
+
+# Boss 1
+- A1
+- B1
+- C1
+
+# Boss 2
+- A2
+- D1
+- E1
+
+# Boss 3
+- C2
+- F1
+- E2
+
+# Boss 4
+- C3
+- D2
+- F2
+
+# Boss 5
+- A3
+- F3
+- B2
+
+# Boss 6
+- B3
+- D3
+- E3

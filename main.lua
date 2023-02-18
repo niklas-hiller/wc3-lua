@@ -9252,16 +9252,19 @@ xpcall(function()
             ["abilities"] = {
                 [1] = {
                     ["code"] = Ability.Blade_Dance,
-                    ["shop"] = 'IA11'
+                    ["shop"] = 'IA11',
+                    ["disabled"] = false
                 },
                 [2] = {
                     ["code"] = Ability.Hurricane_Constellation,
-                    ["shop"] = 'IA12'
+                    ["shop"] = 'IA12',
+                    ["disabled"] = false
                 },
                 [3] = {
                     ["code"] = Ability.Boar,
-                    ["shop"] = 'IA13'
-                }, -- Disabled
+                    ["shop"] = 'IA13',
+                    ["disabled"] = true
+                },
             }
         },
         [2] = {
@@ -9271,16 +9274,19 @@ xpcall(function()
             ["abilities"] = {
                 [1] = {
                     ["code"] = Ability.Blink_Strike,
-                    ["shop"] = 'IA21'
+                    ["shop"] = 'IA21',
+                    ["disabled"] = false
                 },
                 [2] = {
                     ["code"] = Ability.Impale,
-                    ["shop"] = 'IA22'
+                    ["shop"] = 'IA22',
+                    ["disabled"] = false
                 },
                 [3] = {
                     ["code"] = Ability.Wolf,
-                    ["shop"] = 'IA23'
-                }, -- Disabled
+                    ["shop"] = 'IA23',
+                    ["disabled"] = true
+                },
             }
         },
         [3] = {
@@ -9290,16 +9296,19 @@ xpcall(function()
             ["abilities"] = {
                 [1] = {
                     ["code"] = Ability.Interceptor,
-                    ["shop"] = 'IA31'
+                    ["shop"] = 'IA31',
+                    ["disabled"] = false
                 },
                 [2] = {
                     ["code"] = Ability.Judgement,
-                    ["shop"] = 'IA32'
+                    ["shop"] = 'IA32',
+                    ["disabled"] = false
                 },
                 [3] = {
                     ["code"] = Ability.Bear,
-                    ["shop"] = 'IA33'
-                }, -- Disabled
+                    ["shop"] = 'IA33',
+                    ["disabled"] = true
+                },
             }
         },
         [4] = {
@@ -9309,16 +9318,19 @@ xpcall(function()
             ["abilities"] = {
                 [1] = {
                     ["code"] = Ability.Demon_Control,
-                    ["shop"] = 'IA41'
+                    ["shop"] = 'IA41',
+                    ["disabled"] = false
                 },
                 [2] = {
                     ["code"] = Ability.Overload,
-                    ["shop"] = 'IA42'
+                    ["shop"] = 'IA42',
+                    ["disabled"] = false
                 },
                 [3] = {
                     ["code"] = Ability.Reapers,
-                    ["shop"] = 'IA43'
-                }, -- Disabled
+                    ["shop"] = 'IA43',
+                    ["disabled"] = true
+                },
             }
         },
         [5] = {
@@ -9328,15 +9340,18 @@ xpcall(function()
             ["abilities"] = {
                 [1] = {
                     ["code"] = Ability.Heaven_Justice,
-                    ["shop"] = 'IA51'
+                    ["shop"] = 'IA51',
+                    ["disabled"] = false
                 },
                 [2] = {
                     ["code"] = Ability.Blizzard,
-                    ["shop"] = 'IA52'
+                    ["shop"] = 'IA52',
+                    ["disabled"] = false
                 },
                 [3] = {
                     ["code"] = Ability.Sacred_Storm,
-                    ["shop"] = 'IA53'
+                    ["shop"] = 'IA53',
+                    ["disabled"] = false
                 },
             }
         },
@@ -9347,15 +9362,18 @@ xpcall(function()
             ["abilities"] = {
                 [1] = {
                     ["code"] = Ability.Shadow_Strike,
-                    ["shop"] = 'IA61'
+                    ["shop"] = 'IA61',
+                    ["disabled"] = false
                 },
                 [2] = {
                     ["code"] = Ability.Uncontrollable_Flames,
-                    ["shop"] = 'IA62'
+                    ["shop"] = 'IA62',
+                    ["disabled"] = false
                 },
                 [3] = {
                     ["code"] = Ability.Kingdom_Come,
-                    ["shop"] = 'IA63'
+                    ["shop"] = 'IA63',
+                    ["disabled"] = false
                 },
             }
         }
@@ -9433,8 +9451,12 @@ xpcall(function()
                             RemoveItem(item)
 
                             -- Conditions
-                            if (abilitySelection[index] ~= nil) then
+                            if abilitySelection[index] ~= nil then
                                 print("You already selected an ability from this boss.")
+                                return
+                            end
+                            if ability["disabled"] then
+                                print("This ability is currently disabled, please select a different one.")
                                 return
                             end
 
