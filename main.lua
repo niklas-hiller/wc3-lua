@@ -1269,6 +1269,9 @@ Engine.new = function()
         end
 
         function self._destroy()
+            if handle == nil then
+                return
+            end
             self.on_destroy()
             DestroyEffect(handle)
             handle = nil
@@ -4288,8 +4291,6 @@ Engine.new = function()
         local critChance = 0
         local critDamage = 0
 
-        local castSpeed = 0
-
         if IsHeroUnitId(GetUnitTypeId(handle)) then
             -- Capture Hero Stats
             --local capturedLevel = GetHeroLevel(handle)
@@ -4325,7 +4326,7 @@ Engine.new = function()
             elseif index == "mp" then
                 SetUnitState(handle, UNIT_STATE_MANA, value)
             elseif index == "maxmp" then
-                BlzSetUnitMaxMana(handle, value)
+                BlzSetUnitMaxMana(handle, math.floor(value))
             elseif index == "armor"then
                 BlzSetUnitArmor(handle, value)
             elseif index == "visible" then
@@ -4440,8 +4441,6 @@ Engine.new = function()
                 critChance = value
             elseif index == "critDamage" then
                 critDamage = value
-            elseif index == "castSpeed" then
-                castSpeed = value
             else
                 Log.Error("Unknown attribute '" .. index .. "'.")
             end
@@ -4550,8 +4549,6 @@ Engine.new = function()
                 return critChance
             elseif index == "critDamage" then
                 return critDamage
-            elseif index == "castSpeed" then
-                return castSpeed
             elseif index == "acquireRange" then
                 return GetUnitAcquireRange(handle)
             else
@@ -9660,8 +9657,9 @@ Area.new = function(IEngine, rect, configuration, onFirstBossDeath)
 end
 
 AffinitySystem = {}
-AffinitySystem.new = function(unit)
+AffinitySystem.new = function(IEngine, unit)
     local self = {}
+    local clock = IEngine.Clock()
 
     local SKILL_POINTS_BASE = 100
     local SKILL_POINTS_PER_LEVEL = 5
@@ -9755,7 +9753,7 @@ AffinitySystem.new = function(unit)
         elseif stat == "quantum" then
             return "Quantum: " .. quantum .. self.statBonusString(stat) ..
                 "\n - Each point increases critical chance by 0.2%%" ..
-                "\n - Each point increases casting speed by 0.08%%"
+                "\n - Each point increases quantum shield by 1.5%%"
         end
     end
 
@@ -9778,7 +9776,7 @@ AffinitySystem.new = function(unit)
 
         -- Quantum
         local BASE_CRIT_CHANCE = 10.0   -- 10% Critical Chance
-        local BASE_CASTING_SPEED = 1.0  -- 100% Casting Speed
+        local BASE_QUANTUM_SHIELD = 0.0  -- 0% of HP as Quantum Shield
 
         -- Fire related
         local FIRE_DAMAGE_FACTOR = 0.02 -- 2% Damage
@@ -9800,9 +9798,9 @@ AffinitySystem.new = function(unit)
 
         -- Quantum related
         local QUANTUM_CRITICAL_CHANCE_FACTOR = 0.2 -- 0.2% Critical Chance
-        local QUANTUM_CASTING_SPEED_FACTOR = 0.0008 -- 0.08% Casting Speed
+        local QUANTUM_QUANTUM_SHIELD_FACTOR = 0.015 -- 1.5% Quantum Shield
         unit.critChance = BASE_CRIT_CHANCE + (quantum + bonusQuantum) * QUANTUM_CRITICAL_CHANCE_FACTOR
-        unit.castSpeed = BASE_CASTING_SPEED + (quantum + bonusQuantum) * QUANTUM_CASTING_SPEED_FACTOR
+        unit.maxmp = unit.maxhp * (BASE_QUANTUM_SHIELD + (quantum + bonusQuantum) * QUANTUM_QUANTUM_SHIELD_FACTOR)
 
     end
 
@@ -9840,8 +9838,59 @@ AffinitySystem.new = function(unit)
         end
     )
 
+    local quantumShield = IEngine.Effect()
+    quantumShield.model = 'Effects\\Sacred Guard Blue.mdx'
+    quantumShield.scale = 1.7
+    clock.schedule_interval(
+        function(triggeringClock, triggeringSchedule)
+            quantumShield.x = unit.x
+            quantumShield.y = unit.y
+            quantumShield.z = unit.z + 50.
+        end
+    )
+
+    local quantumShieldCooldown = false
+    unit.bind("on_damaged_pre",
+        function(source, target, damageObject)
+            if quantumShieldCooldown then
+                return
+            end
+            if target.maxmp > 0 then
+                if damageObject.damage > target.mp then
+                    damageObject.damage = damageObject.damage - target.mp
+                    target.mp = 0
+                    quantumShield.destroy()
+                    quantumShieldCooldown = true
+                    local currentManaPercent = 0.0
+                    local tickrate = 0.01
+                    local rechargeTime = 10.0
+                    clock.schedule_interval(
+                        function(triggeringClock, triggeringSchedule)
+                            currentManaPercent = currentManaPercent + (rechargeTime * tickrate)
+                            target.mp = target.maxmp * (currentManaPercent / 100.)
+                            if currentManaPercent >= 100.0 then
+                                quantumShieldCooldown = false
+                                quantumShield.create()
+                                triggeringClock.unschedule(triggeringSchedule)
+                            end
+                        end, tickrate
+                    )
+                else
+                    target.mp = target.mp - damageObject.damage
+                    damageObject.damage = 0
+                end
+            end
+        end
+    ).setCondition(
+        function(source, target, damageObject)
+            return target == unit
+        end
+    )
+
     self.updateVisual()
     self.updateStats()
+
+    clock.start()
 
     return self
 end
@@ -10190,7 +10239,7 @@ xpcall(function()
             unit.damage = 1
 
             -- Init Affinity System
-            local affinitySys = AffinitySystem.new(unit)
+            local affinitySys = AffinitySystem.new(Framework, unit)
 
             local abilitySelection = {}
             local pathChosen = nil
