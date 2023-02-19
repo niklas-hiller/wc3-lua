@@ -9440,21 +9440,21 @@ Abilities.new = function(IEngine)
 end
 
 AreaConfiguration = {}
-AreaConfiguration.new = function(disabled)
+AreaConfiguration.new = function(disabled, skin, level, damage, health, armor, xp)
     local self = {}
 
     self.disabled = disabled or false
-    self.creepSkin = 'h007'
-    self.creepDamage = 5 -- 5 | 36 | 600 | 12.000 | 275.000 | 4.000.0000
+    self.creepSkin = skin
+    self.creepLevel = level -- 1 | 20 | 35 | 50 | 65 | 80 Wenn Hero Level < Unit Level - 5 dann keine EXP und keine Stats! ; Maximal 20 Level über Creep, sonst keine XP
+    self.creepDamage = damage -- 5 | 36 | 600 | 12.000 | 275.000 | 4.000.0000
     self.creepAttackspeed = 1.0
     self.creepMovementspeed = 340
-    self.creepHealth = 50 -- 50 | 750 | 12.500 | 275.000 | 3.500.000 | 27.500.000
-    self.creepArmor = 0 -- 0 | 5 | 15 | 20 | 30 | 50
+    self.creepHealth = health -- 50 | 750 | 12.500 | 275.000 | 3.500.000 | 27.500.000
+    self.creepArmor = armor -- 0 | 5 | 15 | 20 | 30 | 50
     self.creepLimit = 75
-    self.creepLevel = 1 -- 1 | 20 | 35 | 50 | 65 | 80 Wenn Hero Level < Unit Level - 5 dann keine EXP und keine Stats! ; Maximal 20 Level über Creep, sonst keine XP
-    self.creepXP = 5 -- 5 | 20 | 60 | 450 | 2500 | 20000
-    self.attackStacks = 0.1 -- 0.1 | 0.3 | 1.5 | 12.0 | 120.0 | 550.0
-    self.healthStacks = 0.2 -- 0.2 | 0.6 | 3.0 | 24.0 | 240.0 | 1100.0
+    self.creepXP = xp -- 5 | 20 | 60 | 450 | 2500 | 20000
+    -- self.attackStacks = attackStacks -- 0.1 | 0.3 | 1.5 | 12.0 | 120.0 | 550.0
+    -- self.healthStacks = healthStacks -- 0.2 | 0.6 | 3.0 | 24.0 | 240.0 | 1100.0
 
     self.bossSkin = 'h000'
     self.bossDamage = 1000
@@ -10161,12 +10161,12 @@ xpcall(function()
     end
 
     local areaConfigurations = {
-        [1] = AreaConfiguration.new(false),
-        [2] = AreaConfiguration.new(true),
-        [3] = AreaConfiguration.new(true),
-        [4] = AreaConfiguration.new(true),
-        [5] = AreaConfiguration.new(true),
-        [6] = AreaConfiguration.new(true)
+        [1] = AreaConfiguration.new(false, 'h007', 1, 5, 50, 0, 5),
+        [2] = AreaConfiguration.new(true, 'h007', 20, 36, 750, 5, 20),
+        [3] = AreaConfiguration.new(true, 'h007', 35, 600, 12500, 15, 60),
+        [4] = AreaConfiguration.new(true, 'h007', 50, 12000, 275000, 20, 450),
+        [5] = AreaConfiguration.new(true, 'h007', 65, 275000, 3500000, 30, 2500),
+        [6] = AreaConfiguration.new(true, 'h007', 80, 4000000, 27500000, 50, 20000)
     }
 
     local areas = {
