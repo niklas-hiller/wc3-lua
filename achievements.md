@@ -269,6 +269,7 @@ Aeon
 ## Path
 Available:
 - Destruction
+    - Aura: Fountain of Souls & Pentagram
     - Category: Damage
     - Abilities:
         - Interceptor
@@ -276,6 +277,7 @@ Available:
         - Kingdom Come
         - [AEON] I am Atomic
 - Preservation
+    - Aura: Holy Aura
     - Category: Tank
     - Abilities:
         - Impale
@@ -283,6 +285,7 @@ Available:
         - Overload
         - [AEON] Heaven Justice
 - Nihility
+    - Aura: Jibril Aura
     - Category: Fast
     - Abilities:
         - Blade Dance
@@ -290,13 +293,15 @@ Available:
         - Demon Control
         - [AEON] Shadow Strike
 - Harmony
+    - Aura: Blue Rune Aura
     - Category: Magic
-    - Abilities:
+    - Abilities: 
         - Magma Constellation
         - Blizzard
         - Uncontrollable Flames
         - [AEON] Black Hole
 - Erudition
+    - Aura: Grim Reaper Aura
     - Category: Summon
     - Abilities
         - Not implemented
@@ -304,6 +309,7 @@ Available:
         - Not implemented
         - [AEON] Not implemented
 - Hunt
+    - Aura: Thunder Aura
     - Category: Lifesteal
     - Abilities
         - Not implemented

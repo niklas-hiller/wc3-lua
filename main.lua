@@ -5717,6 +5717,18 @@ Engine.new = function()
 
 end
 
+MetaData = {}
+MetaData.new = function()
+    local self = {}
+
+    self.name = ""
+    self.description = ""
+    self.icon = ""
+
+    return self
+
+end
+
 EventHolder = {}
 EventHolder.new = function(IEngine)
     local self = {}
@@ -6042,114 +6054,26 @@ _Abilities.Dodge.new = function(IEngine)
     return self
 end
 
-_Abilities.Magma_Constellation = {}
-_Abilities.Magma_Constellation.new = function(IEngine)
-    local self = {}
-    local _eventHolder = {}
-    local group = IEngine.Group()
-
-    local hitEffect = IEngine.Effect()
-    hitEffect.model = "Effects\\Firebolt.mdx"
-    hitEffect.scale = 1.0
-    local stompEffect = IEngine.Effect()
-    stompEffect.model = "Effects\\Stomp_Effect.mdx"
-    stompEffect.scale = 0.7
-
-    function self.apply(unit)
-        if _eventHolder[unit] ~= nil then
-            return
-        end
-        local eventHolder = EventHolder.new(IEngine)
-
-        do
-            local boltEffect = {}
-            local delayTable = {}
-            local amount = 5
-            for i = 1, amount do
-                boltEffect[i] = IEngine.Effect()
-                boltEffect[i].model = "Effects\\Firebolt.mdx"
-                boltEffect[i].scale = 2.0
-                boltEffect[i].create()
-                delayTable[i] = {}
-            end
-
-            local count = 0
-            local increment = math.pi * 2 / 200
-            local span = math.pi * 2 / amount
-            eventHolder.schedule = eventHolder.clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    if count < 200 then
-                        count = count + 1
-                    else
-                        count = 0
-                    end
-                    for i = 1, amount do
-                        local x = unit.x + 350. * math.cos(count * increment + i * span)
-                        local y = unit.y + 350. * math.sin(count * increment + i * span)
-                        local z = unit.z + 75.
-                        boltEffect[i].x = x
-                        boltEffect[i].y = y
-                        boltEffect[i].z = z
-                        for k, v in pairs(delayTable[i]) do
-                            delayTable[i][k] = v + 1
-                        end
-                        group
-                            .inRange(x, y, 150.)
-                            .forEach(
-                                function(group, enumUnit)
-                                    if unit.isEnemy(enumUnit) then
-                                        if delayTable[i][enumUnit] == nil then
-                                            delayTable[i][enumUnit] = 100
-                                        end
-                                        if delayTable[i][enumUnit] >= 100 then
-                                            local dist = math.random(0., 30.)
-                                            local rad = math.random(0., math.pi * 2)
-                                            local newX = x + dist * math.cos(rad)
-                                            local newY = y + dist * math.sin(rad)
-                                            hitEffect.x = newX
-                                            hitEffect.y = newY
-                                            hitEffect.z = z
-                                            hitEffect.create().destroy()
-                                            stompEffect.x = newX
-                                            stompEffect.y = newY
-                                            stompEffect.z = z
-                                            stompEffect.create().destroy()
-                                            unit.damageTarget(enumUnit, unit.damage * 75., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                                            delayTable[i][enumUnit] = 0
-                                        end
-                                    end
-                                end
-                            )
-                    end
-                end, 0.01
-            )
-
-            eventHolder.cleanup = function()
-                for i = 1, amount do
-                    boltEffect[i].destroy()
-                end
-            end
-        end
-
-        _eventHolder[unit] = eventHolder
-    end
-
-    function self.remove(unit)
-        if _eventHolder[unit] == nil then
-            return
-        end
-        _eventHolder[unit].unbindAll()
-        _eventHolder[unit] = nil
-    end
-
-    return self
-end
-
 _Abilities.Blade_Dance = {}
 _Abilities.Blade_Dance.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Blade Dance"
+    metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
 
     local bladeEffect = IEngine.Effect()
     bladeEffect.model = "Effects\\Ephemeral Slash Purple.mdx"
@@ -6203,6 +6127,8 @@ _Abilities.Blade_Dance.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
+    setmetatable(self, mt)
+
     return self
 end
 
@@ -6211,6 +6137,21 @@ _Abilities.Blink_Strike.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Blink Strike"
+    metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
 
     local casterEffect = IEngine.Effect()
     casterEffect.scale = 0.8
@@ -6284,6 +6225,8 @@ _Abilities.Blink_Strike.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
+    setmetatable(self, mt)
+
     return self
 end
 
@@ -6292,6 +6235,21 @@ _Abilities.Demon_Control.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Demon Control"
+    metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
 
     local roarEffect = IEngine.Effect()
     roarEffect.model = "Abilities\\Spells\\Undead\\UnholyFrenzyAOE\\UnholyFrenzyAOETarget.mdl"
@@ -6392,6 +6350,8 @@ _Abilities.Demon_Control.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
+    setmetatable(self, mt)
+
     return self
 end
 
@@ -6400,6 +6360,21 @@ _Abilities.Shadow_Strike.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Shadow Strike"
+    metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihilityPath.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
 
     local disappearEffect = IEngine.Effect()
     disappearEffect.scale = 0.7
@@ -6479,405 +6454,359 @@ _Abilities.Shadow_Strike.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
-    return self
-end
-
---[[
-_Abilities.Possessed = {}
-_Abilities.Possessed.new = function(IEngine)
-    local self = {}
-    local events = {}
-    local clock = IEngine.Clock()
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local auraEffect = IEngine.Effect()
-            auraEffect.model = "Effects\\Fountain of Souls.mdx"
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    auraEffect.x = unit.x
-                    auraEffect.y = unit.y
-                    auraEffect.z = unit.z
-                end, 0.01
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if unit.hasAbility('A001') then
-                        if auraEffect.handle == nil then
-                            auraEffect.create()
-                        end
-                        return true
-                    else
-                        if auraEffect.handle ~= nil then
-                            auraEffect.destroy()
-                        end
-                        return false
-                    end
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
+    setmetatable(self, mt)
 
     return self
 end
-]]--
 
-_Abilities.Wolf = {}
-_Abilities.Wolf.new = function(IEngine)
-    local self = {}
-    local _eventHolder = {}
-    local group = IEngine.Group()
+-- _Abilities.Wolf = {}
+-- _Abilities.Wolf.new = function(IEngine)
+--     local self = {}
+--     local _eventHolder = {}
+--     local group = IEngine.Group()
 
-    local bloodEffect = IEngine.Effect()
-    bloodEffect.model = "Objects\\Spawnmodels\\Human\\HumanBlood\\HumanBloodLarge0.mdl"
-    bloodEffect.scale = 1.2
+--     local bloodEffect = IEngine.Effect()
+--     bloodEffect.model = "Objects\\Spawnmodels\\Human\\HumanBlood\\HumanBloodLarge0.mdl"
+--     bloodEffect.scale = 1.2
     
-    function self.apply(unit)
-        if _eventHolder[unit] ~= nil then
-            return
-        end
-        local eventHolder = EventHolder.new(IEngine)
+--     function self.apply(unit)
+--         if _eventHolder[unit] ~= nil then
+--             return
+--         end
+--         local eventHolder = EventHolder.new(IEngine)
 
-        do
-            local summonUnit
-            do
-                local distance = math.random(0, 400)
-                local rad = math.random(0., math.pi * 2)
-                local x = unit.x + distance * math.cos(rad)
-                local y = unit.y + distance * math.sin(rad)
-                summonUnit = unit.owner.createUnit('unit', x, y, bj_RADTODEG * rad)
-                summonUnit.skin = 'h00I'
-                summonUnit.addAbility('Aloc')
-                summonUnit.invulnerable = true
-                summonUnit.attackspeed = unit.attackspeed * 3.0
-                summonUnit.bind("on_attack",
-                    function(source, target)
-                        local rad = math.atan(target.y - source.y, target.x - source.x)
-                        bloodEffect.x = source.x + 140. * math.cos(rad)
-                        bloodEffect.y = source.y + 140. * math.sin(rad)
-                        bloodEffect.yaw = rad
-                        bloodEffect.create().destroy()
-                    end
-                )
-                summonUnit.bind("on_damage_pre",
-                    function(source, target, attack)
-                        BlzSetEventDamage(0)
-                        unit.damageTarget(target, unit.damage * 300.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
-                    end
-                )
-                --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
-            end
+--         do
+--             local summonUnit
+--             do
+--                 local distance = math.random(0, 400)
+--                 local rad = math.random(0., math.pi * 2)
+--                 local x = unit.x + distance * math.cos(rad)
+--                 local y = unit.y + distance * math.sin(rad)
+--                 summonUnit = unit.owner.createUnit('unit', x, y, bj_RADTODEG * rad)
+--                 summonUnit.skin = 'h00I'
+--                 summonUnit.addAbility('Aloc')
+--                 summonUnit.invulnerable = true
+--                 summonUnit.attackspeed = unit.attackspeed * 3.0
+--                 summonUnit.bind("on_attack",
+--                     function(source, target)
+--                         local rad = math.atan(target.y - source.y, target.x - source.x)
+--                         bloodEffect.x = source.x + 140. * math.cos(rad)
+--                         bloodEffect.y = source.y + 140. * math.sin(rad)
+--                         bloodEffect.yaw = rad
+--                         bloodEffect.create().destroy()
+--                     end
+--                 )
+--                 summonUnit.bind("on_damage_pre",
+--                     function(source, target, attack)
+--                         BlzSetEventDamage(0)
+--                         unit.damageTarget(target, unit.damage * 300.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
+--                     end
+--                 )
+--                 --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
+--             end
 
-            local tx = nil
-            local ty = nil
-            local level = 0
-            eventHolder.schedule = eventHolder.clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    if tx == nil or ty == nil then
-                        tx = summonUnit.x
-                        ty = summonUnit.y
-                    end
-                    local cx = summonUnit.x
-                    local cy = summonUnit.y
-                    local a = unit.face + 180.
-                    local ux = unit.x
-                    local uy = unit.y
-                    local dx = tx - ux
-                    local dy = ty - uy
-                    local dist = math.sqrt(dx * dx + dy * dy)
-                    if dist > 800. then
-                        local otherDist = math.random(400, 600)
-                        local rad = math.random(0., math.pi * 2)
-                        tx = ux + otherDist * math.cos(rad)
-                        ty = uy + otherDist * math.sin(rad)
-                        summonUnit.issueOrder("move", tx, ty)
-                    else
-                        local dx = tx - cx
-                        local dy = ty - cy
-                        local dist = math.sqrt(dx * dx + dy * dy)
-                        if dist > 1. then
-                            local rad = math.atan(dy, dx)
-                            local increment = 200 + 200 * 0.03 * dist / 70
-                            if increment > 500 then
-                                increment = 500
-                                summonUnit.teleportTo(tx, ty)
-                            end
-                            summonUnit.ms = increment
-                        elseif GetRandomInt(0, 1000) == 1 then
-                            local otherDist = math.random(400, 700)
-                            local rad = math.random(0., math.pi * 2)
-                            tx = ux + otherDist * math.cos(rad)
-                            ty = uy + otherDist * math.sin(rad)
-                            summonUnit.issueOrder("move", tx, ty)
-                        end
-                    end
-                end, 0.005
-            )
+--             local tx = nil
+--             local ty = nil
+--             local level = 0
+--             eventHolder.schedule = eventHolder.clock.schedule_interval(
+--                 function(triggeringClock, triggeringSchedule)
+--                     if tx == nil or ty == nil then
+--                         tx = summonUnit.x
+--                         ty = summonUnit.y
+--                     end
+--                     local cx = summonUnit.x
+--                     local cy = summonUnit.y
+--                     local a = unit.face + 180.
+--                     local ux = unit.x
+--                     local uy = unit.y
+--                     local dx = tx - ux
+--                     local dy = ty - uy
+--                     local dist = math.sqrt(dx * dx + dy * dy)
+--                     if dist > 800. then
+--                         local otherDist = math.random(400, 600)
+--                         local rad = math.random(0., math.pi * 2)
+--                         tx = ux + otherDist * math.cos(rad)
+--                         ty = uy + otherDist * math.sin(rad)
+--                         summonUnit.issueOrder("move", tx, ty)
+--                     else
+--                         local dx = tx - cx
+--                         local dy = ty - cy
+--                         local dist = math.sqrt(dx * dx + dy * dy)
+--                         if dist > 1. then
+--                             local rad = math.atan(dy, dx)
+--                             local increment = 200 + 200 * 0.03 * dist / 70
+--                             if increment > 500 then
+--                                 increment = 500
+--                                 summonUnit.teleportTo(tx, ty)
+--                             end
+--                             summonUnit.ms = increment
+--                         elseif GetRandomInt(0, 1000) == 1 then
+--                             local otherDist = math.random(400, 700)
+--                             local rad = math.random(0., math.pi * 2)
+--                             tx = ux + otherDist * math.cos(rad)
+--                             ty = uy + otherDist * math.sin(rad)
+--                             summonUnit.issueOrder("move", tx, ty)
+--                         end
+--                     end
+--                 end, 0.005
+--             )
             
-            eventHolder.event = unit.bind("on_damage_after",
-                function(source, target, attack)
-                    summonUnit.issueOrder("attack", target)
-                end
-            ).setCondition(
-                function(source, target, attack)
-                    return attack.isAttack and summonUnit ~= nil and source == unit
-                end
-            )
+--             eventHolder.event = unit.bind("on_damage_after",
+--                 function(source, target, attack)
+--                     summonUnit.issueOrder("attack", target)
+--                 end
+--             ).setCondition(
+--                 function(source, target, attack)
+--                     return attack.isAttack and summonUnit ~= nil and source == unit
+--                 end
+--             )
 
-            eventHolder.cleanup = function()
-                summonUnit.remove()
-            end
-        end
+--             eventHolder.cleanup = function()
+--                 summonUnit.remove()
+--             end
+--         end
 
-        _eventHolder[unit] = eventHolder
-    end
+--         _eventHolder[unit] = eventHolder
+--     end
 
-    function self.remove(unit)
-        if _eventHolder[unit] == nil then
-            return
-        end
-        _eventHolder[unit].unbindAll()
-        _eventHolder[unit] = nil
-    end
+--     function self.remove(unit)
+--         if _eventHolder[unit] == nil then
+--             return
+--         end
+--         _eventHolder[unit].unbindAll()
+--         _eventHolder[unit] = nil
+--     end
 
-    return self
-end
+--     return self
+-- end
 
-_Abilities.Bear = {}
-_Abilities.Bear.new = function(IEngine)
-    local self = {}
-    local _eventHolder = {}
-    local group = IEngine.Group()
+-- _Abilities.Bear = {}
+-- _Abilities.Bear.new = function(IEngine)
+--     local self = {}
+--     local _eventHolder = {}
+--     local group = IEngine.Group()
 
-    local bloodEffect = IEngine.Effect()
-    bloodEffect.model = "Objects\\Spawnmodels\\Human\\HumanBlood\\HumanBloodLarge0.mdl"
-    bloodEffect.scale = 1.2
+--     local bloodEffect = IEngine.Effect()
+--     bloodEffect.model = "Objects\\Spawnmodels\\Human\\HumanBlood\\HumanBloodLarge0.mdl"
+--     bloodEffect.scale = 1.2
     
-    function self.apply(unit)
-        if _eventHolder[unit] ~= nil then
-            return
-        end
-        local eventHolder = EventHolder.new(IEngine)
+--     function self.apply(unit)
+--         if _eventHolder[unit] ~= nil then
+--             return
+--         end
+--         local eventHolder = EventHolder.new(IEngine)
 
-        do
-            local summonUnit 
-            do
-                local distance = math.random(0, 400)
-                local rad = math.random(0., math.pi * 2)
-                local x = unit.x + distance * math.cos(rad)
-                local y = unit.y + distance * math.sin(rad)
-                summonUnit = unit.owner.createUnit('unit', x, y, bj_RADTODEG * rad)
-                summonUnit.skin = 'h00H'
-                summonUnit.addAbility('Aloc')
-                summonUnit.invulnerable = true
-                summonUnit.attackspeed = unit.attackspeed * 1.0
-                summonUnit.bind("on_attack",
-                    function(source, target)
-                        local rad = math.atan(target.y - source.y, target.x - source.x)
-                        bloodEffect.x = source.x + 140. * math.cos(rad)
-                        bloodEffect.y = source.y + 140. * math.sin(rad)
-                        bloodEffect.yaw = rad
-                        bloodEffect.create().destroy()
-                    end
-                )
-                summonUnit.bind("on_damage_pre",
-                    function(source, target, attack)
-                        BlzSetEventDamage(0)
-                        unit.damageTarget(target, unit.damage * 1000.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
-                    end
-                )
-                --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
-            end
+--         do
+--             local summonUnit 
+--             do
+--                 local distance = math.random(0, 400)
+--                 local rad = math.random(0., math.pi * 2)
+--                 local x = unit.x + distance * math.cos(rad)
+--                 local y = unit.y + distance * math.sin(rad)
+--                 summonUnit = unit.owner.createUnit('unit', x, y, bj_RADTODEG * rad)
+--                 summonUnit.skin = 'h00H'
+--                 summonUnit.addAbility('Aloc')
+--                 summonUnit.invulnerable = true
+--                 summonUnit.attackspeed = unit.attackspeed * 1.0
+--                 summonUnit.bind("on_attack",
+--                     function(source, target)
+--                         local rad = math.atan(target.y - source.y, target.x - source.x)
+--                         bloodEffect.x = source.x + 140. * math.cos(rad)
+--                         bloodEffect.y = source.y + 140. * math.sin(rad)
+--                         bloodEffect.yaw = rad
+--                         bloodEffect.create().destroy()
+--                     end
+--                 )
+--                 summonUnit.bind("on_damage_pre",
+--                     function(source, target, attack)
+--                         BlzSetEventDamage(0)
+--                         unit.damageTarget(target, unit.damage * 1000.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
+--                     end
+--                 )
+--                 --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
+--             end
             
-            local tx = nil
-            local ty = nil
-            local level = 0
-            eventHolder.schedule = eventHolder.clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    if tx == nil or ty == nil then
-                        tx = summonUnit.x
-                        ty = summonUnit.y
-                    end
-                    local cx = summonUnit.x
-                    local cy = summonUnit.y
-                    local a = unit.face + 180.
-                    local ux = unit.x
-                    local uy = unit.y
-                    local dx = tx - ux
-                    local dy = ty - uy
-                    local dist = math.sqrt(dx * dx + dy * dy)
-                    if dist > 800. then
-                        local otherDist = math.random(400, 600)
-                        local rad = math.random(0., math.pi * 2)
-                        tx = ux + otherDist * math.cos(rad)
-                        ty = uy + otherDist * math.sin(rad)
-                        summonUnit.issueOrder("move", tx, ty)
-                    else
-                        local dx = tx - cx
-                        local dy = ty - cy
-                        local dist = math.sqrt(dx * dx + dy * dy)
-                        if dist > 1. then
-                            local rad = math.atan(dy, dx)
-                            local increment = 200 + 200 * 0.03 * dist / 70
-                            if increment > 500 then
-                                increment = 500
-                                summonUnit.teleportTo(tx, ty)
-                            end
-                            summonUnit.ms = increment
-                        elseif GetRandomInt(0, 1000) == 1 then
-                            local otherDist = math.random(400, 700)
-                            local rad = math.random(0., math.pi * 2)
-                            tx = ux + otherDist * math.cos(rad)
-                            ty = uy + otherDist * math.sin(rad)
-                            summonUnit.issueOrder("move", tx, ty)
-                        end
-                    end
-                end, 0.005
-            )
+--             local tx = nil
+--             local ty = nil
+--             local level = 0
+--             eventHolder.schedule = eventHolder.clock.schedule_interval(
+--                 function(triggeringClock, triggeringSchedule)
+--                     if tx == nil or ty == nil then
+--                         tx = summonUnit.x
+--                         ty = summonUnit.y
+--                     end
+--                     local cx = summonUnit.x
+--                     local cy = summonUnit.y
+--                     local a = unit.face + 180.
+--                     local ux = unit.x
+--                     local uy = unit.y
+--                     local dx = tx - ux
+--                     local dy = ty - uy
+--                     local dist = math.sqrt(dx * dx + dy * dy)
+--                     if dist > 800. then
+--                         local otherDist = math.random(400, 600)
+--                         local rad = math.random(0., math.pi * 2)
+--                         tx = ux + otherDist * math.cos(rad)
+--                         ty = uy + otherDist * math.sin(rad)
+--                         summonUnit.issueOrder("move", tx, ty)
+--                     else
+--                         local dx = tx - cx
+--                         local dy = ty - cy
+--                         local dist = math.sqrt(dx * dx + dy * dy)
+--                         if dist > 1. then
+--                             local rad = math.atan(dy, dx)
+--                             local increment = 200 + 200 * 0.03 * dist / 70
+--                             if increment > 500 then
+--                                 increment = 500
+--                                 summonUnit.teleportTo(tx, ty)
+--                             end
+--                             summonUnit.ms = increment
+--                         elseif GetRandomInt(0, 1000) == 1 then
+--                             local otherDist = math.random(400, 700)
+--                             local rad = math.random(0., math.pi * 2)
+--                             tx = ux + otherDist * math.cos(rad)
+--                             ty = uy + otherDist * math.sin(rad)
+--                             summonUnit.issueOrder("move", tx, ty)
+--                         end
+--                     end
+--                 end, 0.005
+--             )
 
-            eventHolder.event = unit.bind("on_damage_after",
-                function(source, target, attack)
-                    summonUnit.issueOrder("attack", target)
-                end
-            ).setCondition(
-                function(source, target, attack)
-                    return attack.isAttack and summonUnit ~= nil and source == unit
-                end
-            )
+--             eventHolder.event = unit.bind("on_damage_after",
+--                 function(source, target, attack)
+--                     summonUnit.issueOrder("attack", target)
+--                 end
+--             ).setCondition(
+--                 function(source, target, attack)
+--                     return attack.isAttack and summonUnit ~= nil and source == unit
+--                 end
+--             )
 
-            eventHolder.cleanup = function()
-                summonUnit.remove()
-            end
-        end
+--             eventHolder.cleanup = function()
+--                 summonUnit.remove()
+--             end
+--         end
 
-        _eventHolder[unit] = eventHolder
-    end
+--         _eventHolder[unit] = eventHolder
+--     end
 
-    function self.remove(unit)
-        if _eventHolder[unit] == nil then
-            return
-        end
-        _eventHolder[unit].unbindAll()
-        _eventHolder[unit] = nil
-    end
+--     function self.remove(unit)
+--         if _eventHolder[unit] == nil then
+--             return
+--         end
+--         _eventHolder[unit].unbindAll()
+--         _eventHolder[unit] = nil
+--     end
 
-    return self
-end
+--     return self
+-- end
 
-_Abilities.Boar = {}
-_Abilities.Boar.new = function(IEngine)
-    local self = {}
-    local _eventHolder = {}
-    local group = IEngine.Group()
+-- _Abilities.Boar = {}
+-- _Abilities.Boar.new = function(IEngine)
+--     local self = {}
+--     local _eventHolder = {}
+--     local group = IEngine.Group()
     
-    function self.apply(unit)
-        if _eventHolder[unit] ~= nil then
-            return
-        end
-        local eventHolder = EventHolder.new(IEngine)
+--     function self.apply(unit)
+--         if _eventHolder[unit] ~= nil then
+--             return
+--         end
+--         local eventHolder = EventHolder.new(IEngine)
 
-        do
-            local summonUnit
-            do
-                local distance = math.random(0, 400)
-                local rad = math.random(0., math.pi * 2)
-                local x = unit.x + distance * math.cos(rad)
-                local y = unit.y + distance * math.sin(rad)
-                summonUnit = unit.owner.createUnit('unit', x, y, bj_RADTODEG * rad)
-                summonUnit.skin = 'h00J'
-                summonUnit.addAbility('Aloc')
-                summonUnit.invulnerable = true
-                summonUnit.attackspeed = unit.attackspeed * 1.5
-                summonUnit.bind("on_damage_pre",
-                    function(source, target, attack)
-                        BlzSetEventDamage(0)
-                        unit.damageTarget(target, unit.damage * 100.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
-                    end
-                )
-                --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
-            end
+--         do
+--             local summonUnit
+--             do
+--                 local distance = math.random(0, 400)
+--                 local rad = math.random(0., math.pi * 2)
+--                 local x = unit.x + distance * math.cos(rad)
+--                 local y = unit.y + distance * math.sin(rad)
+--                 summonUnit = unit.owner.createUnit('unit', x, y, bj_RADTODEG * rad)
+--                 summonUnit.skin = 'h00J'
+--                 summonUnit.addAbility('Aloc')
+--                 summonUnit.invulnerable = true
+--                 summonUnit.attackspeed = unit.attackspeed * 1.5
+--                 summonUnit.bind("on_damage_pre",
+--                     function(source, target, attack)
+--                         BlzSetEventDamage(0)
+--                         unit.damageTarget(target, unit.damage * 100.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
+--                     end
+--                 )
+--                 --summonUnit.setWeaponIntegerField(UNIT_WEAPON_IF_ATTACK_TARGETS_ALLOWED, 0, 4)
+--             end
             
-            local tx = nil
-            local ty = nil
-            eventHolder.schedule = eventHolder.clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    if tx == nil or ty == nil then
-                        tx = summonUnit.x
-                        ty = summonUnit.y
-                    end
-                    local cx = summonUnit.x
-                    local cy = summonUnit.y
-                    local a = unit.face + 180.
-                    local ux = unit.x
-                    local uy = unit.y
-                    local dx = tx - ux
-                    local dy = ty - uy
-                    local dist = math.sqrt(dx * dx + dy * dy)
-                    if dist > 800. then
-                        local otherDist = math.random(400, 600)
-                        local rad = math.random(0., math.pi * 2)
-                        tx = ux + otherDist * math.cos(rad)
-                        ty = uy + otherDist * math.sin(rad)
-                        summonUnit.issueOrder("move", tx, ty)
-                    else
-                        local dx = tx - cx
-                        local dy = ty - cy
-                        local dist = math.sqrt(dx * dx + dy * dy)
-                        if dist > 1. then
-                            local rad = math.atan(dy, dx)
-                            local increment = 200 + 200 * 0.03 * dist / 70
-                            if increment > 500 then
-                                increment = 500
-                                summonUnit.teleportTo(tx, ty)
-                            end
-                            summonUnit.ms = increment
-                        elseif GetRandomInt(0, 1000) == 1 then
-                            local otherDist = math.random(400, 700)
-                            local rad = math.random(0., math.pi * 2)
-                            tx = ux + otherDist * math.cos(rad)
-                            ty = uy + otherDist * math.sin(rad)
-                            summonUnit.issueOrder("move", tx, ty)
-                        end
-                    end
-                end, 0.005
-            )
+--             local tx = nil
+--             local ty = nil
+--             eventHolder.schedule = eventHolder.clock.schedule_interval(
+--                 function(triggeringClock, triggeringSchedule)
+--                     if tx == nil or ty == nil then
+--                         tx = summonUnit.x
+--                         ty = summonUnit.y
+--                     end
+--                     local cx = summonUnit.x
+--                     local cy = summonUnit.y
+--                     local a = unit.face + 180.
+--                     local ux = unit.x
+--                     local uy = unit.y
+--                     local dx = tx - ux
+--                     local dy = ty - uy
+--                     local dist = math.sqrt(dx * dx + dy * dy)
+--                     if dist > 800. then
+--                         local otherDist = math.random(400, 600)
+--                         local rad = math.random(0., math.pi * 2)
+--                         tx = ux + otherDist * math.cos(rad)
+--                         ty = uy + otherDist * math.sin(rad)
+--                         summonUnit.issueOrder("move", tx, ty)
+--                     else
+--                         local dx = tx - cx
+--                         local dy = ty - cy
+--                         local dist = math.sqrt(dx * dx + dy * dy)
+--                         if dist > 1. then
+--                             local rad = math.atan(dy, dx)
+--                             local increment = 200 + 200 * 0.03 * dist / 70
+--                             if increment > 500 then
+--                                 increment = 500
+--                                 summonUnit.teleportTo(tx, ty)
+--                             end
+--                             summonUnit.ms = increment
+--                         elseif GetRandomInt(0, 1000) == 1 then
+--                             local otherDist = math.random(400, 700)
+--                             local rad = math.random(0., math.pi * 2)
+--                             tx = ux + otherDist * math.cos(rad)
+--                             ty = uy + otherDist * math.sin(rad)
+--                             summonUnit.issueOrder("move", tx, ty)
+--                         end
+--                     end
+--                 end, 0.005
+--             )
 
-            eventHolder.event = unit.bind("on_damage_after",
-                function(source, target, attack)
-                    summonUnit.issueOrder("attack", target)
-                end
-            ).setCondition(
-                function(source, target, attack)
-                    return attack.isAttack and summonUnit ~= nil and source == unit
-                end
-            )
+--             eventHolder.event = unit.bind("on_damage_after",
+--                 function(source, target, attack)
+--                     summonUnit.issueOrder("attack", target)
+--                 end
+--             ).setCondition(
+--                 function(source, target, attack)
+--                     return attack.isAttack and summonUnit ~= nil and source == unit
+--                 end
+--             )
 
-            eventHolder.cleanup = function()
-                summonUnit.remove()
-            end
-        end
+--             eventHolder.cleanup = function()
+--                 summonUnit.remove()
+--             end
+--         end
 
-        _eventHolder[unit] = eventHolder
-    end
+--         _eventHolder[unit] = eventHolder
+--     end
 
-    function self.remove(unit)
-        if _eventHolder[unit] == nil then
-            return
-        end
-        _eventHolder[unit].unbindAll()
-        _eventHolder[unit] = nil
-    end
+--     function self.remove(unit)
+--         if _eventHolder[unit] == nil then
+--             return
+--         end
+--         _eventHolder[unit].unbindAll()
+--         _eventHolder[unit] = nil
+--     end
 
-    return self
-end
+--     return self
+-- end
 
 _Abilities.Reapers = {}
 _Abilities.Reapers.new = function(IEngine)
@@ -6901,7 +6830,7 @@ _Abilities.Reapers.new = function(IEngine)
 
                 -- Prepare Aura
                 local auraEffect = IEngine.Effect()
-                auraEffect.model = "Effects\\Malevolence Aura Purple.mdx"
+                auraEffect.model = "Auras\\Malevolence Aura Purple.mdx"
                 auraEffect.scale = 1.5
 
                 -- Prepare Summon
@@ -7011,7 +6940,7 @@ _Abilities.Reapers.new = function(IEngine)
 
                 -- Prepare Aura
                 local auraEffect = IEngine.Effect()
-                auraEffect.model = "Effects\\Malevolence Aura Red.mdx"
+                auraEffect.model = "Auras\\Malevolence Aura Red.mdx"
                 auraEffect.scale = 1.5
 
                 -- Prepare Summon
@@ -7154,7 +7083,7 @@ _Abilities.Reapers.new = function(IEngine)
 
                 -- Prepare Aura
                 local auraEffect = IEngine.Effect()
-                auraEffect.model = "Effects\\Malevolence Aura Blue.mdx"
+                auraEffect.model = "Auras\\Malevolence Aura Blue.mdx"
                 auraEffect.scale = 1.5
 
                 -- Prepare Summon
@@ -7368,60 +7297,6 @@ _Abilities.Soul_Steal.new = function(IEngine)
 
     return self
 end
-
-_Abilities.Grim_Reaper = {}
-_Abilities.Grim_Reaper.new = function(IEngine)
-    local self = {}
-    local events = {}
-    local clock = IEngine.Clock()
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local auraEffect = IEngine.Effect()
-            auraEffect.model = "Effects\\Grim Reaper Aura Origin.mdx"
-            local overheadEffect = IEngine.Effect()
-            overheadEffect.model = "Effects\\Grim Reaper Aura Overhead.mdx"
-            overheadEffect.yaw = 270. * bj_DEGTORAD
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    auraEffect.x = unit.x
-                    auraEffect.y = unit.y
-                    auraEffect.z = unit.z
-                    overheadEffect.x = unit.x
-                    overheadEffect.y = unit.y
-                    overheadEffect.z = unit.z + 100
-                end, 0.01
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if unit.hasAbility('A005') then
-                        if auraEffect.handle == nil then
-                            auraEffect.create()
-                            overheadEffect.create()
-                        end
-                        return true
-                    else
-                        if auraEffect.handle ~= nil then
-                            auraEffect.destroy()
-                            overheadEffect.destroy()
-                        end
-                        return false
-                    end
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
-
-    return self
-end
 ]]--
 
 -- _Abilities.Hurricane_Constellation = {}
@@ -7528,6 +7403,21 @@ _Abilities.Impale.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Impale"
+    metadata.description = "Path: |cffa9e8f9P|r|cff9de0f5r|r|cff91d8f2e|r|cff86d0efs|r|cff7ac9ebe|r|cff6fc1e8r|r|cff62b9e4v|r|cff57b1e1a|r|cff4ba9det|r|cff40a2dai|r|cff349ad7o|r|cff2892d4n|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNPreservation.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
 
     local impaleEffect = IEngine.Effect()
     impaleEffect.scale = 1.0
@@ -7579,6 +7469,8 @@ _Abilities.Impale.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
+    setmetatable(self, mt)
+
     return self
 end
 
@@ -7587,6 +7479,21 @@ _Abilities.Judgement.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Moon Halo"
+    metadata.description = "Path: |cffa9e8f9P|r|cff9de0f5r|r|cff91d8f2e|r|cff86d0efs|r|cff7ac9ebe|r|cff6fc1e8r|r|cff62b9e4v|r|cff57b1e1a|r|cff4ba9det|r|cff40a2dai|r|cff349ad7o|r|cff2892d4n|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNPreservation.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
 
     local impaleEffect = IEngine.Effect()
     impaleEffect.scale = 1.0
@@ -7660,6 +7567,8 @@ _Abilities.Judgement.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
+    setmetatable(self, mt)
+
     return self
 end
 
@@ -7668,6 +7577,21 @@ _Abilities.Overload.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Overload"
+    metadata.description = "Path: |cffa9e8f9P|r|cff9de0f5r|r|cff91d8f2e|r|cff86d0efs|r|cff7ac9ebe|r|cff6fc1e8r|r|cff62b9e4v|r|cff57b1e1a|r|cff4ba9det|r|cff40a2dai|r|cff349ad7o|r|cff2892d4n|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNPreservation.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
 
     local explodeEffect = IEngine.Effect()
     explodeEffect.scale = 1.0
@@ -7736,6 +7660,8 @@ _Abilities.Overload.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
+    setmetatable(self, mt)
+
     return self
 end
 
@@ -7744,6 +7670,21 @@ _Abilities.Heaven_Justice.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Heaven Justice"
+    metadata.description = "Path: |cffa9e8f9P|r|cff9de0f5r|r|cff91d8f2e|r|cff86d0efs|r|cff7ac9ebe|r|cff6fc1e8r|r|cff62b9e4v|r|cff57b1e1a|r|cff4ba9det|r|cff40a2dai|r|cff349ad7o|r|cff2892d4n|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNPreservationPath.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
 
     local explodeEffect = IEngine.Effect()
     explodeEffect.scale = 1.3
@@ -7853,72 +7794,31 @@ _Abilities.Heaven_Justice.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
-    return self
-end
-
---[[
-_Abilities.Temple_Knight = {}
-_Abilities.Temple_Knight.new = function(IEngine)
-    local self = {}
-    local events = {}
-    local clock = IEngine.Clock()
-    
-    function self.apply(unit)
-        if events.unit == nil then
-            local auraEffect = IEngine.Effect()
-            auraEffect.model = "Effects\\Archangel Aura.mdx"
-            auraEffect.scale = 1.4
-            auraEffect.yaw = bj_DEGTORAD * 270.
-            local floatingEffect = IEngine.Effect()
-            floatingEffect.model = "Effects\\Floating Swords.mdx"
-            clock.schedule_interval(
-                function(triggeringClock, triggeringSchedule)
-                    auraEffect.x = unit.x
-                    auraEffect.y = unit.y
-                    auraEffect.z = unit.z
-                    floatingEffect.x = unit.x
-                    floatingEffect.y = unit.y
-                    floatingEffect.z = unit.z
-                    floatingEffect.yaw = unit.face * bj_DEGTORAD
-                end, 0.01
-            ).setCondition(
-                function(triggeringClock, triggeringSchedule)
-                    if unit.hasAbility('A002') then
-                        if auraEffect.handle == nil then
-                            auraEffect.create()
-                            floatingEffect.create()
-                        end
-                        return true
-                    else
-                        if auraEffect.handle ~= nil then
-                            auraEffect.create()
-                            floatingEffect.destroy()
-                        end
-                        return false
-                    end
-                end
-            )
-        end
-    end
-
-    function self.remove(unit)
-        if events.unit ~= nil then
-            unit.unbind(events.unit)
-            events.unit = nil
-        end
-    end
-
-    clock.start()
+    setmetatable(self, mt)
 
     return self
 end
-]]--
 
 _Abilities.Interceptor = {}
 _Abilities.Interceptor.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Interceptor"
+    metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestruction.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
 
     local explodeEffect = IEngine.Effect()
     explodeEffect.scale = 2.0
@@ -7968,6 +7868,8 @@ _Abilities.Interceptor.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
+    setmetatable(self, mt)
+
     return self
 end
 
@@ -7977,6 +7879,21 @@ _Abilities.Sacred_Storm.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Sacred Storm"
+    metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestruction.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
 
     local explodeEffect = IEngine.Effect()
     explodeEffect.model = "Effects\\Gravity Storm.mdx"
@@ -8242,6 +8159,8 @@ _Abilities.Sacred_Storm.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
+    setmetatable(self, mt)
+
     return self
 end
 
@@ -8250,6 +8169,21 @@ _Abilities.Kingdom_Come.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Kingdom Come"
+    metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestruction.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
 
     local explodeEffect = IEngine.Effect()
     explodeEffect.model = "Effects\\Kingdom Come.mdx"
@@ -8316,6 +8250,8 @@ _Abilities.Kingdom_Come.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
+    setmetatable(self, mt)
+
     return self
 end
 
@@ -8324,6 +8260,21 @@ _Abilities.I_Am_Atomic.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "I am Atomic"
+    metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestructionPath.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
 
     function self.apply(unit)
         if _eventHolder[unit] ~= nil then
@@ -8336,11 +8287,11 @@ _Abilities.I_Am_Atomic.new = function(IEngine)
 
             local channelEffect1 = IEngine.Effect()
             channelEffect1.scale = 1.0
-            channelEffect1.model = "Effects\\Darkness.mdx"
+            channelEffect1.model = "Auras\\Darkness.mdx"
 
             local channelEffect2 = IEngine.Effect()
             channelEffect2.scale = 3.0
-            channelEffect2.model = "Effects\\Memento Mori.mdx"
+            channelEffect2.model = "Auras\\Memento Mori.mdx"
 
             local explodeEffect1 = IEngine.Effect()
             explodeEffect1.model = "Effects\\Shadow Explosion 1.mdx"
@@ -8457,6 +8408,128 @@ _Abilities.I_Am_Atomic.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Magma_Constellation = {}
+_Abilities.Magma_Constellation.new = function(IEngine)
+    local self = {}
+    local _eventHolder = {}
+    local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Magma Constellation"
+    metadata.description = "Path: |cffff0000H|r|cffaa0054a|r|cff5500a9r|r|cff0000fem|r|cff0054aao|r|cff00a955n|r|cff00fe00y|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHarmony.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+
+    local hitEffect = IEngine.Effect()
+    hitEffect.model = "Effects\\Firebolt.mdx"
+    hitEffect.scale = 1.0
+    local stompEffect = IEngine.Effect()
+    stompEffect.model = "Effects\\Stomp_Effect.mdx"
+    stompEffect.scale = 0.7
+
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
+
+        do
+            local boltEffect = {}
+            local delayTable = {}
+            local amount = 5
+            for i = 1, amount do
+                boltEffect[i] = IEngine.Effect()
+                boltEffect[i].model = "Effects\\Firebolt.mdx"
+                boltEffect[i].scale = 2.0
+                boltEffect[i].create()
+                delayTable[i] = {}
+            end
+
+            local count = 0
+            local increment = math.pi * 2 / 200
+            local span = math.pi * 2 / amount
+            eventHolder.schedule = eventHolder.clock.schedule_interval(
+                function(triggeringClock, triggeringSchedule)
+                    if count < 200 then
+                        count = count + 1
+                    else
+                        count = 0
+                    end
+                    for i = 1, amount do
+                        local x = unit.x + 350. * math.cos(count * increment + i * span)
+                        local y = unit.y + 350. * math.sin(count * increment + i * span)
+                        local z = unit.z + 75.
+                        boltEffect[i].x = x
+                        boltEffect[i].y = y
+                        boltEffect[i].z = z
+                        for k, v in pairs(delayTable[i]) do
+                            delayTable[i][k] = v + 1
+                        end
+                        group
+                            .inRange(x, y, 150.)
+                            .forEach(
+                                function(group, enumUnit)
+                                    if unit.isEnemy(enumUnit) then
+                                        if delayTable[i][enumUnit] == nil then
+                                            delayTable[i][enumUnit] = 100
+                                        end
+                                        if delayTable[i][enumUnit] >= 100 then
+                                            local dist = math.random(0., 30.)
+                                            local rad = math.random(0., math.pi * 2)
+                                            local newX = x + dist * math.cos(rad)
+                                            local newY = y + dist * math.sin(rad)
+                                            hitEffect.x = newX
+                                            hitEffect.y = newY
+                                            hitEffect.z = z
+                                            hitEffect.create().destroy()
+                                            stompEffect.x = newX
+                                            stompEffect.y = newY
+                                            stompEffect.z = z
+                                            stompEffect.create().destroy()
+                                            unit.damageTarget(enumUnit, unit.damage * 75., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                            delayTable[i][enumUnit] = 0
+                                        end
+                                    end
+                                end
+                            )
+                    end
+                end, 0.01
+            )
+
+            eventHolder.cleanup = function()
+                for i = 1, amount do
+                    boltEffect[i].destroy()
+                end
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
     return self
 end
 
@@ -8465,6 +8538,21 @@ _Abilities.Blizzard.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Blizzard"
+    metadata.description = "Path: |cffff0000H|r|cffaa0054a|r|cff5500a9r|r|cff0000fem|r|cff0054aao|r|cff00a955n|r|cff00fe00y|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHarmony.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
 
     local hailEffect = IEngine.Effect()
     hailEffect.scale = 1.3
@@ -8521,6 +8609,8 @@ _Abilities.Blizzard.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
+    setmetatable(self, mt)
+
     return self
 end
 
@@ -8529,6 +8619,21 @@ _Abilities.Uncontrollable_Flames.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Uncontrollable Flames"
+    metadata.description = "Path: |cffff0000H|r|cffaa0054a|r|cff5500a9r|r|cff0000fem|r|cff0054aao|r|cff00a955n|r|cff00fe00y|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHarmony.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
 
     local explodeEffect = IEngine.Effect()
     explodeEffect.scale = 1.3
@@ -8584,6 +8689,8 @@ _Abilities.Uncontrollable_Flames.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
+    setmetatable(self, mt)
+
     return self
 end
 
@@ -8592,6 +8699,21 @@ _Abilities.Black_Hole.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Black Hole"
+    metadata.description = "Path: |cffff0000H|r|cffaa0054a|r|cff5500a9r|r|cff0000fem|r|cff0054aao|r|cff00a955n|r|cff00fe00y|r"
+    .. "|n..."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHarmonyPath.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
     
     function self.apply(unit)
         if _eventHolder[unit] ~= nil then
@@ -8776,6 +8898,392 @@ _Abilities.Black_Hole.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Destruction_Aura = {}
+_Abilities.Destruction_Aura.new = function(IEngine)
+    local self = {}
+    local _eventHolder = {}
+    local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
+
+        do
+            local auraEffect1 = IEngine.Effect()
+            auraEffect1.model = "Auras\\Fountain of Souls.mdx"
+            auraEffect1.scale = 1.0
+            auraEffect1.yaw = bj_DEGTORAD * 270.
+            auraEffect1.create()
+            local auraEffect2 = IEngine.Effect()
+            auraEffect2.model = "Auras\\Pentagram Aura.mdx"
+            auraEffect2.scale = 2.0
+            auraEffect2.yaw = bj_DEGTORAD * 270.
+            auraEffect2.create()
+            eventHolder.schedule = eventHolder.clock.schedule_interval(
+                function(triggeringClock, triggeringSchedule)
+                    auraEffect1.x = unit.x
+                    auraEffect1.y = unit.y
+                    auraEffect1.z = unit.z
+                    auraEffect2.x = unit.x
+                    auraEffect2.y = unit.y
+                    auraEffect2.z = unit.z
+                end, 0.01
+            )
+
+            eventHolder.cleanup = function()
+                auraEffect1.destroy()
+                auraEffect2.destroy()
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Preservation_Aura = {}
+_Abilities.Preservation_Aura.new = function(IEngine)
+    local self = {}
+    local _eventHolder = {}
+    local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
+
+        do
+            local auraEffect = IEngine.Effect()
+            auraEffect.model = "Auras\\Holy Aura.mdx"
+            auraEffect.scale = 1.5
+            auraEffect.yaw = bj_DEGTORAD * 270.
+            auraEffect.create()
+            eventHolder.schedule = eventHolder.clock.schedule_interval(
+                function(triggeringClock, triggeringSchedule)
+                    auraEffect.x = unit.x
+                    auraEffect.y = unit.y
+                    auraEffect.z = unit.z
+                end, 0.01
+            )
+
+            eventHolder.cleanup = function()
+                auraEffect.destroy()
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Nihility_Aura = {}
+_Abilities.Nihility_Aura.new = function(IEngine)
+    local self = {}
+    local _eventHolder = {}
+    local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
+
+        do
+            local auraEffect = IEngine.Effect()
+            auraEffect.model = "Auras\\Jibril Aura.mdx"
+            auraEffect.scale = 2.0
+            auraEffect.yaw = bj_DEGTORAD * 270.
+            auraEffect.create()
+            eventHolder.schedule = eventHolder.clock.schedule_interval(
+                function(triggeringClock, triggeringSchedule)
+                    auraEffect.x = unit.x
+                    auraEffect.y = unit.y
+                    auraEffect.z = unit.z
+                end, 0.01
+            )
+
+            eventHolder.cleanup = function()
+                auraEffect.destroy()
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Harmony_Aura = {}
+_Abilities.Harmony_Aura.new = function(IEngine)
+    local self = {}
+    local _eventHolder = {}
+    local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
+
+        do
+            local auraEffect = IEngine.Effect()
+            auraEffect.model = "Auras\\Blue Rune Aura.mdx"
+            auraEffect.scale = 2.0
+            auraEffect.yaw = bj_DEGTORAD * 270.
+            auraEffect.create()
+            eventHolder.schedule = eventHolder.clock.schedule_interval(
+                function(triggeringClock, triggeringSchedule)
+                    auraEffect.x = unit.x
+                    auraEffect.y = unit.y
+                    auraEffect.z = unit.z
+                end, 0.01
+            )
+
+            eventHolder.cleanup = function()
+                auraEffect.destroy()
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Erudition_Aura = {}
+_Abilities.Erudition_Aura.new = function(IEngine)
+    local self = {}
+    local _eventHolder = {}
+    local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
+
+        do
+            local auraEffect1 = IEngine.Effect()
+            auraEffect1.model = "Auras\\Grim Reaper Aura Origin.mdx"
+            auraEffect1.scale = 1.5
+            auraEffect1.yaw = bj_DEGTORAD * 270.
+            auraEffect1.create()
+            local auraEffect2 = IEngine.Effect()
+            auraEffect2.model = "Auras\\Grim Reaper Aura Overhead.mdx"
+            auraEffect2.scale = 1.5
+            auraEffect2.yaw = bj_DEGTORAD * 270.
+            auraEffect2.create()
+            eventHolder.schedule = eventHolder.clock.schedule_interval(
+                function(triggeringClock, triggeringSchedule)
+                    auraEffect1.x = unit.x
+                    auraEffect1.y = unit.y
+                    auraEffect1.z = unit.z
+                    auraEffect2.x = unit.x
+                    auraEffect2.y = unit.y
+                    auraEffect2.z = unit.z + 100.
+                end, 0.01
+            )
+
+            eventHolder.cleanup = function()
+                auraEffect1.destroy()
+                auraEffect2.destroy()
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Hunt_Aura = {}
+_Abilities.Hunt_Aura.new = function(IEngine)
+    local self = {}
+    local _eventHolder = {}
+    local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IEngine)
+
+        do
+            local auraEffect = IEngine.Effect()
+            auraEffect.model = "Auras\\Thunder Aura.mdx"
+            auraEffect.scale = 2.0
+            auraEffect.yaw = bj_DEGTORAD * 270.
+            auraEffect.create()
+            eventHolder.schedule = eventHolder.clock.schedule_interval(
+                function(triggeringClock, triggeringSchedule)
+                    auraEffect.x = unit.x
+                    auraEffect.y = unit.y
+                    auraEffect.z = unit.z
+                end, 0.01
+            )
+
+            eventHolder.cleanup = function()
+                auraEffect.destroy()
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
     return self
 end
 
@@ -8784,6 +9292,20 @@ _Abilities.Template.new = function(IEngine)
     local self = {}
     local _eventHolder = {}
     local group = IEngine.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Ability Name"
+    metadata.description = "Ability Description"
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNSomeIcon.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IEngine.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
     
     function self.apply(unit)
         if _eventHolder[unit] ~= nil then
@@ -8806,6 +9328,8 @@ _Abilities.Template.new = function(IEngine)
         _eventHolder[unit] = nil
     end
 
+    setmetatable(self, mt)
+
     return self
 end
 
@@ -8817,45 +9341,54 @@ Abilities.new = function(IEngine)
     self.Sword_Slash = _Abilities.Sword_Slash.new(IEngine)
     self.Dodge = _Abilities.Dodge.new(IEngine)
 
-    -- DEMON
+    -- Nihility
     self.Blink_Strike = _Abilities.Blink_Strike.new(IEngine)
     self.Demon_Control = _Abilities.Demon_Control.new(IEngine)
     self.Blade_Dance = _Abilities.Blade_Dance.new(IEngine)
 
     self.Shadow_Strike = _Abilities.Shadow_Strike.new(IEngine)
+    self.Nihility_Aura = _Abilities.Nihility_Aura.new(IEngine)
 
-    -- SUMMONER (Currently disabled)
-    self.Wolf = _Abilities.Wolf.new(IEngine)
-    self.Bear = _Abilities.Bear.new(IEngine)
-    self.Boar = _Abilities.Boar.new(IEngine)
-
-    self.Reapers = _Abilities.Reapers.new(IEngine)
-
-    -- HOLY
+    -- Preservation
     self.Overload = _Abilities.Overload.new(IEngine)
     self.Impale = _Abilities.Impale.new(IEngine)
     self.Judgement = _Abilities.Judgement.new(IEngine)
 
     self.Heaven_Justice = _Abilities.Heaven_Justice.new(IEngine)
+    self.Preservation_Aura = _Abilities.Preservation_Aura.new(IEngine)
 
-    -- ELEMENTS
+    -- Harmony
     self.Magma_Constellation = _Abilities.Magma_Constellation.new(IEngine)
     self.Blizzard = _Abilities.Blizzard.new(IEngine)
     self.Uncontrollable_Flames = _Abilities.Uncontrollable_Flames.new(IEngine)
 
     self.Black_Hole = _Abilities.Black_Hole.new(IEngine)
+    self.Harmony_Aura = _Abilities.Harmony_Aura.new(IEngine)
 
-    -- DESTROYER
+    -- Destruction
     self.Interceptor = _Abilities.Interceptor.new(IEngine)
     self.Sacred_Storm = _Abilities.Sacred_Storm.new(IEngine)
     self.Kingdom_Come = _Abilities.Kingdom_Come.new(IEngine)
 
     self.I_Am_Atomic = _Abilities.I_Am_Atomic.new(IEngine)
+    self.Destruction_Aura = _Abilities.Destruction_Aura.new(IEngine)
+
+    -- Erudition
+    self.Erudition_Aura = _Abilities.Erudition_Aura.new(IEngine)
+
+    -- Hunt
+    self.Hunt_Aura = _Abilities.Hunt_Aura.new(IEngine)
+
+
+
+    -- Leftovers
+    -- self.Wolf = _Abilities.Wolf.new(IEngine)
+    -- self.Bear = _Abilities.Bear.new(IEngine)
+    -- self.Boar = _Abilities.Boar.new(IEngine)
+
+    -- self.Reapers = _Abilities.Reapers.new(IEngine)
 
     -- self.Soul_Steal = _Abilities.Soul_Steal.new(IEngine)
-    -- self.Grim_Reaper = _Abilities.Grim_Reaper.new(IEngine)
-    -- self.Possessed = _Abilities.Possessed.new(IEngine)
-    -- self.Temple_Knight = _Abilities.Temple_Knight.new(IEngine)
     -- self.Hurricane_Constellation = _Abilities.Hurricane_Constellation.new(IEngine)
 
     return self
@@ -9257,6 +9790,7 @@ xpcall(function()
             .. "|cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r.",
             ["icon"] = "ReplaceableTextures/CommandButtons/BTNDestructionPath.blp",
             ["unlocks"] = Ability.I_Am_Atomic,
+            ["aura"] = Ability.Destruction_Aura,
             ["requires"] = {
                 [1] = Ability.Interceptor,
                 [2] = Ability.Sacred_Storm,
@@ -9270,6 +9804,7 @@ xpcall(function()
             .. "|cffa9e8f9P|r|cff9de0f5r|r|cff91d8f2e|r|cff86d0efs|r|cff7ac9ebe|r|cff6fc1e8r|r|cff62b9e4v|r|cff57b1e1a|r|cff4ba9det|r|cff40a2dai|r|cff349ad7o|r|cff2892d4n|r.",
             ["icon"] = "ReplaceableTextures/CommandButtons/BTNPreservationPath.blp",
             ["unlocks"] = Ability.Heaven_Justice,
+            ["aura"] = Ability.Preservation_Aura,
             ["requires"] = {
                 [1] = Ability.Impale,
                 [2] = Ability.Judgement,
@@ -9283,6 +9818,7 @@ xpcall(function()
             .. "|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r.",
             ["icon"] = "ReplaceableTextures/CommandButtons/BTNNihilityPath.blp",
             ["unlocks"] = Ability.Shadow_Strike,
+            ["aura"] = Ability.Nihility_Aura,
             ["requires"] = {
                 [1] = Ability.Blade_Dance,
                 [2] = Ability.Blink_Strike,
@@ -9296,6 +9832,7 @@ xpcall(function()
             .. "|cffff0000H|r|cffaa0054a|r|cff5500a9r|r|cff0000fem|r|cff0054aao|r|cff00a955n|r|cff00fe00y|r.",
             ["icon"] = "ReplaceableTextures/CommandButtons/BTNHarmonyPath.blp",
             ["unlocks"] = Ability.Black_Hole,
+            ["aura"] = Ability.Harmony_Aura,
             ["requires"] = {
                 [1] = Ability.Magma_Constellation,
                 [2] = Ability.Blizzard,
@@ -9309,6 +9846,7 @@ xpcall(function()
             .. "|cffbcbcf6E|r|cffafaeefr|r|cffa2a0e8u|r|cff9592e1d|r|cff8783dai|r|cff7a75d3t|r|cff6d67cci|r|cff6059c6o|r|cff534bbfn|r.",
             ["icon"] = "ReplaceableTextures/CommandButtons/BTNEruditionPath.blp",
             ["unlocks"] = nil,
+            ["aura"] = Ability.Erudition_Aura,
             ["requires"] = {
                 [1] = nil,
                 [2] = nil,
@@ -9322,6 +9860,7 @@ xpcall(function()
             .. "|cffaae5b7H|r|cff89daa9u|r|cff69d09bn|r|cff49c68et|r.",
             ["icon"] = "ReplaceableTextures/CommandButtons/BTNHuntPath.blp",
             ["unlocks"] = nil,
+            ["aura"] = Ability.Hunt_Aura,
             ["requires"] = {
                 [1] = nil,
                 [2] = nil,
@@ -9554,9 +10093,9 @@ xpcall(function()
                             local _icon = BlzGetAbilityIcon(FourCC(orb['abil']))
                             -- Update for local
                             if unit.owner.isLocal() then
-                                _name = name
-                                _description = description
-                                _icon = icon
+                                _name = ability["code"].metadata.name
+                                _description = ability["code"].metadata.description
+                                _icon = ability["code"].metadata.icon
                             end
                             -- Update ability
                             BlzSetAbilityTooltip(FourCC(orb['abil']), _name, 0)
@@ -9592,7 +10131,12 @@ xpcall(function()
                                 if criteriaFulfilled then
                                     print("You've chosen the Path '" .. aeon['name'] .. "'")
                                     pathChosen = aeon
+
+                                    --- Ability
                                     aeon['unlocks'].apply(unit)
+
+                                    --- Aura
+                                    aeon['aura'].apply(unit)
 
                                     --- Path Spellbook
                                     -- Store current ability data
@@ -9617,9 +10161,9 @@ xpcall(function()
                                     local _icon = BlzGetAbilityIcon(FourCC('APBX'))
                                     -- Update for local
                                     if unit.owner.isLocal() then
-                                        _name = "[AEON] " .. aeon['name']
-                                        _description = "undefined"
-                                        _icon = aeon['icon']
+                                        _name = aeon['unlocks'].metadata.name
+                                        _description = aeon['unlocks'].metadata.description
+                                        _icon = aeon['unlocks'].metadata.icon
                                     end
                                     -- Update ability
                                     BlzSetAbilityTooltip(FourCC('APBX'), _name, 0)
@@ -9726,16 +10270,16 @@ xpcall(function()
                 function(player, message)
                     local whichAbility = StringCase(SubString(message, 5, StringLength(message)), false)
                     -- SUMMONER (Currently disabled)
-                    if whichAbility == 'boar' then
-                        Ability.Boar.apply(unit)
-                    elseif whichAbility == 'wolf' then
-                        Ability.Wolf.apply(unit)
-                    elseif whichAbility == 'bear' then
-                        Ability.Bear.apply(unit)
-                    elseif whichAbility == 'reapers' then
-                        Ability.Reapers.apply(unit)
+                    -- if whichAbility == 'boar' then
+                    --     Ability.Boar.apply(unit)
+                    -- elseif whichAbility == 'wolf' then
+                    --     Ability.Wolf.apply(unit)
+                    -- elseif whichAbility == 'bear' then
+                    --     Ability.Bear.apply(unit)
+                    -- elseif whichAbility == 'reapers' then
+                    --     Ability.Reapers.apply(unit)
                     -- DEMON (Works)
-                    elseif whichAbility == 'blade dance' then
+                    if whichAbility == 'blade dance' then
                         Ability.Blade_Dance.apply(unit)
                     elseif whichAbility == 'blink strike' then
                         Ability.Blink_Strike.apply(unit)
@@ -9761,7 +10305,7 @@ xpcall(function()
                         Ability.Kingdom_Come.apply(unit)
                     elseif whichAbility == 'i am atomic' then
                         Ability.I_Am_Atomic.apply(unit)
-                    -- ELEMENTS (tbd)
+                    -- ELEMENTS (Works)
                     elseif whichAbility == 'magma constellation' then
                         Ability.Magma_Constellation.apply(unit)
                     elseif whichAbility == 'blizzard' then
@@ -9783,16 +10327,16 @@ xpcall(function()
                 function(player, message)
                     local whichAbility = StringCase(SubString(message, 8, StringLength(message)), false)
                     -- SUMMONER (Currently disabled)
-                    if whichAbility == 'boar' then
-                        Ability.Boar.remove(unit)
-                    elseif whichAbility == 'wolf' then
-                        Ability.Wolf.remove(unit)
-                    elseif whichAbility == 'bear' then
-                        Ability.Bear.remove(unit)
-                    elseif whichAbility == 'reapers' then
-                        Ability.Reapers.remove(unit)
+                    -- if whichAbility == 'boar' then
+                    --     Ability.Boar.remove(unit)
+                    -- elseif whichAbility == 'wolf' then
+                    --     Ability.Wolf.remove(unit)
+                    -- elseif whichAbility == 'bear' then
+                    --     Ability.Bear.remove(unit)
+                    -- elseif whichAbility == 'reapers' then
+                    --     Ability.Reapers.remove(unit)
                     -- DEMON (Works)
-                    elseif whichAbility == 'blade dance' then
+                    if whichAbility == 'blade dance' then
                         Ability.Blade_Dance.remove(unit)
                     elseif whichAbility == 'blink strike' then
                         Ability.Blink_Strike.remove(unit)
@@ -9818,7 +10362,7 @@ xpcall(function()
                         Ability.Kingdom_Come.remove(unit)
                     elseif whichAbility == 'i am atomic' then
                         Ability.I_Am_Atomic.remove(unit)
-                    -- ELEMENTS (tbd)
+                    -- ELEMENTS (Works)
                     elseif whichAbility == 'magma constellation' then
                         Ability.Magma_Constellation.remove(unit)
                     elseif whichAbility == 'blizzard' then
@@ -9946,7 +10490,7 @@ xpcall(function()
     --     )
 
     --     --effect = Effect()
-    --     --effect.model = "Effects\\Fountain of Souls.mdx"
+    --     --effect.model = "Auras\\Fountain of Souls.mdx"
     --     --unit.attachEffect(effect, "origin")
 
     --     effect = Framework.Effect()
