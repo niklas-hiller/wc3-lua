@@ -9444,6 +9444,8 @@ AreaConfiguration.new = function(disabled)
     self.creepMovementspeed = 340
     self.creepHealth = 500
     self.creepLimit = 75
+    self.creepLevel = 1 -- 1 | 20 | 35 | 50 | 65 | 80 Wenn Hero Level < Unit Level - 5 dann keine EXP und keine Stats! ; Maximal 20 Level über Creep, sonst keine XP
+    self.creepXP = 5 -- 5 | 20 | 60 | 450 | 2500 | 20000
 
     self.bossSkin = 'h000'
     self.bossDamage = 1000
@@ -9537,6 +9539,8 @@ Area.new = function(IEngine, rect, configuration)
             unit.ms = self.configuration.creepMovementspeed
             unit.maxhp = self.configuration.creepHealth
             unit.hp = self.configuration.creepHealth
+            unit.level = self.configuration.creepLevel
+            local xp = self.configuration.creepXP
             unit.bind("on_death_pre",
                 function(source, target, damageObject)
                     damageObject.damage = 0
@@ -9544,6 +9548,23 @@ Area.new = function(IEngine, rect, configuration)
                     unit.invulnerable = true
                     unit.pause = true
                     unit.playAnimation("death")
+
+                    group
+                        .inRect(rect)
+                        .forEach(
+                            function(group, enumUnit)
+                                if enumUnit.owner == enemyPlayer then
+                                    return
+                                end
+                                if enumUnit.level >= unit.level + 20 then
+                                    return
+                                end
+                                if enumUnit.level < unit.level - 5 then
+                                    return
+                                end
+                                enumUnit.xp = enumUnit.xp + xp
+                            end
+                        )
 
                     self.killcount = self.killcount + 1
                     clock.schedule_once(

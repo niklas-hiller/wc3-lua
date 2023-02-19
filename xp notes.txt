@@ -1,0 +1,7 @@
+Level 1 -> 10 XP -> 2 Creeps -> 5 XP pro Creep
+Level 20 -> 273 XP -> 15 Creeps -> 18,2 XP pro Creep
+Level 35 -> 3.704 XP -> 65 Creeps -> 56,985 XP pro Creep
+Level 50 -> 50.327 XP -> 120 Creeps -> 419,392 XP pro Creep
+Level 60 -> 286.597 XP -> 200 Creeps -> 1432,985 XP pro Creep
+Level 70 -> 1.632.076 XP -> 300 Creeps -> 5440,25 XP pro Creep
+Level 80 -> 9.294.156 XP -> 350 Creep -> 25.000 XP pro Creep
