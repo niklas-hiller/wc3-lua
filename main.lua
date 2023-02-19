@@ -10242,30 +10242,6 @@ xpcall(function()
             Ability.Sword_Slash.apply(unit)
             Ability.Dodge.apply(unit)
 
-            -- DESTROYER
-            -- Ability.Interceptor.apply(unit)
-            -- Ability.Sacred_Storm.apply(unit)
-            -- Ability.Kingdom_Come.apply(unit)
-            -- Ability.I_Am_Atomic.apply(unit)
-
-            -- HOLY
-            --Ability.Impale.apply(unit)
-            --Ability.Judgement.apply(unit)
-            --Ability.Overload.apply(unit)
-            --Ability.Heaven_Justice.apply(unit)
-
-            -- ELEMENTALIST
-            -- Ability.Magma_Constellation.apply(unit)
-            -- Ability.Blizzard.apply(unit)
-            -- Ability.Uncontrollable_Flames.apply(unit)
-            -- Ability.Black_Hole.apply(unit)
-
-            -- DEMON
-            -- Ability.Blade_Dance.apply(unit)
-            -- Ability.Blink_Strike.apply(unit)
-            -- Ability.Demon_Control.apply(unit)
-            -- Ability.Shadow_Strike.apply(unit, Ability)
-
             player.bind("on_message",
                 function(player, message)
                     local whichAbility = StringCase(SubString(message, 5, StringLength(message)), false)
@@ -10424,43 +10400,6 @@ xpcall(function()
             
 
             -- native BlzSetSpecialEffectAlpha                    takes effect whichEffect, integer alpha returns nothing
-
-            --[[
-
-            -- 100 INT
-            Ability.Magma_Constellation.apply(unit)
-
-            -- FIRST BOSS
-            Ability.Blade_Dance.apply(unit)
-            Ability.Hurricane_Constellation.apply(unit)
-            Ability.Boar.apply(unit)
-
-            -- SECOND BOSS
-            Ability.Blink_Strike.apply(unit)
-            Ability.Impale.apply(unit)
-            Ability.Wolf.apply(unit)
-
-            -- THIRD BOSS
-            Ability.Interceptor.apply(unit)
-            Ability.Judgement.apply(unit)
-            Ability.Bear.apply(unit)
-
-            -- FOURTH BOSS
-            Ability.Demon_Control.apply(unit)
-            Ability.Overload.apply(unit)
-            Ability.Reapers.apply(unit)
-
-            -- FIFTH BOSS
-            Ability.Heaven_Justice.apply(unit)
-            Ability.Blizzard.apply(unit)
-            Ability.Sacred_Storm.apply(unit)
-
-            -- SIXTH BOSS
-            Ability.Shadow_Strike.apply(unit)
-            Ability.Uncontrollable_Flames.apply(unit)
-            Ability.Kingdom_Come.apply(unit)
-
-            ]]--
         end
     end
 
@@ -10500,33 +10439,6 @@ xpcall(function()
     --     --effect = Effect()
     --     --effect.model = "Effects\\Ubershield Azure.mdx"
     --     --unit.attachEffect(effect, "chest")
-
-    --     Ability.Shadow_Strike.apply(unit)
-    --     Ability.Blink_Strike.apply(unit)
-    --     Ability.Demon_Control.apply(unit)
-    --     Ability.Blade_Dance.apply(unit)
-    --     Ability.Possessed.apply(unit)
-
-    --     Ability.Reapers.apply(unit)
-    --     Ability.Soul_Steal.apply(unit)
-    --     Ability.Grim_Reaper.apply(unit)
-
-    --     Ability.Wolf.apply(unit)
-    --     Ability.Bear.apply(unit)
-    --     Ability.Boar.apply(unit)
-
-    --     Ability.Overload.apply(unit)
-    --     Ability.Heaven_Justice.apply(unit)
-    --     Ability.Impale.apply(unit)
-    --     Ability.Judgement.apply(unit)
-    --     Ability.Temple_Knight.apply(unit)
-
-    --     Ability.Magma_Constellation.apply(unit)
-    --     Ability.Uncontrollable_Flames.apply(unit)
-    --     Ability.Blizzard.apply(unit)
-    --     Ability.Hurricane_Constellation.apply(unit)
-
-    --     
         
     --     --unit.bind("on_damaged_pre",
     --     --    function(source, target, attack)
