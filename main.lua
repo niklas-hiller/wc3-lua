@@ -9466,11 +9466,13 @@ AreaConfiguration.new = function(disabled, skin, level, damage, health, armor, x
 end
 
 Area = {}
-Area.new = function(IEngine, rect, configuration)
+Area.new = function(IEngine, rect, configuration, onFirstBossDeath)
     local self = {}
     local mt = {}
 
     self.configuration = configuration
+    self.onFirstBossDeath = onFirstBossDeath
+    local firstDeath = true
     local clock = IEngine.Clock()
     local group = IEngine.Group()
     local enemyPlayer = IEngine.Player(PLAYER_NEUTRAL_AGGRESSIVE)
@@ -9523,7 +9525,14 @@ Area.new = function(IEngine, rect, configuration)
     function self.spawnBoss()
         bossSpawned = true
         self.removeAllEnemies()
+        
         -- Todo: spawn boss
+
+        -- For testing, normally only after boss death
+        if firstDeath then
+            firstDeath = false
+            self.onFirstBossDeath()
+        end
     end
 
     function self.getRandomX()
@@ -10170,12 +10179,47 @@ xpcall(function()
     }
 
     local areas = {
-        ['I000'] = Area.new(Framework, gg_rct_Bottom_Left_Room_BL, areaConfigurations[1]),
-        ['I001'] = Area.new(Framework, gg_rct_Bottom_Left_Room_BR, areaConfigurations[2]),
-        ['I002'] = Area.new(Framework, gg_rct_Bottom_Left_Room_TL, areaConfigurations[3]),
-        ['I003'] = Area.new(Framework, gg_rct_Bottom_Right_Room_BL, areaConfigurations[4]),
-        ['I004'] = Area.new(Framework, gg_rct_Bottom_Right_Room_BR, areaConfigurations[5]),
-        ['I005'] = Area.new(Framework, gg_rct_Bottom_Right_Room_TR, areaConfigurations[6])
+        ['I000'] = Area.new(Framework, gg_rct_Bottom_Left_Room_BL, areaConfigurations[1],
+            function()
+                print("The Boss of Area 1 was defeated! Players can now enter the second area!")
+                areaConfigurations[2].configuration.disabled = false
+                orbs[1].visible = true
+            end
+        ),
+        ['I001'] = Area.new(Framework, gg_rct_Bottom_Left_Room_BR, areaConfigurations[2],
+            function()
+                print("The Boss of Area 2 was defeated! Players can now enter the third area!")
+                areaConfigurations[3].configuration.disabled = false
+                orbs[2].visible = true
+            end
+        ),
+        ['I002'] = Area.new(Framework, gg_rct_Bottom_Left_Room_TL, areaConfigurations[3],
+            function()
+                print("The Boss of Area 3 was defeated! Players can now enter the fourth area!")
+                areaConfigurations[4].configuration.disabled = false
+                orbs[3].visible = true
+            end
+        ),
+        ['I003'] = Area.new(Framework, gg_rct_Bottom_Right_Room_BL, areaConfigurations[4],
+            function()
+                print("The Boss of Area 4 was defeated! Players can now enter the fifth area!")
+                areaConfigurations[5].configuration.disabled = false
+                orbs[4].visible = true
+            end
+        ),
+        ['I004'] = Area.new(Framework, gg_rct_Bottom_Right_Room_BR, areaConfigurations[5],
+            function()
+                print("The Boss of Area 5 was defeated! Players can now enter the sixth area!")
+                areaConfigurations[6].configuration.disabled = false
+                orbs[5].visible = true
+            end
+        ),
+        ['I005'] = Area.new(Framework, gg_rct_Bottom_Right_Room_TR, areaConfigurations[6],
+            function()
+                print("The Boss of Area 6 was defeated! A mysterious space rift opened!")
+                orbs[6].visible = true
+            end
+        )
     }
 
     local MAX_PLAYERS = 8
