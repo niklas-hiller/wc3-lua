@@ -9771,26 +9771,27 @@ AffinitySystem.new = function(IEngine, unit)
 
     function self.updateAffinities()
         -- Default
-        local DAMAGE_PER_LEVEL_ABSOLUT = 2.4    -- Should be 240 at Level 100
-        local DAMAGE_PER_LEVEL_FAKTOR = 1.06412 -- Should be 500 at Level 100
-        local HEALTH_PER_LEVEL_ABSOLUT = 4.8    -- Should be 480 at Level 100
+        local DAMAGE_PER_LEVEL_ABSOLUT = 2.4    -- Should be  240 at Level 100
+        local DAMAGE_PER_LEVEL_FAKTOR = 1.06412 -- Should be  500 at Level 100
+        
+        local HEALTH_PER_LEVEL_ABSOLUT = 4.8    -- Should be  480 at Level 100
         local HEALTH_PER_LEVEL_FAKTOR = 1.07152 -- Should be 1000 at Level 100
 
         -- Fire
-        local BASE_DAMAGE = 10          -- 10 Damage
-        local BASE_CRIT_DAMAGE = 2.0    -- 200% Critical Damage
+        local BASE_DAMAGE = 10              -- 10 Damage
+        local BASE_CRIT_DAMAGE = 2.0        -- 200% Critical Damage
 
         -- Physical
-        local BASE_HEALTH = 20         -- 20 Health
-        local BASE_ARMOR = 0            -- 0 Armor
+        local BASE_HEALTH = 20              -- 20 Health
+        local BASE_ARMOR = 0                -- 0 Armor
 
         -- Lightning
-        local BASE_ATTACKSPEED = 0.7    -- 0.7 Attacks/second
-        local BASE_MOVEMENTSPEED = 270  -- 270 Movement Speed
+        local BASE_ATTACKSPEED = 0.7        -- 0.7 Attacks/second
+        local BASE_MOVEMENTSPEED = 270      -- 270 Movement Speed
 
         -- Quantum
-        local BASE_CRIT_CHANCE = 10.0   -- 10% Critical Chance
-        local BASE_QUANTUM_SHIELD = 0.0  -- 0% of HP as Quantum Shield
+        local BASE_CRIT_CHANCE = 10.0       -- 10% Critical Chance
+        local BASE_QUANTUM_SHIELD = 0.0     -- 0% of HP as Quantum Shield
 
         -- Fire related
         local FIRE_DAMAGE_FACTOR = 0.02 -- 2% Damage
