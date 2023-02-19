@@ -9621,7 +9621,7 @@ Area.new = function(IEngine, rect, configuration, onFirstBossDeath)
 
     function self.enter(unit)
         if configuration.disabled then
-            print("Area is currently disabled.")
+            print("Clear previous Area!")
             return
         end
         if self.contains(unit) then
