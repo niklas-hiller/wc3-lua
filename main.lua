@@ -9680,8 +9680,8 @@ AttributeSystem.new = function(unit)
     local bonusAgi = 0 -- Used for items & passives later on
     local bonusInt = 0 -- Used for items & passives later on
 
-    local damageStacks = 0
-    local healthStacks = 0
+    self.damageStacks = 0
+    self.healthStacks = 0
 
     while unit.skillPoints > skillPoints do
         UnitModifySkillPoints(unit.handle, -1)
@@ -9764,13 +9764,13 @@ AttributeSystem.new = function(unit)
         local ARMOR_FACTOR = 1
 
         -- NO CATEGORY
-        unit.damage = BASE_ATTACK + damageStacks
+        unit.damage = BASE_ATTACK + self.damageStacks
 
         -- STR related
         -- Calculated on damage
 
         -- VIT related
-        unit.maxhp = (BASE_HEALTH + healthStacks) * (1 + HEALTH_FACTOR * vit)
+        unit.maxhp = (BASE_HEALTH + self.healthStacks) * (1 + HEALTH_FACTOR * vit)
         unit.armor = BASE_ARMOR + (ARMOR_FACTOR * vit)
 
         -- AGI related
@@ -9874,18 +9874,18 @@ AttributeSystem.new = function(unit)
             end
             for _, data in ipairs(dataTable) do
                 if target.level == data['level'] then
-                    if damageStacks < data['damageUpper'] then
-                        if damageStacks + data['damage'] > data['damageUpper'] then
-                            damageStacks = data['damageUpper']
+                    if self.damageStacks < data['damageUpper'] then
+                        if self.damageStacks + data['damage'] > data['damageUpper'] then
+                            self.damageStacks = data['damageUpper']
                         else
-                            damageStacks = damageStacks + data['damage']
+                            self.damageStacks = self.damageStacks + data['damage']
                         end
                     end
-                    if healthStacks < data['healthUpper'] then
-                        if healthStacks + data['health'] > data['healthUpper'] then
-                            healthStacks = data['healthUpper']
+                    if self.healthStacks < data['healthUpper'] then
+                        if self.healthStacks + data['health'] > data['healthUpper'] then
+                            self.healthStacks = data['healthUpper']
                         else
-                            healthStacks = healthStacks + data['health']
+                            self.healthStacks = self.healthStacks + data['health']
                         end
                     end
                     break
@@ -10431,120 +10431,6 @@ xpcall(function()
 
             player.bind("on_message",
                 function(player, message)
-                    local whichAbility = StringCase(SubString(message, 5, StringLength(message)), false)
-                    -- SUMMONER (Currently disabled)
-                    -- if whichAbility == 'boar' then
-                    --     Ability.Boar.apply(unit)
-                    -- elseif whichAbility == 'wolf' then
-                    --     Ability.Wolf.apply(unit)
-                    -- elseif whichAbility == 'bear' then
-                    --     Ability.Bear.apply(unit)
-                    -- elseif whichAbility == 'reapers' then
-                    --     Ability.Reapers.apply(unit)
-                    -- DEMON (Works)
-                    if whichAbility == 'blade dance' then
-                        Ability.Blade_Dance.apply(unit)
-                    elseif whichAbility == 'blink strike' then
-                        Ability.Blink_Strike.apply(unit)
-                    elseif whichAbility == 'demon control' then
-                        Ability.Demon_Control.apply(unit)
-                    elseif whichAbility == 'shadow strike' then
-                        Ability.Shadow_Strike.apply(unit, Ability)
-                    -- HOLY (Works)
-                    elseif whichAbility == 'impale' then
-                        Ability.Impale.apply(unit)
-                    elseif whichAbility == 'judgement' then
-                        Ability.Judgement.apply(unit)
-                    elseif whichAbility == 'overload' then
-                        Ability.Overload.apply(unit)
-                    elseif whichAbility == 'heaven justice' then
-                        Ability.Heaven_Justice.apply(unit)
-                    -- DESTROYER (Works)
-                    elseif whichAbility == 'interceptor' then
-                        Ability.Interceptor.apply(unit)
-                    elseif whichAbility == 'sacred storm' then
-                        Ability.Sacred_Storm.apply(unit)
-                    elseif whichAbility == 'kingdom come' then
-                        Ability.Kingdom_Come.apply(unit)
-                    elseif whichAbility == 'i am atomic' then
-                        Ability.I_Am_Atomic.apply(unit)
-                    -- ELEMENTS (Works)
-                    elseif whichAbility == 'magma constellation' then
-                        Ability.Magma_Constellation.apply(unit)
-                    elseif whichAbility == 'blizzard' then
-                        Ability.Blizzard.apply(unit)
-                    elseif whichAbility == 'uncontrollable flames' then
-                        Ability.Uncontrollable_Flames.apply(unit)
-                    elseif whichAbility == 'black hole' then
-                        Ability.Black_Hole.apply(unit)
-                    end
-                    print("Executed " .. message)
-                end
-            ).setCondition(
-                function(player, message)
-                    return SubString(message, 0, 4) == "-add"
-                end
-            )
-
-            player.bind("on_message",
-                function(player, message)
-                    local whichAbility = StringCase(SubString(message, 8, StringLength(message)), false)
-                    -- SUMMONER (Currently disabled)
-                    -- if whichAbility == 'boar' then
-                    --     Ability.Boar.remove(unit)
-                    -- elseif whichAbility == 'wolf' then
-                    --     Ability.Wolf.remove(unit)
-                    -- elseif whichAbility == 'bear' then
-                    --     Ability.Bear.remove(unit)
-                    -- elseif whichAbility == 'reapers' then
-                    --     Ability.Reapers.remove(unit)
-                    -- DEMON (Works)
-                    if whichAbility == 'blade dance' then
-                        Ability.Blade_Dance.remove(unit)
-                    elseif whichAbility == 'blink strike' then
-                        Ability.Blink_Strike.remove(unit)
-                    elseif whichAbility == 'demon control' then
-                        Ability.Demon_Control.remove(unit)
-                    elseif whichAbility == 'shadow strike' then
-                        Ability.Shadow_Strike.remove(unit)
-                    -- HOLY (Works)
-                    elseif whichAbility == 'impale' then
-                        Ability.Impale.remove(unit)
-                    elseif whichAbility == 'judgement' then
-                        Ability.Judgement.remove(unit)
-                    elseif whichAbility == 'overload' then
-                        Ability.Overload.remove(unit)
-                    elseif whichAbility == 'heaven justice' then
-                        Ability.Heaven_Justice.remove(unit)
-                    -- DESTROYER (Works)
-                    elseif whichAbility == 'interceptor' then
-                        Ability.Interceptor.remove(unit)
-                    elseif whichAbility == 'sacred storm' then
-                        Ability.Sacred_Storm.remove(unit)
-                    elseif whichAbility == 'kingdom come' then
-                        Ability.Kingdom_Come.remove(unit)
-                    elseif whichAbility == 'i am atomic' then
-                        Ability.I_Am_Atomic.remove(unit)
-                    -- ELEMENTS (Works)
-                    elseif whichAbility == 'magma constellation' then
-                        Ability.Magma_Constellation.remove(unit)
-                    elseif whichAbility == 'blizzard' then
-                        Ability.Blizzard.remove(unit)
-                    elseif whichAbility == 'uncontrollable flames' then
-                        Ability.Uncontrollable_Flames.remove(unit)
-                    elseif whichAbility == 'black hole' then
-                        Ability.Black_Hole.remove(unit)
-                    end
-                    print("Executed " .. message)
-                end
-            ).setCondition(
-                function(player, message)
-                    return SubString(message, 0, 7) == "-remove"
-                end
-            )
-
-            player.bind("on_message",
-                function(player, message)
                     local whichAbility = StringCase(SubString(message, 6, StringLength(message)), false)
                     if whichAbility == '1' then
                         orbs[1].visible = true
@@ -10582,12 +10468,26 @@ xpcall(function()
             player.bind("on_message",
                 function(player, message)
                     local damage = S2I(SubString(message, 8, StringLength(message)))
-                    unit.damage = damage
+                    attributeSys.damageStacks = damage
+                    attributeSys.updateStats()
                     print("Executed " .. message)
                 end
             ).setCondition(
                 function(player, message)
                     return SubString(message, 0, 7) == "-damage"
+                end
+            )
+
+            player.bind("on_message",
+                function(player, message)
+                    local health = S2I(SubString(message, 8, StringLength(message)))
+                    attributeSys.healthStacks = health
+                    attributeSys.updateStats()
+                    print("Executed " .. message)
+                end
+            ).setCondition(
+                function(player, message)
+                    return SubString(message, 0, 7) == "-health"
                 end
             )
 
