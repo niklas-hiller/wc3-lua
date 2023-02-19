@@ -9446,6 +9446,8 @@ AreaConfiguration.new = function(disabled)
     self.creepLimit = 75
     self.creepLevel = 1 -- 1 | 20 | 35 | 50 | 65 | 80 Wenn Hero Level < Unit Level - 5 dann keine EXP und keine Stats! ; Maximal 20 Level über Creep, sonst keine XP
     self.creepXP = 5 -- 5 | 20 | 60 | 450 | 2500 | 20000
+    self.attackStacks = 1 -- 1 | 3 | 15 | 120 | 1200 | 5500
+    self.healthStacks = 2 -- 2 | 6 | 30 | 240 | 2400 | 11000
 
     self.bossSkin = 'h000'
     self.bossDamage = 1000
@@ -9804,23 +9806,39 @@ AttributeSystem.new = function(unit)
 
     unit.bind("on_damage_after",
         function(source, target, damageObject)
-            damageStacks = damageStacks + 1
+            if target.level > source.level + 5 then
+                -- Player is more than 5 levels below
+                return
+            end
+            if target.level + 20 < source.level then
+                -- Player is more than 20 levels above
+                return
+            end
+            if target.level == 1 then
+                damageStacks = damageStacks + 1
+                healthStacks = healthStacks + 2
+            elseif target.level == 20 then
+                damageStacks = damageStacks + 3
+                healthStacks = healthStacks + 6
+            elseif target.level == 35 then
+                damageStacks = damageStacks + 15
+                healthStacks = healthStacks + 30
+            elseif target.level == 50 then
+                damageStacks = damageStacks + 120
+                healthStacks = healthStacks + 240
+            elseif target.level == 65 then
+                damageStacks = damageStacks + 1200
+                healthStacks = healthStacks + 2400
+            elseif target.level == 80 then
+                damageStacks = damageStacks + 5500
+                healthStacks = healthStacks + 11000
+            end
+            
             self.updateStats()
         end
     ).setCondition(
         function(source, target, damageObject)
             return source == unit
-        end
-    )
-
-    unit.bind("on_damaged_after",
-        function(source, target, damageObject)
-            healthStacks = healthStacks + 1
-            self.updateStats()
-        end
-    ).setCondition(
-        function(source, target, damageObject)
-            return target == unit
         end
     )
 
@@ -10465,6 +10483,18 @@ xpcall(function()
             ).setCondition(
                 function(player, message)
                     return SubString(message, 0, 6) == "-level"
+                end
+            )
+
+            player.bind("on_message",
+                function(player, message)
+                    local damage = S2I(SubString(message, 8, StringLength(message)))
+                    unit.damage = damage
+                    print("Executed " .. message)
+                end
+            ).setCondition(
+                function(player, message)
+                    return SubString(message, 0, 7) == "-damage"
                 end
             )
 

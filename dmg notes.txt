@@ -1,0 +1,8 @@
+1.000.000.000 -> damage cap
+
+1. Cap -> 500 Damage -> 500 Creeps -> 1 Damage
+2. Cap -> 7.500 Damage -> 3000 Creeps -> 3 Damage
+3. Cap -> 125.000 Damage -> 10.000 Creeps -> 15 Damage
+4. Cap -> 2.750.000 Damage -> 25.000 Creeps -> 120 Damage
+5. Cap -> 35.000.000 Damage -> 30.000 Creeps -> 1200 Damage
+6. Cap -> 275.000.000 Damage -> 50.000 Creeps -> 5500 Damage
