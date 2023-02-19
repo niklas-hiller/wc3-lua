@@ -9404,7 +9404,7 @@ AreaConfiguration.new = function(disabled)
     self.creepAttackspeed = 1.0
     self.creepMovementspeed = 340
     self.creepHealth = 500
-    self.creepLimit = 150
+    self.creepLimit = 100
 
     self.bossSkin = 'h000'
     self.bossDamage = 1000
@@ -9477,11 +9477,11 @@ Area.new = function(IEngine, rect, configuration)
     end
 
     function self.getRandomX()
-        return math.random(self.minX + 1000., self.maxX - 1000.)
+        return math.random(self.minX + 2000., self.maxX - 2000.)
     end
 
     function self.getRandomY()
-        return math.random(self.minY + 1000., self.maxY - 1000.)
+        return math.random(self.minY + 2000., self.maxY - 2000.)
     end
 
     function self.spawnUnit()
@@ -9504,6 +9504,7 @@ Area.new = function(IEngine, rect, configuration)
                 self.killcount = self.killcount + 1
                 clock.schedule_once(
                     function(triggeringClock, triggeringSchedule)
+                        unit.remove()
                         self.spawnUnit()
                     end, math.random(1.0, 3.0)
                 )
@@ -9527,7 +9528,7 @@ Area.new = function(IEngine, rect, configuration)
         end
         unit.teleportTo(self.x, self.y)
 
-        local change = 2000.
+        local change = 2500.
         unit.owner.setCameraBounds(
             self.minX + change, self.minY + change, 
             self.minX + change, self.maxY - change, 
