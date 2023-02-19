@@ -9806,32 +9806,73 @@ AttributeSystem.new = function(unit)
 
     unit.bind("on_damage_after",
         function(source, target, damageObject)
+            local dataTable = {
+                [1] = {
+                    ['level'] = 1,
+                    ['damage'] = 1,
+                    ['health'] = 2,
+                    ['damageUpper'] = 500,
+                    ['healthUpper'] = 1000
+                },
+                [2] = {
+                    ['level'] = 20,
+                    ['damage'] = 3,
+                    ['health'] = 6,
+                    ['damageUpper'] = 7500,
+                    ['healthUpper'] = 15000
+                },
+                [3] = {
+                    ['level'] = 35,
+                    ['damage'] = 15,
+                    ['health'] = 30,
+                    ['damageUpper'] = 125000,
+                    ['healthUpper'] = 250000
+                },
+                [4] = {
+                    ['level'] = 50,
+                    ['damage'] = 120,
+                    ['health'] = 240,
+                    ['damageUpper'] = 2750000,
+                    ['healthUpper'] = 5500000
+                },
+                [5] = {
+                    ['level'] = 65,
+                    ['damage'] = 1200,
+                    ['health'] = 2400,
+                    ['damageUpper'] = 35000000,
+                    ['healthUpper'] = 70000000
+                },
+                [6] = {
+                    ['level'] = 80,
+                    ['damage'] = 5500,
+                    ['health'] = 11000,
+                    ['damageUpper'] = 275000000,
+                    ['healthUpper'] = 500000000
+                }
+            }
+
             if target.level > source.level + 5 then
                 -- Player is more than 5 levels below
                 return
             end
-            if target.level + 20 < source.level then
-                -- Player is more than 20 levels above
-                return
-            end
-            if target.level == 1 then
-                damageStacks = damageStacks + 1
-                healthStacks = healthStacks + 2
-            elseif target.level == 20 then
-                damageStacks = damageStacks + 3
-                healthStacks = healthStacks + 6
-            elseif target.level == 35 then
-                damageStacks = damageStacks + 15
-                healthStacks = healthStacks + 30
-            elseif target.level == 50 then
-                damageStacks = damageStacks + 120
-                healthStacks = healthStacks + 240
-            elseif target.level == 65 then
-                damageStacks = damageStacks + 1200
-                healthStacks = healthStacks + 2400
-            elseif target.level == 80 then
-                damageStacks = damageStacks + 5500
-                healthStacks = healthStacks + 11000
+            for _, data in ipairs(dataTable) do
+                if target.level == data['level'] then
+                    if damageStacks < data['damageUpper'] then
+                        if damageStacks + data['damage'] > data['damageUpper'] then
+                            damageStacks = data['damageUpper']
+                        else
+                            damageStacks = damageStacks + data['damage']
+                        end
+                    end
+                    if healthStacks < data['healthUpper'] then
+                        if healthStacks + data['health'] > data['healthUpper'] then
+                            healthStacks = data['healthUpper']
+                        else
+                            healthStacks = healthStacks + data['health']
+                        end
+                    end
+                    break
+                end
             end
             
             self.updateStats()
