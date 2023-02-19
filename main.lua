@@ -9701,8 +9701,8 @@ AffinitySystem.new = function(IEngine, unit)
         end
     )
 
-    function self.statBonusString(stat)
-        if stat == "fire" then
+    function self.affinityBonusString(affinity)
+        if affinity == "fire" then
             if bonusFire == 0 then
                 return "|c00808080 + 0" .. "|r"
             elseif bonusFire > 0 then
@@ -9710,7 +9710,7 @@ AffinitySystem.new = function(IEngine, unit)
             else
                 return "|c00FF0000 - " .. (bonusFire * -1) .. "|r"
             end
-        elseif stat == "physical" then
+        elseif affinity == "physical" then
             if bonusPhysical == 0 then
                 return "|c00808080 + 0" .. "|r"
             elseif bonusPhysical > 0 then
@@ -9718,7 +9718,7 @@ AffinitySystem.new = function(IEngine, unit)
             else
                 return "|c00FF0000 - " .. (bonusPhysical * -1) .. "|r"
             end
-        elseif stat == "lightning" then
+        elseif affinity == "lightning" then
             if bonusLightning == 0 then
                 return "|c00808080 + 0" .. "|r"
             elseif bonusLightning > 0 then
@@ -9726,7 +9726,7 @@ AffinitySystem.new = function(IEngine, unit)
             else
                 return "|c00FF0000 - " .. (bonusLightning * -1) .. "|r"
             end
-        elseif stat == "quantum" then
+        elseif affinity == "quantum" then
             if bonusQuantum == 0 then
                 return "|c00808080 + 0" .. "|r"
             elseif bonusQuantum > 0 then
@@ -9737,27 +9737,27 @@ AffinitySystem.new = function(IEngine, unit)
         end
     end
 
-    function self.statString(stat)
-        if stat == "fire" then
-            return "Fire: " .. fire .. self.statBonusString(stat) ..
+    function self.affinityString(affinity)
+        if affinity == "fire" then
+            return "Fire: " .. fire .. self.affinityBonusString(affinity) ..
                 "\n - Each point increases damage by 2%%" ..
                 "\n - Each point increases critical damage by 1%%"
-        elseif stat == "physical" then
-            return "Physical: " .. physical .. self.statBonusString(stat) ..
+        elseif affinity == "physical" then
+            return "Physical: " .. physical .. self.affinityBonusString(affinity) ..
                 "\n - Each point increases health by 2%%" ..
                 "\n - Each point increases armor by 1"
-        elseif stat == "lightning" then
-            return "Lightning: " .. lightning .. self.statBonusString(stat) ..
+        elseif affinity == "lightning" then
+            return "Lightning: " .. lightning .. self.affinityBonusString(affinity) ..
                 "\n - Each point increases attack speed by 2%%" ..
                 "\n - Each point increases movement speed by 0.5%%"
-        elseif stat == "quantum" then
-            return "Quantum: " .. quantum .. self.statBonusString(stat) ..
+        elseif affinity == "quantum" then
+            return "Quantum: " .. quantum .. self.affinityBonusString(affinity) ..
                 "\n - Each point increases critical chance by 0.2%%" ..
                 "\n - Each point increases quantum shield by 1.5%%"
         end
     end
 
-    function self.updateStats()
+    function self.updateAffinities()
         -- Default
         local DAMAGE_PER_LEVEL = 0.8
         local HEALTH_PER_LEVEL = 1.4
@@ -9808,10 +9808,10 @@ AffinitySystem.new = function(IEngine, unit)
         local tooltip = BlzGetAbilityExtendedTooltip(INFORMATION_ABILITY, 0)
         if unit.owner.isLocal() then
             tooltip = 
-                self.statString('fire') .. "\n" ..
-                self.statString('physical') .. "\n" ..
-                self.statString('lightning') .. "\n" ..
-                self.statString('quantum') .. "\n"
+                self.affinityString('fire') .. "\n" ..
+                self.affinityString('physical') .. "\n" ..
+                self.affinityString('lightning') .. "\n" ..
+                self.affinityString('quantum') .. "\n"
         end
         BlzSetAbilityExtendedTooltip(INFORMATION_ABILITY, tooltip, 0)
     end
@@ -9834,7 +9834,7 @@ AffinitySystem.new = function(IEngine, unit)
             end
             
             self.updateVisual()
-            self.updateStats()
+            self.updateAffinities()
         end
     )
 
@@ -9888,7 +9888,7 @@ AffinitySystem.new = function(IEngine, unit)
     )
 
     self.updateVisual()
-    self.updateStats()
+    self.updateAffinities()
 
     clock.start()
 
@@ -10236,7 +10236,6 @@ xpcall(function()
             -- Force Base Stats
             unit.propername = player.name
             unit.skin = 'h006'
-            unit.damage = 1
 
             -- Init Affinity System
             local affinitySys = AffinitySystem.new(Framework, unit)
