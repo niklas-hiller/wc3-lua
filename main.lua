@@ -9771,15 +9771,17 @@ AffinitySystem.new = function(IEngine, unit)
 
     function self.updateAffinities()
         -- Default
-        local DAMAGE_PER_LEVEL = 0.8
-        local HEALTH_PER_LEVEL = 1.4
+        local DAMAGE_PER_LEVEL_ABSOLUT = 2.4    -- Should be 240 at Level 100
+        local DAMAGE_PER_LEVEL_FAKTOR = 1.06412 -- Should be 500 at Level 100
+        local HEALTH_PER_LEVEL_ABSOLUT = 4.8    -- Should be 480 at Level 100
+        local HEALTH_PER_LEVEL_FAKTOR = 1.07152 -- Should be 1000 at Level 100
 
         -- Fire
-        local BASE_ATTACK = 10          -- 10 Attack Damage
+        local BASE_DAMAGE = 10          -- 10 Damage
         local BASE_CRIT_DAMAGE = 2.0    -- 200% Critical Damage
 
         -- Physical
-        local BASE_HEALTH = 100         -- 100 Health
+        local BASE_HEALTH = 20         -- 20 Health
         local BASE_ARMOR = 0            -- 0 Armor
 
         -- Lightning
@@ -9793,13 +9795,13 @@ AffinitySystem.new = function(IEngine, unit)
         -- Fire related
         local FIRE_DAMAGE_FACTOR = 0.02 -- 2% Damage
         local FIRE_CRITICAL_DAMAGE_FACTOR = 0.01 -- 1% Critical Damage
-        unit.damage = (BASE_ATTACK + unit.level * DAMAGE_PER_LEVEL) * (1 + (fire + bonusFire) * FIRE_DAMAGE_FACTOR)
+        unit.damage = math.floor(BASE_DAMAGE + unit.level * DAMAGE_PER_LEVEL_ABSOLUT + DAMAGE_PER_LEVEL_FAKTOR ^ unit.level) * (1 + (fire + bonusFire) * FIRE_DAMAGE_FACTOR)
         unit.critDamage = BASE_CRIT_DAMAGE + (fire + bonusFire) * FIRE_CRITICAL_DAMAGE_FACTOR
 
         -- Physical related
         local PHYSICAL_HEALTH_FACTOR = 0.02 -- 2% Health
         local PHYSICAL_ARMOR_FACTOR = 1 -- 1 Armor
-        unit.maxhp = (BASE_HEALTH + unit.level * HEALTH_PER_LEVEL) * (1 + (physical + bonusPhysical) * PHYSICAL_HEALTH_FACTOR)
+        unit.maxhp = math.floor(BASE_HEALTH + unit.level * HEALTH_PER_LEVEL_ABSOLUT + HEALTH_PER_LEVEL_FAKTOR ^ unit.level) * (1 + (physical + bonusPhysical) * PHYSICAL_HEALTH_FACTOR)
         unit.armor = BASE_ARMOR + (physical + bonusPhysical) * PHYSICAL_ARMOR_FACTOR
 
         -- Lightning related
