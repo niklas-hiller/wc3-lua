@@ -9773,7 +9773,7 @@ AffinitySystem.new = function(IEngine, unit)
         -- Default
         local DAMAGE_PER_LEVEL_ABSOLUT = 2.4    -- Should be  240 at Level 100
         local DAMAGE_PER_LEVEL_FAKTOR = 1.06412 -- Should be  500 at Level 100
-        
+
         local HEALTH_PER_LEVEL_ABSOLUT = 4.8    -- Should be  480 at Level 100
         local HEALTH_PER_LEVEL_FAKTOR = 1.07152 -- Should be 1000 at Level 100
 
@@ -9915,19 +9915,56 @@ xpcall(function()
 
     -- Hide Hero Attributes
     do
-        local parentDummy
-        -- can not be used on Texture/String
-        function HideSimpleFramePerma(frame)
-            if not parentDummy then
-                parentDummy = BlzCreateFrameByType("SIMPLEFRAME", "", BlzGetFrameByName("ConsoleUI", 0), "", 0)
-                BlzFrameSetVisible(parentDummy, false)
+        do
+            local parentDummy
+            -- can not be used on Texture/String
+            function HideSimpleFramePerma(frame)
+                if not parentDummy then
+                    parentDummy = BlzCreateFrameByType("SIMPLEFRAME", "", BlzGetFrameByName("ConsoleUI", 0), "", 0)
+                    BlzFrameSetVisible(parentDummy, false)
+                end
+                BlzFrameSetParent(frame, parentDummy)
             end
-            BlzFrameSetParent(frame, parentDummy)
         end
+        HideSimpleFramePerma(BlzGetFrameByName("SimpleInfoPanelIconAlly", 7))
+        HideSimpleFramePerma(BlzGetFrameByName("SimpleInfoPanelIconHeroText", 6))
+        BlzFrameSetSize(BlzGetFrameByName("InfoPanelIconHeroIcon", 6), 0.00001, 0.00001)
     end
-    HideSimpleFramePerma(BlzGetFrameByName("SimpleInfoPanelIconAlly", 7))
-    HideSimpleFramePerma(BlzGetFrameByName("SimpleInfoPanelIconHeroText", 6))
-    BlzFrameSetSize(BlzGetFrameByName("InfoPanelIconHeroIcon", 6), 0.00001, 0.00001)
+
+    -- HideMinDamageV3
+    do
+        local timer, damageA, damageB, parentA, parentB, damageA2, damageB2, text, index
+        local function update(sourceFrame, targetFrame)
+            text = BlzFrameGetText(sourceFrame)
+            index = string.find(text, " - ", 1, true)
+            BlzFrameSetText(targetFrame, string.sub( text, index + 3))
+        end
+        local function Init()
+            BlzLoadTOCFile("Tasyen\\HideMinDamage.toc")
+            if not timer then timer = CreateTimer() end
+            damageA = BlzGetFrameByName("InfoPanelIconValue", 0)
+            damageB = BlzGetFrameByName("InfoPanelIconValue", 1)
+            parentA = BlzGetFrameByName("SimpleInfoPanelIconDamage",0)
+            parentB = BlzGetFrameByName("SimpleInfoPanelIconDamage",1)
+            BlzCreateSimpleFrame("CustomDamageString", parentA, 0)
+            damageA2 = BlzGetFrameByName("CustomDamageStringValue", 0)
+            BlzCreateSimpleFrame("CustomDamageString", parentB, 1)
+            damageB2 = BlzGetFrameByName("CustomDamageStringValue", 1)
+            BlzFrameSetFont(damageA, "", 0, 0)
+            BlzFrameSetFont(damageB, "", 0, 0)
+            
+            TimerStart(timer, 0.05, true, function()
+                if BlzFrameIsVisible(parentA) then
+                    update(damageA, damageA2)
+                end
+                if BlzFrameIsVisible(parentB) then
+                    update(damageB, damageB2)
+                end
+            end)
+        end
+        Init()
+    end
+
 
     -- Initiate Framework
     Framework = Engine.new()
