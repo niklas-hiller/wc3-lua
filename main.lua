@@ -4718,6 +4718,15 @@ Engine.new = function()
             if status then return val end
         end
 
+        function self._isHero()
+            return IsHeroUnitId(GetUnitTypeId(handle))
+        end
+
+        self.isHero = function()
+            local status, val = xpcall(self._isHero, Log.Error)
+            if status then return val end
+        end
+
         function self._attachEffect(effect, point)
             return effect.attachTo(self, point)
         end
@@ -9449,7 +9458,7 @@ AreaConfiguration.new = function(disabled, skin, level, damage, health, xp)
     self.disabled = disabled or false
     self.creepSkin = skin
     self.creepLevel = level -- 1 | 20 | 35 | 50 | 65 | 80 Wenn Hero Level < Unit Level - 5 dann keine EXP! ; Maximal 20 Level über Creep, sonst keine XP
-    self.creepDamage = damage -- 5 | 36 | 600 | 12.000 | 275.000 | 4.000.0000
+    self.creepDamage = damage -- 5 | 36 | 600 | 12.000 | 275.000 | 4.000.000
     self.creepAttackspeed = 1.0
     self.creepMovementspeed = 340
     self.creepHealth = health -- 50 | 750 | 12.500 | 275.000 | 3.500.000 | 27.500.000
@@ -9574,6 +9583,9 @@ Area.new = function(IEngine, rect, configuration, onFirstBossDeath)
                         .forEach(
                             function(group, enumUnit)
                                 if enumUnit.owner == enemyPlayer then
+                                    return
+                                end
+                                if not enumUnit.isHero() then
                                     return
                                 end
                                 if enumUnit.level >= unit.level + 20 then
