@@ -9443,17 +9443,17 @@ Abilities.new = function(IEngine)
 end
 
 AreaConfiguration = {}
-AreaConfiguration.new = function(disabled, skin, level, damage, health, armor, xp)
+AreaConfiguration.new = function(disabled, skin, level, damage, health, xp)
     local self = {}
 
     self.disabled = disabled or false
     self.creepSkin = skin
-    self.creepLevel = level -- 1 | 20 | 35 | 50 | 65 | 80 Wenn Hero Level < Unit Level - 5 dann keine EXP und keine Stats! ; Maximal 20 Level über Creep, sonst keine XP
+    self.creepLevel = level -- 1 | 20 | 35 | 50 | 65 | 80 Wenn Hero Level < Unit Level - 5 dann keine EXP! ; Maximal 20 Level über Creep, sonst keine XP
     self.creepDamage = damage -- 5 | 36 | 600 | 12.000 | 275.000 | 4.000.0000
     self.creepAttackspeed = 1.0
     self.creepMovementspeed = 340
     self.creepHealth = health -- 50 | 750 | 12.500 | 275.000 | 3.500.000 | 27.500.000
-    self.creepArmor = armor -- 0 | 5 | 15 | 20 | 30 | 50
+    self.creepArmor = 0
     self.creepLimit = 75
     self.creepXP = xp -- 5 | 20 | 60 | 450 | 2500 | 20000
 
@@ -10159,12 +10159,12 @@ xpcall(function()
     end
 
     local areaConfigurations = {
-        [1] = AreaConfiguration.new(false, 'h007', 1, 5, 50, 0, 5),
-        [2] = AreaConfiguration.new(true, 'h007', 20, 36, 750, 5, 20),
-        [3] = AreaConfiguration.new(true, 'h007', 35, 600, 12500, 15, 60),
-        [4] = AreaConfiguration.new(true, 'h007', 50, 12000, 275000, 20, 450),
-        [5] = AreaConfiguration.new(true, 'h007', 65, 275000, 3500000, 30, 2500),
-        [6] = AreaConfiguration.new(true, 'h007', 80, 4000000, 27500000, 50, 20000)
+        [1] = AreaConfiguration.new(false, 'h007', 1, 5, 50, 5),
+        [2] = AreaConfiguration.new(true, 'h007', 20, 36, 750, 20),
+        [3] = AreaConfiguration.new(true, 'h007', 35, 600, 12500, 60),
+        [4] = AreaConfiguration.new(true, 'h007', 50, 12000, 275000, 450),
+        [5] = AreaConfiguration.new(true, 'h007', 65, 275000, 3500000, 2500),
+        [6] = AreaConfiguration.new(true, 'h007', 80, 4000000, 27500000, 20000)
     }
 
     local areas = {
