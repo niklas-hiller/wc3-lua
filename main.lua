@@ -9556,11 +9556,6 @@ Area.new = function(IEngine, rect, configuration)
     return self
 end
 
-AchievementSystem = {}
-AchievementSystem.new = function(unit)
-    -- WIP
-end
-
 AttributeSystem = {}
 AttributeSystem.new = function(unit)
     local self = {}
