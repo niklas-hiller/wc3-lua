@@ -9594,13 +9594,14 @@ xpcall(function()
                                     pathChosen = aeon
                                     aeon['unlocks'].apply(unit)
 
+                                    --- Path Spellbook
                                     -- Store current ability data
                                     local _name = BlzGetAbilityTooltip(FourCC('ASBA'), 0)
                                     local _description = BlzGetAbilityExtendedTooltip(FourCC('ASBA'), 0)
                                     local _icon = BlzGetAbilityIcon(FourCC('ASBA'))
                                     -- Update for local
                                     if unit.owner.isLocal() then
-                                        _name = aeon['name']
+                                        _name = "Path: " .. aeon['name']
                                         _description = aeon['description']
                                         _icon = aeon['icon']
                                     end
@@ -9608,6 +9609,22 @@ xpcall(function()
                                     BlzSetAbilityTooltip(FourCC('ASBA'), _name, 0)
                                     BlzSetAbilityExtendedTooltip(FourCC('ASBA'), _description, 0)
                                     BlzSetAbilityIcon(FourCC('ASBA'), _icon)
+
+                                    --- Aeon Ability
+                                    -- Store current ability data
+                                    local _name = BlzGetAbilityTooltip(FourCC('APBX'), 0)
+                                    local _description = BlzGetAbilityExtendedTooltip(FourCC('APBX'), 0)
+                                    local _icon = BlzGetAbilityIcon(FourCC('APBX'))
+                                    -- Update for local
+                                    if unit.owner.isLocal() then
+                                        _name = "[AEON] " .. aeon['name']
+                                        _description = "undefined"
+                                        _icon = aeon['icon']
+                                    end
+                                    -- Update ability
+                                    BlzSetAbilityTooltip(FourCC('APBX'), _name, 0)
+                                    BlzSetAbilityExtendedTooltip(FourCC('APBX'), _description, 0)
+                                    BlzSetAbilityIcon(FourCC('APBX'), _icon)
                                 end
                                 ::continue::
                             end
