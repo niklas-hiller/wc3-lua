@@ -4380,7 +4380,7 @@ Engine.new = function()
             elseif index == "attackspeed" then
                 BlzSetUnitAttackCooldown(handle, 1.0 / value, 0)
             elseif index == "damage" then
-                BlzSetUnitBaseDamage(handle, value, 0)
+                BlzSetUnitBaseDamage(handle, math.floor(value), 0)
             elseif index == "str" then
                 if IsHeroUnitId(GetUnitTypeId(handle)) then
                     customStr = value - (GetHeroStr(handle, false) - customStr)
@@ -6103,7 +6103,7 @@ _Abilities.Blade_Dance.new = function(IEngine)
 
     metadata.name = "Blade Dance"
     metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
-    .. "|n..."
+    .. "|nBlades rotate around you, dealing a total of 350% damage per second."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
 
     function mt.__index(table, index)
@@ -6127,6 +6127,9 @@ _Abilities.Blade_Dance.new = function(IEngine)
         local eventHolder = EventHolder.new(IEngine)
 
         do
+            local dps = 3.5
+            local tickrate = 0.05
+            local damagePerTick = dps * tickrate
             eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
                     bladeEffect.x = unit.x
@@ -6135,7 +6138,7 @@ _Abilities.Blade_Dance.new = function(IEngine)
                     bladeEffect.timeScale = math.random(0.8, 1.3)
                     bladeEffect.yaw = math.random(0., math.pi * 2)
                     bladeEffect.create().destroy()
-
+                    
                     group
                         .inRange(unit.x, unit.y, 150.)
                         .forEach(
@@ -6147,11 +6150,11 @@ _Abilities.Blade_Dance.new = function(IEngine)
                                     bloodEffect.x = enumUnit.x
                                     bloodEffect.y = enumUnit.y
                                     bloodEffect.create().destroy()
-                                    unit.damageTarget(enumUnit, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
+                                    unit.damageTarget(enumUnit, unit.damage * damagePerTick, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
                                 end
                             end
                         )
-                end, 0.05
+                end, tickrate
             )
         end
 
@@ -6181,7 +6184,7 @@ _Abilities.Blink_Strike.new = function(IEngine)
 
     metadata.name = "Blink Strike"
     metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
-    .. "|n..."
+    .. "|nEach attack you blink to a random nearby enemy and deal 450% damage."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
 
     function mt.__index(table, index)
@@ -6244,7 +6247,7 @@ _Abilities.Blink_Strike.new = function(IEngine)
                     targetEffect.create().destroy()
 
                     source.issueOrder("attack", target)
-                    source.damageTarget(target, source.damage * 20., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
+                    source.damageTarget(target, source.damage * 4.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
                 end
             ).setCondition(
                 function(source, target, attack)
@@ -6279,7 +6282,7 @@ _Abilities.Demon_Control.new = function(IEngine)
 
     metadata.name = "Demon Control"
     metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
-    .. "|n..."
+    .. "|nA Demon follows you, healing you by 30% of your max hp every 40 attacks."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
 
     function mt.__index(table, index)
@@ -6349,7 +6352,7 @@ _Abilities.Demon_Control.new = function(IEngine)
                 eventHolder.event = unit.bind("on_damage_after",
                     function(source, target, attack)
                         attackCount = attackCount + 1
-                        if attackCount >= 50 and not casting then
+                        if attackCount >= 40 and not casting then
                             attackCount = 0
                             casting = true
                             roarEffect.x = demonEffect.x
@@ -6404,7 +6407,7 @@ _Abilities.Shadow_Strike.new = function(IEngine)
 
     metadata.name = "Shadow Strike"
     metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
-    .. "|n..."
+    .. "|nEach attack spawns a illusion, with a duration of 5 seconds, that copies your damage, attack speed and blink strike."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihilityPath.blp"
 
     function mt.__index(table, index)
@@ -7447,7 +7450,7 @@ _Abilities.Impale.new = function(IEngine)
 
     metadata.name = "Impale"
     metadata.description = "Path: |cffa9e8f9P|r|cff9de0f5r|r|cff91d8f2e|r|cff86d0efs|r|cff7ac9ebe|r|cff6fc1e8r|r|cff62b9e4v|r|cff57b1e1a|r|cff4ba9det|r|cff40a2dai|r|cff349ad7o|r|cff2892d4n|r"
-    .. "|n..."
+    .. "|nEach 3 seconds deal 750% damage to nearby enemies within 850 range, and heal your allies in the same range by 5% of your max health."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNPreservation.blp"
 
     function mt.__index(table, index)
@@ -7469,31 +7472,28 @@ _Abilities.Impale.new = function(IEngine)
         local eventHolder = EventHolder.new(IEngine)
 
         do
-            local count = 0
+            local tickrate = 3.0
             eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
-                    count = count + 1
-                    if count >= 60 then
-                        count = 0
-                        group
-                            .inRange(unit.x, unit.y, 850.)
-                            .forEach(
-                                function(group, enumUnit)
-                                    if enumUnit.hp <= 1 or enumUnit.invulnerable then
-                                        return
-                                    end
-
-                                    if unit.isEnemy(enumUnit) then
-                                        impaleEffect.x = enumUnit.x
-                                        impaleEffect.y = enumUnit.y
-                                        impaleEffect.create().destroy()
-                                        unit.damageTarget(enumUnit, unit.damage * 50., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
-                                        unit.hp = unit.hp + (0.03 * unit.maxhp)
-                                    end
+                    group
+                        .inRange(unit.x, unit.y, 850.)
+                        .forEach(
+                            function(group, enumUnit)
+                                if enumUnit.hp <= 1 or enumUnit.invulnerable then
+                                    return
                                 end
-                            )
-                    end
-                end, 0.05
+
+                                if unit.isEnemy(enumUnit) then
+                                    impaleEffect.x = enumUnit.x
+                                    impaleEffect.y = enumUnit.y
+                                    impaleEffect.create().destroy()
+                                    unit.damageTarget(enumUnit, unit.damage * 7.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                                else
+                                    unit.hp = unit.hp + (0.05 * unit.maxhp)
+                                end
+                            end
+                        )
+                end, tickrate
             )
         end
 
@@ -7523,7 +7523,7 @@ _Abilities.Judgement.new = function(IEngine)
 
     metadata.name = "Moon Halo"
     metadata.description = "Path: |cffa9e8f9P|r|cff9de0f5r|r|cff91d8f2e|r|cff86d0efs|r|cff7ac9ebe|r|cff6fc1e8r|r|cff62b9e4v|r|cff57b1e1a|r|cff4ba9det|r|cff40a2dai|r|cff349ad7o|r|cff2892d4n|r"
-    .. "|n..."
+    .. "|nEach attack has a 10% chance to cause a huge aoe damage infront of you, that deals 950% damage."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNPreservation.blp"
 
     function mt.__index(table, index)
@@ -7576,7 +7576,7 @@ _Abilities.Judgement.new = function(IEngine)
                                                 end
 
                                                 if source.isEnemy(enumUnit) then
-                                                    source.damageTarget(enumUnit, source.damage * 100., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                                    source.damageTarget(enumUnit, source.damage * 9.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                                 end
                                             end
                                         )
@@ -7621,7 +7621,7 @@ _Abilities.Overload.new = function(IEngine)
 
     metadata.name = "Overload"
     metadata.description = "Path: |cffa9e8f9P|r|cff9de0f5r|r|cff91d8f2e|r|cff86d0efs|r|cff7ac9ebe|r|cff6fc1e8r|r|cff62b9e4v|r|cff57b1e1a|r|cff4ba9det|r|cff40a2dai|r|cff349ad7o|r|cff2892d4n|r"
-    .. "|n..."
+    .. "|nEach time you are attacked there is a 10% chance to deal a huge aoe damage around you, that deals 1000% damage."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNPreservation.blp"
 
     function mt.__index(table, index)
@@ -7669,7 +7669,7 @@ _Abilities.Overload.new = function(IEngine)
                                                 end
                                                 
                                                 if caster.isEnemy(enumUnit) then
-                                                    caster.damageTarget(enumUnit, caster.damage * 100., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                                    caster.damageTarget(enumUnit, caster.damage * 10.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                                 end
                                             end
                                         )
@@ -7714,7 +7714,7 @@ _Abilities.Heaven_Justice.new = function(IEngine)
 
     metadata.name = "Heaven Justice"
     metadata.description = "Path: |cffa9e8f9P|r|cff9de0f5r|r|cff91d8f2e|r|cff86d0efs|r|cff7ac9ebe|r|cff6fc1e8r|r|cff62b9e4v|r|cff57b1e1a|r|cff4ba9det|r|cff40a2dai|r|cff349ad7o|r|cff2892d4n|r"
-    .. "|n..."
+    .. "|nEvery 10 seconds a angel descends from the sky, casting lasers on several locations, dealing 4500% damage to enemies and healing allies by 20% of your max health."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNPreservationPath.blp"
 
     function mt.__index(table, index)
@@ -7742,83 +7742,78 @@ _Abilities.Heaven_Justice.new = function(IEngine)
         local eventHolder = EventHolder.new(IEngine)
 
         do
-            local count = 0
             eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
-                    count = count + 1
-                    if count >= 200 then
-                        count = 0
-                        local dist = math.random(300, 700)
-                        local rad = math.random(0., math.pi * 2)
-                        local x = unit.x + dist * math.cos(rad)
-                        local y = unit.y + dist * math.sin(rad)
-                        local auraEffect = IEngine.Effect()
-                        auraEffect.model = "Effects\\Holy Aura.mdx"
-                        auraEffect.x = x
-                        auraEffect.y = y
-                        auraEffect.scale = 1.0
-                        auraEffect.create()
-                        local angelUnit = unit.owner.createUnit('hpea', x, y, 270.)
-                        angelUnit.skin = 'h00D'
-                        angelUnit.addAbility('Aloc')
-                        angelUnit.playAnimation("birth")
-                        triggeringClock.schedule_once(
-                            function(triggeringClock, triggeringSchedule)
-                                angelUnit.playAnimation(2)
-                                triggeringClock.schedule_once(
-                                    function(triggeringClock, triggeringSchedule)
-                                        angelUnit.playAnimation(5)
+                    local dist = math.random(300, 700)
+                    local rad = math.random(0., math.pi * 2)
+                    local x = unit.x + dist * math.cos(rad)
+                    local y = unit.y + dist * math.sin(rad)
+                    local auraEffect = IEngine.Effect()
+                    auraEffect.model = "Effects\\Holy Aura.mdx"
+                    auraEffect.x = x
+                    auraEffect.y = y
+                    auraEffect.scale = 1.0
+                    auraEffect.create()
+                    local angelUnit = unit.owner.createUnit('hpea', x, y, 270.)
+                    angelUnit.skin = 'h00D'
+                    angelUnit.addAbility('Aloc')
+                    angelUnit.playAnimation("birth")
+                    triggeringClock.schedule_once(
+                        function(triggeringClock, triggeringSchedule)
+                            angelUnit.playAnimation(2)
+                            triggeringClock.schedule_once(
+                                function(triggeringClock, triggeringSchedule)
+                                    angelUnit.playAnimation(5)
+                                    triggeringClock.schedule_once(
+                                        function(triggeringClock, triggeringSchedule)
+                                            angelUnit.remove()
+                                            auraEffect.destroy()
+                                        end, 1.9
+                                    )
+                                end, 2.55
+                            )
+                            triggeringClock.schedule_once(
+                                function(triggeringClock, triggeringSchedule)
+                                    local max = math.pi * 2
+                                    for i = 0, 35 do
+                                        local dist = math.random(0., 850.)
+                                        local rad = math.random(0., max)
+                                        local x2 = x + dist * math.cos(rad)
+                                        local y2 = y + dist * math.sin(rad)
+                                        pointEffect.x = x2
+                                        pointEffect.y = y2
+                                        pointEffect.create().destroy()
                                         triggeringClock.schedule_once(
                                             function(triggeringClock, triggeringSchedule)
-                                                angelUnit.remove()
-                                                auraEffect.destroy()
-                                            end, 1.9
-                                        )
-                                    end, 2.55
-                                )
-                                triggeringClock.schedule_once(
-                                    function(triggeringClock, triggeringSchedule)
-                                        local max = math.pi * 2
-                                        for i = 0, 35 do
-                                            local dist = math.random(0., 850.)
-                                            local rad = math.random(0., max)
-                                            local x2 = x + dist * math.cos(rad)
-                                            local y2 = y + dist * math.sin(rad)
-                                            pointEffect.x = x2
-                                            pointEffect.y = y2
-                                            pointEffect.create().destroy()
-                                            triggeringClock.schedule_once(
-                                                function(triggeringClock, triggeringSchedule)
-                                                    explodeEffect.x = x2
-                                                    explodeEffect.y = y2
-                                                    explodeEffect.create().destroy()
-                                                    afterEffect.x = x2
-                                                    afterEffect.y = y2
-                                                    afterEffect.create().destroy()
-                                                    group
-                                                        .inRange(x2, y2, 150.)
-                                                        .forEach(
-                                                            function(group, enumUnit)
-                                                                if enumUnit.hp <= 1 or enumUnit.invulnerable then
-                                                                    return
-                                                                end
-                                                                
-                                                                if unit.isEnemy(enumUnit) then
-                                                                    unit.damageTarget(enumUnit, unit.damage * 2500., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
-                                                                else
-                                                                    enumUnit.hp = enumUnit.hp + 0.2 * unit.maxhp
-                                                                end
+                                                explodeEffect.x = x2
+                                                explodeEffect.y = y2
+                                                explodeEffect.create().destroy()
+                                                afterEffect.x = x2
+                                                afterEffect.y = y2
+                                                afterEffect.create().destroy()
+                                                group
+                                                    .inRange(x2, y2, 150.)
+                                                    .forEach(
+                                                        function(group, enumUnit)
+                                                            if enumUnit.hp <= 1 or enumUnit.invulnerable then
+                                                                return
                                                             end
-                                                        )
-                                                end, 1.05
-                                            )
-                                        end
-                                    end, 1.1
-                                )
-                            end, 1.3
-                        )
-                    end
-                end, 0.05
+                                                            
+                                                            if unit.isEnemy(enumUnit) then
+                                                                unit.damageTarget(enumUnit, unit.damage * 45.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                                            else
+                                                                enumUnit.hp = enumUnit.hp + 0.2 * unit.maxhp
+                                                            end
+                                                        end
+                                                    )
+                                            end, 1.05
+                                        )
+                                    end
+                                end, 1.1
+                            )
+                        end, 1.3
+                    )
+                end, 10.0
             )
         end
 
@@ -7848,7 +7843,7 @@ _Abilities.Interceptor.new = function(IEngine)
 
     metadata.name = "Interceptor"
     metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
-    .. "|n..."
+    .. "|nEach 0.1 seconds a rocket falls from the sky within 100-800 range and deals 750% damage."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestruction.blp"
 
     function mt.__index(table, index)
@@ -7870,6 +7865,7 @@ _Abilities.Interceptor.new = function(IEngine)
         local eventHolder = EventHolder.new(IEngine)
 
         do
+            local tickrate = 0.1
             eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
                     local dist = math.random(100, 800)
@@ -7886,13 +7882,13 @@ _Abilities.Interceptor.new = function(IEngine)
                                 .forEach(
                                     function(group, enumUnit)
                                         if unit.isEnemy(enumUnit) then
-                                            unit.damageTarget(enumUnit, unit.damage * 100.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
+                                            unit.damageTarget(enumUnit, unit.damage * 7.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
                                         end
                                     end
                                 )
                         end, 0.1
                     )
-                end, 0.1
+                end, tickrate
             )
         end
 
@@ -7923,7 +7919,7 @@ _Abilities.Sacred_Storm.new = function(IEngine)
 
     metadata.name = "Sacred Storm"
     metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
-    .. "|n..."
+    .. "|nSummons 2 Lasers, which deal 1000% damage per second. When the two lasers collide, an area of darkness is created which causes eruptions each 0.2 seconds, that deal 500% damage."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestruction.blp"
 
     function mt.__index(table, index)
@@ -7952,6 +7948,10 @@ _Abilities.Sacred_Storm.new = function(IEngine)
             local blueX = nil
             local blueY = nil
             do
+                local dps = 10.0
+                local tickrate = 0.01
+                local damagePerTick = dps * tickrate
+
                 local laserOrange = nil
                 local currentDist
                 local targetRad
@@ -8023,11 +8023,11 @@ _Abilities.Sacred_Storm.new = function(IEngine)
                             .forEach(
                                 function(group, enumUnit)
                                     if unit.isEnemy(enumUnit) then
-                                        unit.damageTarget(enumUnit, unit.damage * 0.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
+                                        unit.damageTarget(enumUnit, unit.damage * damagePerTick, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
                                     end
                                 end
                             )
-                    end, 0.01
+                    end, tickrate
                 )
 
                 eventHolder.cleanup = function()
@@ -8038,6 +8038,10 @@ _Abilities.Sacred_Storm.new = function(IEngine)
             end
 
             do
+                local dps = 10.0
+                local tickrate = 0.01
+                local damagePerTick = dps * tickrate
+
                 local laserBlue = nil
                 local currentDist
                 local targetRad
@@ -8109,11 +8113,11 @@ _Abilities.Sacred_Storm.new = function(IEngine)
                             .forEach(
                                 function(group, enumUnit)
                                     if unit.isEnemy(enumUnit) then
-                                        unit.damageTarget(enumUnit, unit.damage * 0.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
+                                        unit.damageTarget(enumUnit, unit.damage * damagePerTick, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
                                     end
                                 end
                             )
-                    end, 0.01
+                    end, tickrate
                 )
 
                 eventHolder.cleanup = function()
@@ -8124,6 +8128,8 @@ _Abilities.Sacred_Storm.new = function(IEngine)
             end
 
             do
+                local tickrate = 0.01
+
                 local laserDark = nil
                 local count = 0
                 eventHolder.schedule = eventHolder.clock.schedule_interval(
@@ -8152,7 +8158,8 @@ _Abilities.Sacred_Storm.new = function(IEngine)
                                 laserDark.y = newY
                             end
                             count = count + 1
-                            if count >= 20 then
+                            local requiredCount = 20
+                            if count >= requiredCount then
                                 count = 0
                                 local rad = math.random(0., math.pi * 2)
                                 local dist = math.random(0, 150)
@@ -8166,7 +8173,7 @@ _Abilities.Sacred_Storm.new = function(IEngine)
                                     .forEach(
                                         function(group, enumUnit)
                                             if unit.isEnemy(enumUnit) then
-                                                unit.damageTarget(enumUnit, unit.damage * 40.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
+                                                unit.damageTarget(enumUnit, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE) 
                                             end
                                         end
                                     )
@@ -8176,7 +8183,7 @@ _Abilities.Sacred_Storm.new = function(IEngine)
                             laserDark = nil
                             count = 0
                         end
-                    end, 0.01
+                    end, tickrate
                 )
 
                 eventHolder.cleanup = function()
@@ -8213,7 +8220,7 @@ _Abilities.Kingdom_Come.new = function(IEngine)
 
     metadata.name = "Kingdom Come"
     metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
-    .. "|n..."
+    .. "|nEach second a sword falls from the sky that deals 2000% damage. Every 10th sword deals 6000% damage and is 400% larger."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestruction.blp"
 
     function mt.__index(table, index)
@@ -8239,11 +8246,11 @@ _Abilities.Kingdom_Come.new = function(IEngine)
                 function(triggeringClock, triggeringSchedule)
                     count = count + 1
                     local scale = 1.5
-                    local damage_factor = 250.
+                    local damage_factor = 20.
                     if count >= 10 then
                         count = 0
                         scale = 4.0
-                        damage_factor = 1000.
+                        damage_factor = 60.
                     end
                     local dist = math.random(100, 800)
                     local rad = math.random(0., math.pi * 2)
@@ -8304,7 +8311,7 @@ _Abilities.I_Am_Atomic.new = function(IEngine)
 
     metadata.name = "I am Atomic"
     metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
-    .. "|n..."
+    .. "|nAfter being hit 30 times, cause a huge explosion after a few seconds, that deals a maximum of 25000% damage in its epicenter."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestructionPath.blp"
 
     function mt.__index(table, index)
@@ -8398,7 +8405,7 @@ _Abilities.I_Am_Atomic.new = function(IEngine)
                             explodeEffect1.create()
                             explodeEffect2.create()
 
-                            local damageFactor = 20000.
+                            local damageFactor = 250.
                             local damage_per_tick = damage_factor / (totalDuration / tickrate)
 
                             triggeringClock.schedule_interval(
@@ -8462,7 +8469,7 @@ _Abilities.Magma_Constellation.new = function(IEngine)
 
     metadata.name = "Magma Constellation"
     metadata.description = "Path: |cffff0000H|r|cffaa0054a|r|cff5500a9r|r|cff0000fem|r|cff0054aao|r|cff00a955n|r|cff00fe00y|r"
-    .. "|n..."
+    .. "|nMagma Stars are rotating around you, dealing 500% damage per tick. Each star can only deal damage once every 1.0 seconds."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHarmony.blp"
 
     function mt.__index(table, index)
@@ -8539,7 +8546,7 @@ _Abilities.Magma_Constellation.new = function(IEngine)
                                             stompEffect.y = newY
                                             stompEffect.z = z
                                             stompEffect.create().destroy()
-                                            unit.damageTarget(enumUnit, unit.damage * 75., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                            unit.damageTarget(enumUnit, unit.damage * 5., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                             delayTable[i][enumUnit] = 0
                                         end
                                     end
@@ -8582,7 +8589,7 @@ _Abilities.Blizzard.new = function(IEngine)
 
     metadata.name = "Blizzard"
     metadata.description = "Path: |cffff0000H|r|cffaa0054a|r|cff5500a9r|r|cff0000fem|r|cff0054aao|r|cff00a955n|r|cff00fe00y|r"
-    .. "|n..."
+    .. "|nSummons a blizzard around you, that deals 1000% damage per ice shard."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHarmony.blp"
 
     function mt.__index(table, index)
@@ -8607,7 +8614,6 @@ _Abilities.Blizzard.new = function(IEngine)
         local eventHolder = EventHolder.new(IEngine)
 
         do
-            local count = 0
             eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
                     local dist = math.random(350., 650.)
@@ -8627,7 +8633,7 @@ _Abilities.Blizzard.new = function(IEngine)
                                 .forEach(
                                     function(group, enumUnit)
                                         if unit.isEnemy(enumUnit) then
-                                            unit.damageTarget(enumUnit, unit.damage * 250., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                            unit.damageTarget(enumUnit, unit.damage * 10., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                         end
                                     end
                                 )
@@ -8663,7 +8669,7 @@ _Abilities.Uncontrollable_Flames.new = function(IEngine)
 
     metadata.name = "Uncontrollable Flames"
     metadata.description = "Path: |cffff0000H|r|cffaa0054a|r|cff5500a9r|r|cff0000fem|r|cff0054aao|r|cff00a955n|r|cff00fe00y|r"
-    .. "|n..."
+    .. "|nCause fire eruptions around you, that deal 750% damage each."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHarmony.blp"
 
     function mt.__index(table, index)
@@ -8709,7 +8715,7 @@ _Abilities.Uncontrollable_Flames.new = function(IEngine)
                         .forEach(
                             function(group, enumUnit)
                                 if unit.isEnemy(enumUnit) then
-                                    unit.damageTarget(enumUnit, unit.damage * 500., false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
+                                    unit.damageTarget(enumUnit, unit.damage * 7.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS) 
                                 end
                             end
                         )
@@ -8743,7 +8749,7 @@ _Abilities.Black_Hole.new = function(IEngine)
 
     metadata.name = "Black Hole"
     metadata.description = "Path: |cffff0000H|r|cffaa0054a|r|cff5500a9r|r|cff0000fem|r|cff0054aao|r|cff00a955n|r|cff00fe00y|r"
-    .. "|n..."
+    .. "|nEach 3.0 seconds spawns a orange and a purple blackhole nearby, that stays for 10 seconds. Both blackholes deal 2500% damage per second to enemies that are in it. The purple blackhole drags enemies to its center, while the orange blackhole pushes enemies away from its center. Both effects get stronger, the nearer the unit is to the blackholes center."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHarmonyPath.blp"
 
     function mt.__index(table, index)
@@ -8769,7 +8775,7 @@ _Abilities.Black_Hole.new = function(IEngine)
                 local tickrate = 0.01
                 local range = 700.
                 local damageRange = 250.
-                local damageFactor = 20.
+                local damageFactor = 25. * tickrate
                 local minDist = 150.
                 local maxDist = 1200.
                 local change = 1.0 -- < 0 for push, > 0 for pull
@@ -8851,7 +8857,7 @@ _Abilities.Black_Hole.new = function(IEngine)
                 local tickrate = 0.01
                 local range = 700.
                 local damageRange = 250.
-                local damageFactor = 20.
+                local damageFactor = 25. * tickrate
                 local minDist = 150.
                 local maxDist = 1200.
                 local change = -1.0 -- < 0 for push, > 0 for pull
@@ -9439,15 +9445,16 @@ AreaConfiguration.new = function(disabled)
 
     self.disabled = disabled or false
     self.creepSkin = 'h007'
-    self.creepDamage = 20
+    self.creepDamage = 5 -- 5 | 36 | 600 | 12.000 | 275.000 | 4.000.0000
     self.creepAttackspeed = 1.0
     self.creepMovementspeed = 340
-    self.creepHealth = 500
+    self.creepHealth = 50 -- 50 | 750 | 12.500 | 275.000 | 3.500.000 | 27.500.000
+    self.creepArmor = 0 -- 0 | 5 | 15 | 20 | 30 | 50
     self.creepLimit = 75
     self.creepLevel = 1 -- 1 | 20 | 35 | 50 | 65 | 80 Wenn Hero Level < Unit Level - 5 dann keine EXP und keine Stats! ; Maximal 20 Level über Creep, sonst keine XP
     self.creepXP = 5 -- 5 | 20 | 60 | 450 | 2500 | 20000
-    self.attackStacks = 1 -- 1 | 3 | 15 | 120 | 1200 | 5500
-    self.healthStacks = 2 -- 2 | 6 | 30 | 240 | 2400 | 11000
+    self.attackStacks = 0.1 -- 0.1 | 0.3 | 1.5 | 12.0 | 120.0 | 550.0
+    self.healthStacks = 0.2 -- 0.2 | 0.6 | 3.0 | 24.0 | 240.0 | 1100.0
 
     self.bossSkin = 'h000'
     self.bossDamage = 1000
@@ -9542,6 +9549,7 @@ Area.new = function(IEngine, rect, configuration)
             unit.maxhp = self.configuration.creepHealth
             unit.hp = self.configuration.creepHealth
             unit.level = self.configuration.creepLevel
+            unit.armor = self.configuration.creepArmor
             local xp = self.configuration.creepXP
             unit.bind("on_death_pre",
                 function(source, target, damageObject)
@@ -9809,45 +9817,45 @@ AttributeSystem.new = function(unit)
             local dataTable = {
                 [1] = {
                     ['level'] = 1,
-                    ['damage'] = 1,
-                    ['health'] = 2,
-                    ['damageUpper'] = 500,
-                    ['healthUpper'] = 1000
+                    ['damage'] = 0.1,
+                    ['health'] = 0.2,
+                    ['damageUpper'] = 50,
+                    ['healthUpper'] = 100
                 },
                 [2] = {
                     ['level'] = 20,
-                    ['damage'] = 3,
-                    ['health'] = 6,
-                    ['damageUpper'] = 7500,
-                    ['healthUpper'] = 15000
+                    ['damage'] = 0.3,
+                    ['health'] = 0.6,
+                    ['damageUpper'] = 750,
+                    ['healthUpper'] = 1500
                 },
                 [3] = {
                     ['level'] = 35,
-                    ['damage'] = 15,
-                    ['health'] = 30,
-                    ['damageUpper'] = 125000,
-                    ['healthUpper'] = 250000
+                    ['damage'] = 1.5,
+                    ['health'] = 3.0,
+                    ['damageUpper'] = 12500,
+                    ['healthUpper'] = 25000
                 },
                 [4] = {
                     ['level'] = 50,
-                    ['damage'] = 120,
-                    ['health'] = 240,
-                    ['damageUpper'] = 2750000,
-                    ['healthUpper'] = 5500000
+                    ['damage'] = 12,
+                    ['health'] = 24,
+                    ['damageUpper'] = 275000,
+                    ['healthUpper'] = 550000
                 },
                 [5] = {
                     ['level'] = 65,
-                    ['damage'] = 1200,
-                    ['health'] = 2400,
-                    ['damageUpper'] = 35000000,
-                    ['healthUpper'] = 70000000
+                    ['damage'] = 120,
+                    ['health'] = 240,
+                    ['damageUpper'] = 3500000,
+                    ['healthUpper'] = 7000000
                 },
                 [6] = {
                     ['level'] = 80,
-                    ['damage'] = 5500,
-                    ['health'] = 11000,
-                    ['damageUpper'] = 275000000,
-                    ['healthUpper'] = 500000000
+                    ['damage'] = 550,
+                    ['health'] = 1100,
+                    ['damageUpper'] = 27500000,
+                    ['healthUpper'] = 50000000
                 }
             }
 

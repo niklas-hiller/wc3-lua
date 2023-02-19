@@ -143,86 +143,86 @@ Ability 4
 ## Destruction
 Ability 1
 - Path: Destruction
-- Name: Missile Strike
-- Description: 100x
+- Name: Interceptor
+- Description: Each 0.1 seconds a rocket falls from the sky within 100-800 range and deals 750% damage.
 
 Ability 2
 - Path: Destruction
-- Name: Orbital Strike
-- Description: 0.5 per tick (0.01) + 40.0x per explosion (0.2)
+- Name: Sacred Storm
+- Description: Summons 2 Lasers, which deal 1000% damage per second. When the two lasers collide, an area of darkness is created which causes eruptions each 0.2 seconds, that deal 500% damage.
 
 Ability 3
 - Path: Destruction
 - Name: Sword of Destruction
-- Description: 250x / 1000x
+- Description: Each second a sword falls from the sky that deals 2000% damage. Every 10th sword deals 6000% damage and is 400% larger.
 
 Aeon
 - Path: Destruction
 - Name: I Am Atomic
-- Description: 20.000x
+- Description: After being hit 30 times, cause a huge explosion after a few seconds, that deals a maximum of 25000% damage in its epicenter.
 
 ## Preservation
 Ability 1
 - Path: Preservation
 - Name: Impale
-- Description: 50x damage and 3% max hp heal per hit
+- Description: Each 3 seconds deal 750% damage to nearby enemies within 850 range, and heal your allies in the same range by 5% of your max health.
 
 Ability 2
 - Path: Preservation
 - Name: Moon Halo
-- Description: 100x damage per laser
+- Description: Each attack has a 10% chance to cause a huge aoe damage infront of you, that deals 950% damage.
 
 Ability 3
 - Path: Preservation
 - Name: Overload
-- Description: 100x damage per laser
+- Description: Each time you are attacked there is a 10% chance to deal a huge aoe damage around you, that deals 1000% damage.
 
 Aeon
 - Path: Preservation
 - Name: Michaels Blessing
-- Description: 2500x damage per laser to enemies and heal 20% max hp per laser to allies hit 
+- Description: Every 10 seconds a angel descends from the sky, casting lasers on several locations, dealing 4500% damage to enemies and healing allies by 20% of your max health.
 
 ## Nihility
 Ability 1
 - Path: Nihility
 - Name: Blade Dance
-- Description: Deal 5x damage per tick (0.05)
+- Description: Blades rotate around you, dealing a total of 350% damage per second.
 
 Ability 2
 - Path: Nihility
 - Name: Blink Strike
-- Description: Blinks to random nearby enemy within 1200 range and deals 20x damage
+- Description: Each attack you blink to a random nearby enemy and deal 450% damage.
 
 Ability 3
 - Path: Nihility
 - Name: Demon Control
-- Description: Heal by 30% max hp every 50 attacks
+- Description: A Demon follows you, healing you by 30% of your max hp every 40 attacks.
 
 Aeon
 - Path: Nihility
 - Name: Shadow Strike
-- Description: Spawn an illusion each attack, that copies you damage, attackspeed and blink strike
+- Description: Each attack spawns a illusion, with a duration of 5 seconds, that copies your damage, attack speed and blink strike.
 
 ## Harmony
 Ability 1
 - Path: Harmony
 - Name: Magma Constellation
-- Description: 75x per tick
+- Description: Magma Stars are rotating around you, dealing 500% damage per tick. Each star can only deal damage once every 1.0 seconds.
 
 Ability 2
 - Path: Harmony
 - Name: Blizzard
-- Description: 250x per shard
+- Description: Summons a blizzard around you, that deals 1000% damage per ice shard.
 
 Ability 3
 - Path: Harmony
 - Name: Uncontrollable Flames
-- Description: 500x per stomp
+- Description: Cause fire eruptions around you, that deal 750% damage each.
 
 Aeon
 - Path: Harmony
 - Name: Black Hole
-- Description: 2000x per second
+- Description: Each 3.0 seconds spawns a orange and a purple blackhole nearby, that stays for 10 seconds. Both blackholes deal 2500% damage per second to enemies that are in it. The purple blackhole drags enemies to its center, while the orange blackhole pushes enemies away from its center. Both effects get stronger, the nearer the unit is to the blackholes center.
 
 ## Erudition
 Ability 1
