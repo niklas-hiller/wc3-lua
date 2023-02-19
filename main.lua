@@ -4288,6 +4288,8 @@ Engine.new = function()
         local critChance = 0
         local critDamage = 0
 
+        local castSpeed = 0
+
         if IsHeroUnitId(GetUnitTypeId(handle)) then
             -- Capture Hero Stats
             --local capturedLevel = GetHeroLevel(handle)
@@ -4438,6 +4440,8 @@ Engine.new = function()
                 critChance = value
             elseif index == "critDamage" then
                 critDamage = value
+            elseif index == "castSpeed" then
+                castSpeed = value
             else
                 Log.Error("Unknown attribute '" .. index .. "'.")
             end
@@ -4546,6 +4550,8 @@ Engine.new = function()
                 return critChance
             elseif index == "critDamage" then
                 return critDamage
+            elseif index == "castSpeed" then
+                return castSpeed
             elseif index == "acquireRange" then
                 return GetUnitAcquireRange(handle)
             else
@@ -9453,8 +9459,6 @@ AreaConfiguration.new = function(disabled, skin, level, damage, health, armor, x
     self.creepArmor = armor -- 0 | 5 | 15 | 20 | 30 | 50
     self.creepLimit = 75
     self.creepXP = xp -- 5 | 20 | 60 | 450 | 2500 | 20000
-    -- self.attackStacks = attackStacks -- 0.1 | 0.3 | 1.5 | 12.0 | 120.0 | 550.0
-    -- self.healthStacks = healthStacks -- 0.2 | 0.6 | 3.0 | 24.0 | 240.0 | 1100.0
 
     self.bossSkin = 'h000'
     self.bossDamage = 1000
@@ -9655,33 +9659,29 @@ Area.new = function(IEngine, rect, configuration, onFirstBossDeath)
     return self
 end
 
-AttributeSystem = {}
-AttributeSystem.new = function(unit)
+AffinitySystem = {}
+AffinitySystem.new = function(unit)
     local self = {}
 
     local SKILL_POINTS_BASE = 100
     local SKILL_POINTS_PER_LEVEL = 5
-    --local informationAbility = BlzGetUnitAbility(unit.handle, FourCC('AATR'))
     local skillPoints = SKILL_POINTS_BASE + (unit.level - 1) * SKILL_POINTS_PER_LEVEL
 
-    local BASE_ATTACK = 10
-    local BASE_ATTACKSPEED = 0.7
-    local BASE_MOVEMENTSPEED = 270
-    local BASE_HEALTH = 100
-    local BASE_ARMOR = 0
+    local INFORMATION_ABILITY = FourCC('AATR')
+    local FIRE_ABILITY = FourCC('AST1')
+    local PHYSICAL_ABILITY = FourCC('AST2')
+    local LIGHTNING_ABILITY = FourCC('AST3')
+    local QUANTUM_ABILITY = FourCC('AST4')
 
-    local str = 0
-    local vit = 0
-    local agi = 0
-    local int = 0
+    local fire = 0
+    local physical = 0
+    local lightning = 0
+    local quantum = 0
 
-    local bonusStr = 0 -- Used for items & passives later on
-    local bonusVit = 0 -- Used for items & passives later on
-    local bonusAgi = 0 -- Used for items & passives later on
-    local bonusInt = 0 -- Used for items & passives later on
-
-    self.damageStacks = 0
-    self.healthStacks = 0
+    local bonusFire = 0 -- Used for items & passives later on
+    local bonusPhysical = 0 -- Used for items & passives later on
+    local bonusLightning = 0 -- Used for items & passives later on
+    local bonusQuantum = 0 -- Used for items & passives later on
 
     while unit.skillPoints > skillPoints do
         UnitModifySkillPoints(unit.handle, -1)
@@ -9704,199 +9704,139 @@ AttributeSystem.new = function(unit)
     )
 
     function self.statBonusString(stat)
-        if stat == "str" then
-            if bonusStr == 0 then
+        if stat == "fire" then
+            if bonusFire == 0 then
                 return "|c00808080 + 0" .. "|r"
-            elseif bonusStr > 0 then
-                return "|c0000FF00 + " .. bonusStr .. "|r"
+            elseif bonusFire > 0 then
+                return "|c0000FF00 + " .. bonusFire .. "|r"
             else
-                return "|c00FF0000 - " .. (bonusStr * -1) .. "|r"
+                return "|c00FF0000 - " .. (bonusFire * -1) .. "|r"
             end
-        elseif stat == "vit" then
-            if bonusVit == 0 then
+        elseif stat == "physical" then
+            if bonusPhysical == 0 then
                 return "|c00808080 + 0" .. "|r"
-            elseif bonusVit > 0 then
-                return "|c0000FF00 + " .. bonusVit .. "|r"
+            elseif bonusPhysical > 0 then
+                return "|c0000FF00 + " .. bonusPhysical .. "|r"
             else
-                return "|c00FF0000 - " .. (bonusVit * -1) .. "|r"
+                return "|c00FF0000 - " .. (bonusPhysical * -1) .. "|r"
             end
-        elseif stat == "agi" then
-            if bonusAgi == 0 then
+        elseif stat == "lightning" then
+            if bonusLightning == 0 then
                 return "|c00808080 + 0" .. "|r"
-            elseif bonusAgi > 0 then
-                return "|c0000FF00 + " .. bonusAgi .. "|r"
+            elseif bonusLightning > 0 then
+                return "|c0000FF00 + " .. bonusLightning .. "|r"
             else
-                return "|c00FF0000 - " .. (bonusAgi * -1) .. "|r"
+                return "|c00FF0000 - " .. (bonusLightning * -1) .. "|r"
             end
-        elseif stat == "int" then
-            if bonusInt == 0 then
+        elseif stat == "quantum" then
+            if bonusQuantum == 0 then
                 return "|c00808080 + 0" .. "|r"
-            elseif bonusInt > 0 then
-                return "|c0000FF00 + " .. bonusInt .. "|r"
+            elseif bonusQuantum > 0 then
+                return "|c0000FF00 + " .. bonusQuantum .. "|r"
             else
-                return "|c00FF0000 - " .. (bonusInt * -1) .. "|r"
+                return "|c00FF0000 - " .. (bonusQuantum * -1) .. "|r"
             end
         end
     end
 
     function self.statString(stat)
-        if stat == "str" then
-            return "STR: " .. str .. self.statBonusString(stat) ..
-                "\n - Each point increases physical damage by 2%%"
-        elseif stat == "vit" then
-            return "VIT: " .. vit .. self.statBonusString(stat) ..
-                "\n - Each point increases armor by 1" ..
-                "\n - Each point increases health by 2%%"
-        elseif stat == "agi" then
-            return "AGI: " .. agi .. self.statBonusString(stat) ..
+        if stat == "fire" then
+            return "Fire: " .. fire .. self.statBonusString(stat) ..
+                "\n - Each point increases damage by 2%%" ..
+                "\n - Each point increases critical damage by 1%%"
+        elseif stat == "physical" then
+            return "Physical: " .. physical .. self.statBonusString(stat) ..
+                "\n - Each point increases health by 2%%" ..
+                "\n - Each point increases armor by 1"
+        elseif stat == "lightning" then
+            return "Lightning: " .. lightning .. self.statBonusString(stat) ..
                 "\n - Each point increases attack speed by 2%%" ..
                 "\n - Each point increases movement speed by 0.5%%"
-        elseif stat == "int" then
-            return "INT: " .. int .. self.statBonusString(stat) ..
-                "\n - Each point increases magical damage by 2%%"
+        elseif stat == "quantum" then
+            return "Quantum: " .. quantum .. self.statBonusString(stat) ..
+                "\n - Each point increases critical chance by 0.2%%" ..
+                "\n - Each point increases casting speed by 0.08%%"
         end
     end
 
     function self.updateStats()
-        local ATTACKSPEED_FACTOR = 0.02
-        local MOVEMENTSPEED_FACTOR = 0.005
-        local HEALTH_FACTOR = 0.02
-        local ARMOR_FACTOR = 1
+        -- Default
+        local DAMAGE_PER_LEVEL = 0.8
+        local HEALTH_PER_LEVEL = 1.4
 
-        -- NO CATEGORY
-        unit.damage = BASE_ATTACK + self.damageStacks
+        -- Fire
+        local BASE_ATTACK = 10          -- 10 Attack Damage
+        local BASE_CRIT_DAMAGE = 2.0    -- 200% Critical Damage
 
-        -- STR related
-        -- Calculated on damage
+        -- Physical
+        local BASE_HEALTH = 100         -- 100 Health
+        local BASE_ARMOR = 0            -- 0 Armor
 
-        -- VIT related
-        unit.maxhp = (BASE_HEALTH + self.healthStacks) * (1 + HEALTH_FACTOR * vit)
-        unit.armor = BASE_ARMOR + (ARMOR_FACTOR * vit)
+        -- Lightning
+        local BASE_ATTACKSPEED = 0.7    -- 0.7 Attacks/second
+        local BASE_MOVEMENTSPEED = 270  -- 270 Movement Speed
 
-        -- AGI related
-        unit.attackspeed = BASE_ATTACKSPEED * (1 + ATTACKSPEED_FACTOR * agi)
-        unit.ms = BASE_MOVEMENTSPEED * (1 + MOVEMENTSPEED_FACTOR * agi)
+        -- Quantum
+        local BASE_CRIT_CHANCE = 10.0   -- 10% Critical Chance
+        local BASE_CASTING_SPEED = 1.0  -- 100% Casting Speed
 
-        -- INT related
-        -- Calculated on damage
+        -- Fire related
+        local FIRE_DAMAGE_FACTOR = 0.02 -- 2% Damage
+        local FIRE_CRITICAL_DAMAGE_FACTOR = 0.01 -- 1% Critical Damage
+        unit.damage = (BASE_ATTACK + unit.level * DAMAGE_PER_LEVEL) * (1 + (fire + bonusFire) * FIRE_DAMAGE_FACTOR)
+        unit.critDamage = BASE_CRIT_DAMAGE + (fire + bonusFire) * FIRE_CRITICAL_DAMAGE_FACTOR
+
+        -- Physical related
+        local PHYSICAL_HEALTH_FACTOR = 0.02 -- 2% Health
+        local PHYSICAL_ARMOR_FACTOR = 1 -- 1 Armor
+        unit.maxhp = (BASE_HEALTH + unit.level * HEALTH_PER_LEVEL) * (1 + (physical + bonusPhysical) * PHYSICAL_HEALTH_FACTOR)
+        unit.armor = BASE_ARMOR + (physical + bonusPhysical) * PHYSICAL_ARMOR_FACTOR
+
+        -- Lightning related
+        local LIGHTNING_ATTACKSPEED_FACTOR = 0.02 -- 2% Attack Speed
+        local LIGHTNING_MOVEMENTSPEED_FACTOR = 0.005 -- 0.5% Movement Speed
+        unit.attackspeed = BASE_ATTACKSPEED * (1 + (lightning + bonusLightning) * LIGHTNING_ATTACKSPEED_FACTOR)
+        unit.ms = BASE_MOVEMENTSPEED * (1 + (lightning + bonusLightning) * LIGHTNING_MOVEMENTSPEED_FACTOR)
+
+        -- Quantum related
+        local QUANTUM_CRITICAL_CHANCE_FACTOR = 0.2 -- 0.2% Critical Chance
+        local QUANTUM_CASTING_SPEED_FACTOR = 0.0008 -- 0.08% Casting Speed
+        unit.critChance = BASE_CRIT_CHANCE + (quantum + bonusQuantum) * QUANTUM_CRITICAL_CHANCE_FACTOR
+        unit.castSpeed = BASE_CASTING_SPEED + (quantum + bonusQuantum) * QUANTUM_CASTING_SPEED_FACTOR
 
     end
 
     function self.updateVisual()
-        local tooltip = BlzGetAbilityExtendedTooltip(FourCC('AATR'), 0)
+        local tooltip = BlzGetAbilityExtendedTooltip(INFORMATION_ABILITY, 0)
         if unit.owner.isLocal() then
             tooltip = 
-                self.statString('str') .. "\n" ..
-                self.statString('vit') .. "\n" ..
-                self.statString('agi') .. "\n" ..
-                self.statString('int') .. "\n"
+                self.statString('fire') .. "\n" ..
+                self.statString('physical') .. "\n" ..
+                self.statString('lightning') .. "\n" ..
+                self.statString('quantum') .. "\n"
         end
-        BlzSetAbilityExtendedTooltip(FourCC('AATR'), tooltip, 0)
-        --BlzSetAbilityStringLevelField(informationAbility, ABILITY_SLF_TOOLTIP_NORMAL_EXTENDED, 1, "test")
+        BlzSetAbilityExtendedTooltip(INFORMATION_ABILITY, tooltip, 0)
     end
 
     unit.bind("on_skill",
         function(unit, abilityId)
-            --local ability = BlzGetUnitAbility(unit.handle, abilityId)
-            --local currentLevel = BlzGetAbilityIntegerField(ability, ABILITY_IF_LEVELS)
-            --print(currentLevel)
-            --BlzSetAbilityIntegerField(ability, ABILITY_IF_LEVELS, currentLevel + 1)
             if unit.getAbilityLevel(abilityId) == 2 then
                 DecUnitAbilityLevel(unit.handle, abilityId)
             end
             skillPoints = skillPoints - 1
-            --print("Current Skill Points: " .. skillPoints)
 
-            if abilityId == FourCC('ASTR') then
-                str = str + 1
-            elseif abilityId == FourCC('AVIT') then
-                vit = vit + 1
-            elseif abilityId == FourCC('AAGI') then
-                agi = agi + 1
-            elseif abilityId == FourCC('AINT') then
-                int = int + 1
-            end
-            self.updateVisual()
-            self.updateStats()
-        end
-    )
-
-    unit.bind("on_damage_after",
-        function(source, target, damageObject)
-            local dataTable = {
-                [1] = {
-                    ['level'] = 1,
-                    ['damage'] = 0.1,
-                    ['health'] = 0.2,
-                    ['damageUpper'] = 50,
-                    ['healthUpper'] = 100
-                },
-                [2] = {
-                    ['level'] = 20,
-                    ['damage'] = 0.3,
-                    ['health'] = 0.6,
-                    ['damageUpper'] = 750,
-                    ['healthUpper'] = 1500
-                },
-                [3] = {
-                    ['level'] = 35,
-                    ['damage'] = 1.5,
-                    ['health'] = 3.0,
-                    ['damageUpper'] = 12500,
-                    ['healthUpper'] = 25000
-                },
-                [4] = {
-                    ['level'] = 50,
-                    ['damage'] = 12,
-                    ['health'] = 24,
-                    ['damageUpper'] = 275000,
-                    ['healthUpper'] = 550000
-                },
-                [5] = {
-                    ['level'] = 65,
-                    ['damage'] = 120,
-                    ['health'] = 240,
-                    ['damageUpper'] = 3500000,
-                    ['healthUpper'] = 7000000
-                },
-                [6] = {
-                    ['level'] = 80,
-                    ['damage'] = 550,
-                    ['health'] = 1100,
-                    ['damageUpper'] = 27500000,
-                    ['healthUpper'] = 50000000
-                }
-            }
-
-            if target.level > source.level + 5 then
-                -- Player is more than 5 levels below
-                return
-            end
-            for _, data in ipairs(dataTable) do
-                if target.level == data['level'] then
-                    if self.damageStacks < data['damageUpper'] then
-                        if self.damageStacks + data['damage'] > data['damageUpper'] then
-                            self.damageStacks = data['damageUpper']
-                        else
-                            self.damageStacks = self.damageStacks + data['damage']
-                        end
-                    end
-                    if self.healthStacks < data['healthUpper'] then
-                        if self.healthStacks + data['health'] > data['healthUpper'] then
-                            self.healthStacks = data['healthUpper']
-                        else
-                            self.healthStacks = self.healthStacks + data['health']
-                        end
-                    end
-                    break
-                end
+            if abilityId == FIRE_ABILITY then
+                fire = fire + 1
+            elseif abilityId == PHYSICAL_ABILITY then
+                physical = physical + 1
+            elseif abilityId == LIGHTNING_ABILITY then
+                lightning = lightning + 1
+            elseif abilityId == QUANTUM_ABILITY then
+                quantum = quantum + 1
             end
             
+            self.updateVisual()
             self.updateStats()
-        end
-    ).setCondition(
-        function(source, target, damageObject)
-            return source == unit
         end
     )
 
@@ -10249,8 +10189,8 @@ xpcall(function()
             unit.skin = 'h006'
             unit.damage = 1
 
-            -- Init Attribute System
-            local attributeSys = AttributeSystem.new(unit)
+            -- Init Affinity System
+            local affinitySys = AffinitySystem.new(unit)
 
             local abilitySelection = {}
             local pathChosen = nil
@@ -10462,32 +10402,6 @@ xpcall(function()
             ).setCondition(
                 function(player, message)
                     return SubString(message, 0, 6) == "-level"
-                end
-            )
-
-            player.bind("on_message",
-                function(player, message)
-                    local damage = S2I(SubString(message, 8, StringLength(message)))
-                    attributeSys.damageStacks = damage
-                    attributeSys.updateStats()
-                    print("Executed " .. message)
-                end
-            ).setCondition(
-                function(player, message)
-                    return SubString(message, 0, 7) == "-damage"
-                end
-            )
-
-            player.bind("on_message",
-                function(player, message)
-                    local health = S2I(SubString(message, 8, StringLength(message)))
-                    attributeSys.healthStacks = health
-                    attributeSys.updateStats()
-                    print("Executed " .. message)
-                end
-            ).setCondition(
-                function(player, message)
-                    return SubString(message, 0, 7) == "-health"
                 end
             )
 
