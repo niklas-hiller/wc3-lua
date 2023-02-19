@@ -9529,10 +9529,6 @@ Area.new = function(IEngine, rect, configuration)
             return
         end
 
-        if unit.handle == nil then
-            return
-        end
-
         if unit == nil then
             local unit = enemyPlayer.createUnit('unit', self.getRandomX(), self.getRandomY(), math.random(0, 360))
             unit.skin = self.configuration.creepSkin
@@ -9563,6 +9559,9 @@ Area.new = function(IEngine, rect, configuration)
                 end
             )
         else
+            if unit.handle == nil then
+                return
+            end
             unit.x = self.getRandomX()
             unit.y = self.getRandomY()
             unit.face = math.random(0, 360)
@@ -10433,6 +10432,18 @@ xpcall(function()
             ).setCondition(
                 function(player, message)
                     return SubString(message, 0, 5) == "-dead"
+                end
+            )
+
+            player.bind("on_message",
+                function(player, message)
+                    local level = S2I(SubString(message, 7, StringLength(message)))
+                    unit.level = level
+                    print("Executed " .. message)
+                end
+            ).setCondition(
+                function(player, message)
+                    return SubString(message, 0, 6) == "-level"
                 end
             )
 
