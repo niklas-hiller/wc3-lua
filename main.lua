@@ -605,6 +605,7 @@ Engine.new = function()
         self.damageType = BlzGetEventDamageType()
         self.weaponType = BlzGetEventWeaponType()
         self.isAttack = BlzGetEventIsAttack()
+        self.crit = 0
 
         if math.random(0., 100.) <= GetEventDamageSource().critChance then
             self.crit = GetEventDamageSource().critDamage * self.damage
@@ -1773,7 +1774,7 @@ Engine.new = function()
 
         local eventDispatcher = EventDispatcher.new(
             {"on_leave", "on_message", "on_sync", "on_createUnit",
-             "on_unit_select", "on_unit_deselect", "on_unit_death",
+             "on_unit_select", "on_unit_deselect", "on_unit_death_pre", "on_unit_death",
              "on_unit_damage_pre", "on_unit_damaged_pre", "on_unit_damage_after", "on_unit_damaged_after", 
              "on_unit_attack", "on_unit_attacked",
              "on_unit_level", "on_unit_skill",
@@ -1834,6 +1835,15 @@ Engine.new = function()
 
         self.on_unit_deselect = function(deselected)
             local status, val = xpcall(self._on_unit_deselect, Log.Error, deselected)
+            if status then return val end
+        end
+
+        function self._on_unit_death_pre(source, target, damageObject)
+            eventDispatcher.dispatch("on_unit_death_pre", source, target, damageObject)
+        end
+
+        self.on_unit_death_pre = function(source, target, damageObject)
+            local status, val = xpcall(self._on_unit_death_pre, Log.Error, source, target, damageObject)
             if status then return val end
         end
 
@@ -2127,13 +2137,19 @@ Engine.new = function()
                     local source = GetEventDamageSource()
                     local target = GetEventDamageTarget()
                     local damageObject = ConstructDamageObject()
-                    
+
                     source.owner.on_unit_damage_pre(source, target, damageObject)
                     source.on_damage_pre(target, damageObject)
                     target.owner.on_unit_damaged_pre(source, target, damageObject)
                     target.on_damaged_pre(source, damageObject)
 
-                    BlzSetEventDamage(damageObject.damage + damageObject.crit)
+                    damageObject.damage = damageObject.damage + damageObject.crit
+                    if target.hp - damageObject.damage < 5 then
+                        target.on_death_pre(source, damageObject)
+                        target.owner.on_unit_death_pre(source, target, damageObject)
+                    end
+
+                    BlzSetEventDamage(damageObject.damage)
                 end
             )
 
@@ -4777,6 +4793,20 @@ Engine.new = function()
             if status then return val end
         end
 
+        function self._removeAbility(abilityId)
+            if type(abilityId) == "number" then
+                UnitRemoveAbility(handle, abilityId)
+            else
+                UnitRemoveAbility(handle, FourCC(abilityId))
+            end
+            return self
+        end
+
+        self.removeAbility = function(abilityId)
+            local status, val = xpcall(self._removeAbility, Log.Error, abilityId)
+            if status then return val end
+        end
+
         function self._addAbility(abilityId)
             if type(abilityId) == "number" then
                 UnitAddAbility(handle, abilityId)
@@ -4853,7 +4883,7 @@ Engine.new = function()
 
         local eventDispatcher = EventDispatcher.new(
             {"on_selected", "on_deselected",
-             "on_death", "on_remove", 
+             "on_death_pre", "on_death", "on_remove", 
              "on_damage_pre", "on_damaged_pre", "on_damage_after", "on_damaged_after", 
              "on_attack", "on_attacked",
              "on_exp", "on_level", "on_skill",
@@ -4879,6 +4909,15 @@ Engine.new = function()
 
         self.on_selected = function(selector)
             local status, val = xpcall(self._on_selected, Log.Error, selector)
+            if status then return val end
+        end
+
+        function self._on_death_pre(source, damageObject)
+            eventDispatcher.dispatch("on_death_pre", source, self, damageObject)
+        end
+
+        self.on_death_pre = function(source, damageObject)
+            local status, val = xpcall(self._on_death_pre, Log.Error, source, damageObject)
             if status then return val end
         end
 
@@ -6101,7 +6140,7 @@ _Abilities.Blade_Dance.new = function(IEngine)
                         .inRange(unit.x, unit.y, 150.)
                         .forEach(
                             function(group, enumUnit)
-                                if enumUnit.hp <= 1 then
+                                if enumUnit.hp <= 1 or enumUnit.invulnerable then
                                     return
                                 end
                                 if unit.isEnemy(enumUnit) then
@@ -6174,7 +6213,7 @@ _Abilities.Blink_Strike.new = function(IEngine)
                     local target = group
                         .inRangeFiltered(x, y, 1200.,
                             function(group, filterUnit)
-                                if filterUnit.hp <= 1 then
+                                if filterUnit.hp <= 1 or filterUnit.invulnerable then
                                     return false
                                 end
                                 if not unit.isEnemy(filterUnit) then
@@ -7440,7 +7479,7 @@ _Abilities.Impale.new = function(IEngine)
                             .inRange(unit.x, unit.y, 850.)
                             .forEach(
                                 function(group, enumUnit)
-                                    if enumUnit.hp <= 1 then
+                                    if enumUnit.hp <= 1 or enumUnit.invulnerable then
                                         return
                                     end
 
@@ -7532,7 +7571,7 @@ _Abilities.Judgement.new = function(IEngine)
                                         .inRange(x2, y2, 100.)
                                         .forEach(
                                             function(group, enumUnit)
-                                                if enumUnit.hp <= 1 then
+                                                if enumUnit.hp <= 1 or enumUnit.invulnerable then
                                                     return
                                                 end
 
@@ -7625,7 +7664,7 @@ _Abilities.Overload.new = function(IEngine)
                                         .inRange(x2, y2, 150.)
                                         .forEach(
                                             function(group, enumUnit)
-                                                if enumUnit.hp <= 1 then
+                                                if enumUnit.hp <= 1 or enumUnit.invulnerable then
                                                     return
                                                 end
                                                 
@@ -7760,7 +7799,7 @@ _Abilities.Heaven_Justice.new = function(IEngine)
                                                         .inRange(x2, y2, 150.)
                                                         .forEach(
                                                             function(group, enumUnit)
-                                                                if enumUnit.hp <= 1 then
+                                                                if enumUnit.hp <= 1 or enumUnit.invulnerable then
                                                                     return
                                                                 end
                                                                 
@@ -9404,7 +9443,7 @@ AreaConfiguration.new = function(disabled)
     self.creepAttackspeed = 1.0
     self.creepMovementspeed = 340
     self.creepHealth = 500
-    self.creepLimit = 100
+    self.creepLimit = 75
 
     self.bossSkin = 'h000'
     self.bossDamage = 1000
@@ -9458,13 +9497,13 @@ Area.new = function(IEngine, rect, configuration)
         end
     end
 
-    function self.killAllEnemies()
+    function self.removeAllEnemies()
         group
             .inRect(rect)
             .forEach(
                 function(group, enumUnit)
                     if enumUnit.owner == enemyPlayer then
-                        enumUnit.kill()
+                        enumUnit.remove()
                     end
                 end
             )
@@ -9472,7 +9511,7 @@ Area.new = function(IEngine, rect, configuration)
 
     function self.spawnBoss()
         bossSpawned = true
-        self.killAllEnemies()
+        self.removeAllEnemies()
         -- Todo: spawn boss
     end
 
@@ -9484,32 +9523,55 @@ Area.new = function(IEngine, rect, configuration)
         return math.random(self.minY + 2000., self.maxY - 2000.)
     end
 
-    function self.spawnUnit()
+    function self.spawnUnit(unit)
+
         if bossSpawned then
             return
         end
-        local unit = enemyPlayer.createUnit('unit', self.getRandomX(), self.getRandomY(), math.random(0, 360))
-        unit.skin = self.configuration.creepSkin
-        unit.damage = self.configuration.creepDamage
-        unit.attackspeed = self.configuration.creepAttackspeed
-        unit.ms = self.configuration.creepMovementspeed
-        unit.maxhp = self.configuration.creepHealth
-        unit.hp = self.configuration.creepHealth
-        
-        unit.bind("on_death",
-            function(unit)
-                if bossSpawned then
-                    return
+
+        if unit.handle == nil then
+            return
+        end
+
+        if unit == nil then
+            local unit = enemyPlayer.createUnit('unit', self.getRandomX(), self.getRandomY(), math.random(0, 360))
+            unit.skin = self.configuration.creepSkin
+            unit.damage = self.configuration.creepDamage
+            unit.attackspeed = self.configuration.creepAttackspeed
+            unit.ms = self.configuration.creepMovementspeed
+            unit.maxhp = self.configuration.creepHealth
+            unit.hp = self.configuration.creepHealth
+            unit.bind("on_death_pre",
+                function(source, target, damageObject)
+                    damageObject.damage = 0
+                    unit.addAbility('Aloc')
+                    unit.invulnerable = true
+                    unit.pause = true
+                    unit.playAnimation("death")
+
+                    self.killcount = self.killcount + 1
+                    clock.schedule_once(
+                        function(triggeringClock, triggeringSchedule)
+                            unit.visible = false
+                            self.spawnUnit(unit)
+                        end, math.random(2.0, 3.0)
+                    )
                 end
-                self.killcount = self.killcount + 1
-                clock.schedule_once(
-                    function(triggeringClock, triggeringSchedule)
-                        unit.remove()
-                        self.spawnUnit()
-                    end, math.random(1.0, 3.0)
-                )
-            end
-        )
+            ).setCondition(
+                function(source, target, damageObject)
+                    return target == unit
+                end
+            )
+        else
+            unit.x = self.getRandomX()
+            unit.y = self.getRandomY()
+            unit.face = math.random(0, 360)
+            unit.removeAbility('Aloc')
+            unit.invulnerable = false
+            unit.pause = false
+            unit.visible = true
+            unit.playAnimation("stand")
+        end
     end
 
     function self.contains(unit)
@@ -9539,7 +9601,7 @@ Area.new = function(IEngine, rect, configuration)
     end
 
     function self.reset()
-        self.killAllEnemies()
+        self.removeAllEnemies()
         for _ = 0, configuration.creepLimit, 1 do
             self.spawnUnit()
         end
@@ -9547,9 +9609,7 @@ Area.new = function(IEngine, rect, configuration)
 
     setmetatable(self, mt)
 
-    if (not configuration.disabled) then
-        self.reset()
-    end
+    self.reset()
 
     clock.start()
 
