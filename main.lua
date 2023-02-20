@@ -9867,9 +9867,16 @@ AffinitySystem.new = function(IEngine, unit)
     local quantumShieldCooldown = false
     unit.bind("on_damaged_pre",
         function(source, target, damageObject)
+            -- Armor reduces damage by 1 per point (minimum 2 damage)
+            if damageObject.damage - target.armor < 2 then
+                damageObject.damage = 2
+            else
+                damageObject.damage = damageObject.damage - target.armor
+            end
             if quantumShieldCooldown then
                 return
             end
+            -- Mana is the Quantum Shield
             if target.maxmp > 0 then
                 if damageObject.damage > target.mp then
                     damageObject.damage = damageObject.damage - target.mp
