@@ -9458,10 +9458,10 @@ AreaConfiguration.new = function(disabled, skin, level, damage, health, xp)
     self.disabled = disabled or false
     self.creepSkin = skin
     self.creepLevel = level -- 1 | 20 | 35 | 50 | 65 | 80 Wenn Hero Level < Unit Level - 5 dann keine EXP! ; Maximal 20 Level über Creep, sonst keine XP
-    self.creepDamage = damage -- 5 | 36 | 600 | 12.000 | 275.000 | 4.000.000
-    self.creepAttackspeed = 1.0
-    self.creepMovementspeed = 340
-    self.creepHealth = health -- 50 | 750 | 12.500 | 275.000 | 3.500.000 | 27.500.000
+    self.creepDamage = damage -- 10 | 65 | 175 | 290 | 450 | 875
+    self.creepAttackspeed = 0.9 + 0.005 * level
+    self.creepMovementspeed = 340 + level
+    self.creepHealth = health -- 50 | 487.5 | 1.750 | 3.625 | 6.750 | 17.500
     self.creepArmor = 0
     self.creepLimit = 75
     self.creepXP = xp -- 5 | 20 | 60 | 450 | 2500 | 20000
@@ -9710,6 +9710,8 @@ AffinitySystem.new = function(IEngine, unit)
             while unit.skillPoints < skillPoints do
                 UnitModifySkillPoints(unit.handle, 1)
             end
+            self.updateVisual()
+            self.updateAffinities()
         end
     )
 
@@ -10218,12 +10220,12 @@ xpcall(function()
     end
 
     local areaConfigurations = {
-        [1] = AreaConfiguration.new(false, 'h007', 1, 5, 50, 5),
-        [2] = AreaConfiguration.new(true, 'h007', 20, 36, 750, 20),
-        [3] = AreaConfiguration.new(true, 'h007', 35, 600, 12500, 60),
-        [4] = AreaConfiguration.new(true, 'h007', 50, 12000, 275000, 450),
-        [5] = AreaConfiguration.new(true, 'h007', 65, 275000, 3500000, 2500),
-        [6] = AreaConfiguration.new(true, 'h007', 80, 4000000, 27500000, 20000)
+        [1] = AreaConfiguration.new(false, 'h007', 1, 10, 50, 5),
+        [2] = AreaConfiguration.new(true, 'h008', 20, 65, 490, 20),
+        [3] = AreaConfiguration.new(true, 'h009', 35, 175, 1750, 60),
+        [4] = AreaConfiguration.new(true, 'h00A', 50, 290, 3625, 450),
+        [5] = AreaConfiguration.new(true, 'h00B', 65, 450, 6750, 2500),
+        [6] = AreaConfiguration.new(true, 'h00C', 80, 875, 17500, 20000)
     }
 
     local areas = {
