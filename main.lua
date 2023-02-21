@@ -10224,7 +10224,7 @@ do
     
             local areaConfigurations = {
                 --                                   Skin    Level      ATK        HP      XP
-                [1] = AreaConfiguration.new(false,  'h007',      1,       1,       50,      5),   -- ATK: 10  | HP: 50
+                [1] = AreaConfiguration.new(false,  'h007',      1,      10,       50,      5),   -- ATK: 10  | HP: 50
                 [2] = AreaConfiguration.new(true,   'h008',     20,      65,     3850,     20),   -- ATK: 65  | HP: 3850
                 [3] = AreaConfiguration.new(true,   'h009',     35,     175,     8750,     60),   -- ATK: 175 | HP: 8750
                 [4] = AreaConfiguration.new(true,   'h00A',     50,     290,    14750,    450),   -- ATK: 290 | HP: 14750
