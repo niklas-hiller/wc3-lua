@@ -9532,17 +9532,19 @@ Area.new = function(IEngine, rect, configuration, onFirstBossDeath)
             )
     end
 
-    function self.spawnBoss()
-        bossSpawned = true
-        self.removeAllEnemies()
-        
-        -- Todo: spawn boss
-
-        -- For testing, normally only after boss death
+    function self.boss_death()
         if firstDeath then
             firstDeath = false
             self.onFirstBossDeath()
         end
+    end
+
+    function self.spawnBoss()
+        bossSpawned = true
+        killcount = 0
+        self.removeAllEnemies()
+        
+        -- Todo: spawn boss
     end
 
     function self.getRandomX()
@@ -10220,47 +10222,48 @@ xpcall(function()
     end
 
     local areaConfigurations = {
-        [1] = AreaConfiguration.new(false, 'h007', 1, 10, 50, 5),
-        [2] = AreaConfiguration.new(true, 'h008', 20, 65, 490, 20),
-        [3] = AreaConfiguration.new(true, 'h009', 35, 175, 1750, 60),
-        [4] = AreaConfiguration.new(true, 'h00A', 50, 290, 3625, 450),
-        [5] = AreaConfiguration.new(true, 'h00B', 65, 450, 6750, 2500),
-        [6] = AreaConfiguration.new(true, 'h00C', 80, 875, 17500, 20000)
+        --                                  Skin     Level      ATK        HP      XP
+        [1] = AreaConfiguration.new(false,  'h007',      1,       1,       50,      5),   -- ATK: 10  | HP: 50
+        [2] = AreaConfiguration.new(true,   'h008',     20,      65,     3850,     20),   -- ATK: 65  | HP: 3850
+        [3] = AreaConfiguration.new(true,   'h009',     35,     175,     8750,     60),   -- ATK: 175 | HP: 8750
+        [4] = AreaConfiguration.new(true,   'h00A',     50,     290,    14750,    450),   -- ATK: 290 | HP: 14750
+        [5] = AreaConfiguration.new(true,   'h00B',     65,     450,    31250,   2500),   -- ATK: 450 | HP: 31250
+        [6] = AreaConfiguration.new(true,   'h00C',     80,     875,    78500,  20000)    -- ATK: 875 | HP: 78500
     }
 
     local areas = {
         ['I000'] = Area.new(Framework, gg_rct_Bottom_Left_Room_BL, areaConfigurations[1],
             function()
                 print("The Boss of Area 1 was defeated! Players can now enter the second area!")
-                areaConfigurations[2].configuration.disabled = false
+                areaConfigurations[2].disabled = false
                 orbs[1].visible = true
             end
         ),
         ['I001'] = Area.new(Framework, gg_rct_Bottom_Left_Room_BR, areaConfigurations[2],
             function()
                 print("The Boss of Area 2 was defeated! Players can now enter the third area!")
-                areaConfigurations[3].configuration.disabled = false
+                areaConfigurations[3].disabled = false
                 orbs[2].visible = true
             end
         ),
         ['I002'] = Area.new(Framework, gg_rct_Bottom_Left_Room_TL, areaConfigurations[3],
             function()
                 print("The Boss of Area 3 was defeated! Players can now enter the fourth area!")
-                areaConfigurations[4].configuration.disabled = false
+                areaConfigurations[4].disabled = false
                 orbs[3].visible = true
             end
         ),
         ['I003'] = Area.new(Framework, gg_rct_Bottom_Right_Room_BL, areaConfigurations[4],
             function()
                 print("The Boss of Area 4 was defeated! Players can now enter the fifth area!")
-                areaConfigurations[5].configuration.disabled = false
+                areaConfigurations[5].disabled = false
                 orbs[4].visible = true
             end
         ),
         ['I004'] = Area.new(Framework, gg_rct_Bottom_Right_Room_BR, areaConfigurations[5],
             function()
                 print("The Boss of Area 5 was defeated! Players can now enter the sixth area!")
-                areaConfigurations[6].configuration.disabled = false
+                areaConfigurations[6].disabled = false
                 orbs[5].visible = true
             end
         ),
@@ -10482,17 +10485,17 @@ xpcall(function()
                 function(player, message)
                     local whichAbility = StringCase(SubString(message, 6, StringLength(message)), false)
                     if whichAbility == '1' then
-                        orbs[1].visible = true
+                        areas['I000'].boss_death()
                     elseif whichAbility == '2' then
-                        orbs[2].visible = true
+                        areas['I001'].boss_death()
                     elseif whichAbility == '3' then
-                        orbs[3].visible = true
+                        areas['I002'].boss_death()
                     elseif whichAbility == '4' then
-                        orbs[4].visible = true
+                        areas['I003'].boss_death()
                     elseif whichAbility == '5' then
-                        orbs[5].visible = true
+                        areas['I004'].boss_death()
                     elseif whichAbility == '6' then
-                        orbs[6].visible = true
+                        areas['I005'].boss_death()
                     end
                     print("Executed " .. message)
                 end
