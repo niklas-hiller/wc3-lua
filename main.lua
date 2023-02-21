@@ -85,18 +85,6 @@ Framework.new = function()
                     end
                 end
 
-                -- TimerStart(CreateTimer(), 0., false, 
-                --     function()
-                --         print("Loaded " .. #transients + #singletons + #multitons .. " modules.")
-                --         for _, module in ipairs(loadedModules) do
-                --             print("   - " .. module.name)
-                --         end
-                --         for _, task in ipairs(scheduled) do
-                --             task(Interface)
-                --         end
-                --     end
-                -- )
-
                 return Runner.new(Interface, scheduled)
             end
 
@@ -5765,72 +5753,6 @@ Framework.new = function()
     --         )
     --     )
     -- end
-
-    -- Interface [Object API]
-    -- local IFramework = {}
-    -- IFramework.Trigger = Interface.Trigger
-    -- IFramework.EventDispatcher = Interface.EventDispatcher
-    -- IFramework.Effect = Interface.Effect
-    -- IFramework.Player = Interface.Player
-    -- IFramework.Easing = Interface.Easing
-    -- IFramework.Window = Interface.Window
-    -- IFramework.Clock = Interface.Clock
-    -- IFramework.SoundLoader = Interface.SoundLoader
-    -- IFramework.Unit = function(player, unitId, x, y, face)
-    --     local status, val = xpcall(Interface.Unit, Interface.Log.Error, player.createUnit(unitId, x, y, face))
-    --     if status then return val end
-    -- end
-    -- IFramework.Log = Interface.Log
-    -- IFramework.Configuration = Interface.Configuration
-    -- IFramework.Group = Interface.Group
-    -- IFramework.Terrain = Interface.Terrain
-    -- IFramework.Item = Item.new
-
-    -- Interface [Unit API]
-    -- IFramework.GetTriggerUnit = GetTriggerUnit
-    -- IFramework.GetAttacker = GetAttacker
-    -- IFramework.GetFilterUnit = GetFilterUnit
-    -- IFramework.GetSpellTargetUnit = GetSpellTargetUnit
-    -- IFramework.GetManipulatedItem = GetManipulatedItem
-    -- IFramework.GetFilterItem = GetFilterItem
-    -- IFramework.GetTriggerPlayer = GetTriggerPlayer
-    -- IFramework.GetItemPlayer = GetItemPlayer
-    -- IFramework.GetEventDamageSource = GetEventDamageSource
-    -- IFramework.GetEventDamageTarget = GetEventDamageTarget
-    -- IFramework.GetOwningPlayer = GetOwningPlayer
-    -- IFramework.FirstOfGroup = FirstOfGroup
-    -- IFramework.GetEnumUnit = GetEnumUnit
-    -- IFramework.GetEnteringUnit = GetEnteringUnit
-    -- IFramework.GetLeavingUnit = GetLeavingUnit
-    -- IFramework.GetLevelingUnit = GetLevelingUnit
-    -- IFramework.GetLearningUnit = GetLearningUnit
-    -- IFramework.GetRevivableUnit = GetRevivableUnit
-    -- IFramework.GetRevivingUnit = GetRevivingUnit
-    -- IFramework.GetRescuer = GetRescuer
-    -- IFramework.GetDyingUnit = GetDyingUnit
-    -- IFramework.GetKillingUnit = GetKillingUnit
-    -- IFramework.GetDecayingUnit = GetDecayingUnit
-    -- IFramework.GetSelectedUnit = GetSelectedUnit
-    -- IFramework.GetConstructingStructure = GetConstructingStructure
-    -- IFramework.GetCancelledStructure = GetCancelledStructure
-    -- IFramework.GetConstructedStructure = GetConstructedStructure
-    -- IFramework.GetResearchingUnit = GetResearchingUnit
-    -- IFramework.GetTrainedUnit = GetTrainedUnit
-    -- IFramework.GetDetectedUnit = GetDetectedUnit
-    -- IFramework.GetSummoningUnit = GetSummoningUnit
-    -- IFramework.GetSummonedUnit = GetSummonedUnit
-    -- IFramework.GetTransportUnit = GetTransportUnit
-    -- IFramework.GetLoadedUnit = GetLoadedUnit
-    -- IFramework.GetSellingUnit = GetSellingUnit
-    -- IFramework.GetSoldUnit = GetSoldUnit
-    -- IFramework.GetBuyingUnit = GetBuyingUnit
-    -- IFramework.GetChangingUnit = GetChangingUnit
-    -- IFramework.GetManipulatingUnit = GetManipulatingUnit
-    -- IFramework.GetOrderedUnit = GetOrderedUnit
-    -- IFramework.GetOrderTargetUnit = GetOrderTargetUnit
-    -- IFramework.GetSpellAbilityUnit = GetSpellAbilityUnit
-    -- IFramework.GetEventTargetUnit = GetEventTargetUnit
-    -- IFramework.BlzGroupUnitAt = BlzGroupUnitAt
 
     return Initializer
 
