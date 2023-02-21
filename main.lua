@@ -10248,7 +10248,7 @@ xpcall(function()
     end
 
     local areaConfigurations = {
-        --                                  Skin     Level      ATK        HP      XP
+        --                                   Skin    Level      ATK        HP      XP
         [1] = AreaConfiguration.new(false,  'h007',      1,       1,       50,      5),   -- ATK: 10  | HP: 50
         [2] = AreaConfiguration.new(true,   'h008',     20,      65,     3850,     20),   -- ATK: 65  | HP: 3850
         [3] = AreaConfiguration.new(true,   'h009',     35,     175,     8750,     60),   -- ATK: 175 | HP: 8750
@@ -10295,7 +10295,7 @@ xpcall(function()
         ),
         ['I005'] = Area.new(Framework, gg_rct_Bottom_Right_Room_TR, areaConfigurations[6],
             function()
-                print("The Boss of Area 6 was defeated! A mysterious space rift opened!")
+                print("The Boss of Area 6 was defeated! A mysterious space rift (not) opened! (Not implemented yet)")
                 orbs[6].visible = true
             end
         )
@@ -10315,7 +10315,6 @@ xpcall(function()
                 player.startPositionX + change, player.startPositionY + change, 
                 player.startPositionX + change, player.startPositionY - change
             )
-            player.setCameraField(CAMERA_FIELD_TARGET_DISTANCE, 2250., 0.)
 
             -- Prepare Player Unit
             local rad = pId * (math.pi * 2 / MAX_PLAYERS)
