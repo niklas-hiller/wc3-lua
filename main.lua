@@ -32,6 +32,7 @@ Engine.new = function()
     local EventDispatcher = {}
     local Easing = {}
     local Camera = {}
+    local Terrain = {}
 
     -- Engine Logger
     local LOG_LEVEL = {
@@ -3880,6 +3881,20 @@ Engine.new = function()
 
     local Window = _Window.new()
 
+    -- Engine Terrain
+    do
+        local function truncate(x)
+            return math.floor(x*100)/100
+        end
+
+        local item = CreateItem(FourCC('IDUM'), 0., 0.)
+        Terrain = {}
+        Terrain.isPathable = function(x, y)
+            SetItemPosition(item, x, y)
+            return truncate(GetWidgetX(item)) == truncate(x) and truncate(GetWidgetY(item)) == truncate(y)
+        end
+    end
+
     
     -- Engine Clock
     _Clock.new = function()
@@ -5601,16 +5616,16 @@ Engine.new = function()
     end
 
     -- Delete pre-placed items
-    do
-        EnumItemsInRect(GetWorldBounds(), 
-            Filter(
-                function()
-                    RemoveItem(_GetFilterItem())
-                    -- _Item.new(_GetFilterItem())
-                end
-            )
-        )
-    end
+    -- do
+    --     EnumItemsInRect(GetWorldBounds(), 
+    --         Filter(
+    --             function()
+    --                 RemoveItem(_GetFilterItem())
+    --                 -- _Item.new(_GetFilterItem())
+    --             end
+    --         )
+    --     )
+    -- end
 
 
     -- Capture default creationg functions
@@ -5716,6 +5731,7 @@ Engine.new = function()
     IEngine.Log = Log
     IEngine.Configuration = Configuration
     IEngine.Group = Group.new
+    IEngine.Terrain = Terrain
     -- IEngine.Item = Item.new
 
     -- Interface [Unit API]
@@ -6010,7 +6026,7 @@ _Abilities.Dodge.new = function(IEngine)
                     )
                     eventHolder.clock.schedule_interval(
                         function(triggeringClock, triggeringSchedule)
-                            local tempUnit = source.owner.createUnit('hpea', unit.x, unit.y, bj_RADTODEG * a)
+                            local tempUnit = source.owner.createUnit('unit', unit.x, unit.y, bj_RADTODEG * a)
                             tempUnit.skin = source.skin
                             tempUnit.addAbility('Aloc')
                             tempUnit.setVertexColor(55, 55, 55, 65)
@@ -6025,10 +6041,20 @@ _Abilities.Dodge.new = function(IEngine)
                             traveledDistance = traveledDistance + speed
                             if traveledDistance >= distance * 0.25 and traveledDistance < distance * 0.5 then
                                 traveledDistance = distance * 0.75
-                                unit.teleportTo(unit.x + (distance * 0.5) * math.cos(a), unit.y + (distance * 0.5) * math.sin(a))
+                                local newX = unit.x + (distance * 0.5) * math.cos(a)
+                                local newY = unit.y + (distance * 0.5) * math.sin(a)
+                                if IEngine.Terrain.isPathable(newX, newY) then
+                                    unit.teleportTo(newX, newY)
+                                else
+                                    unit.teleportTo(unit.x, unit.y)
+                                end
                             else
-                                unit.x = unit.x + speed * math.cos(a)
-                                unit.y = unit.y + speed * math.sin(a)
+                                local newX = unit.x + speed * math.cos(a)
+                                local newY = unit.y + speed * math.sin(a)
+                                if IEngine.Terrain.isPathable(newX, newY) then
+                                    unit.x = newX
+                                    unit.y = newY
+                                end
                             end
                             -- -0.5 because of error range
                             if traveledDistance >= distance - 0.5 then
@@ -7766,7 +7792,7 @@ _Abilities.Heaven_Justice.new = function(IEngine)
                     auraEffect.y = y
                     auraEffect.scale = 1.0
                     auraEffect.create()
-                    local angelUnit = unit.owner.createUnit('hpea', x, y, 270.)
+                    local angelUnit = unit.owner.createUnit('unit', x, y, 270.)
                     angelUnit.skin = 'h00D'
                     angelUnit.addAbility('Aloc')
                     angelUnit.playAnimation("birth")
