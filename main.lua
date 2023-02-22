@@ -1820,10 +1820,10 @@ Framework.new = function()
                     local part = {}
                     local current = 0
                     local totalSync = 0
-                    while StringLength(data) > 0 do
-                        if StringLength(data) > 180 then
+                    while string.len(data) > 0 do
+                        if string.len(data) > 180 then
                             part[current] = SubString(data, 0, 180)
-                            data = SubString(data, 180, StringLength(data))
+                            data = SubString(data, 180, string.len(data))
                         else
                             part[current] = data
                             data = ""
@@ -2132,7 +2132,7 @@ Framework.new = function()
                         local data = ""
                         local part = 0
                         local total = 0
-                        for current = 0, StringLength(raw) do
+                        for current = 0, string.len(raw) do
                             if SubString(raw, current, current + 2) == "id" then
                                 current = current + 4
                                 local infoStart = current
@@ -2462,7 +2462,7 @@ Framework.new = function()
                 if progress < 0.5 then
                     return 2. * progress * progress
                 else
-                    return 1. - Pow(-2. * progress + 2., 2.) / 2.
+                    return 1. - ((-2. * progress + 2.) ^ 2.) / 2.
                 end
             end
 
@@ -2471,14 +2471,14 @@ Framework.new = function()
             end
 
             self.out_cubic = function(progress)
-                return 1. - Pow(1. - progress, 3.)
+                return 1. - ((1. - progress) ^ 3.)
             end
 
             self.in_out_cubic = function(progress)
                 if progress < 0.5 then
                     return 4. * progress * progress * progress
                 else
-                    return 1. - Pow(-2. * progress + 2., 3.) / 2.
+                    return 1. - ((-2. * progress + 2.) ^ 3.) / 2.
                 end
             end
 
@@ -2487,14 +2487,14 @@ Framework.new = function()
             end
 
             self.out_quart = function(progress)
-                return 1. - Pow(1. - progress, 4.)
+                return 1. - ((1. - progress) ^ 4.)
             end
 
             self.in_out_quart = function(progress)
                 if progress < 0.5 then
                     return 8. * progress * progress * progress * progress
                 else
-                    return 1. - Pow(-2. * progress + 2., 4.) / 2.
+                    return 1. - ((-2. * progress + 2.) ^ 4.) / 2.
                 end
             end
 
@@ -2503,14 +2503,14 @@ Framework.new = function()
             end
 
             self.out_quint = function(progress)
-                return 1. - Pow(1. - progress, 5.)
+                return 1. - ((1. - progress) ^ 5.)
             end
 
             self.in_out_quint = function(progress)
                 if progress < 0.5 then
                     return 16. * progress * progress * progress * progress * progress
                 else
-                    return 1. - Pow(-2. * progress + 2., 5.) / 2.
+                    return 1. - ((-2. * progress + 2.) ^ 5.) / 2.
                 end
             end
 
@@ -2518,7 +2518,7 @@ Framework.new = function()
                 if progress == 0. then
                     return 0.
                 else
-                    return Pow(2., 10. * progress - 10.)
+                    return (2. ^ (10. * progress - 10.))
                 end
             end
 
@@ -2526,7 +2526,7 @@ Framework.new = function()
                 if progress == 1. then
                     return 1.
                 else
-                    return 1. - Pow(2., -10. * progress)
+                    return 1. - (2. ^ (-10. * progress))
                 end
             end
 
@@ -2536,88 +2536,88 @@ Framework.new = function()
                 elseif progress == 1. then
                     return 1.
                 elseif progress < 0.5 then
-                    return Pow(2., 20. * progress - 10.) / 2.
+                    return (2. ^ (20. * progress - 10.)) / 2.
                 else
-                    return (2. - Pow(2., -20. * progress + 10.)) / 2.
+                    return (2. - (2. ^ (-20. * progress + 10.))) / 2.
                 end
             end
 
             self.in_circ = function(progress)
-                return 1. - math.sqrt(1. - Pow(progress, 2.))
+                return 1. - math.sqrt(1. - (progress ^ 2.))
             end
 
             self.out_circ = function(progress)
-                return math.sqrt(1. - Pow(progress - 1., 2.))
+                return math.sqrt(1. - ((progress - 1.) ^ 2.))
             end
 
             self.in_out_circ = function(progress)
                 if progress < 0.5 then
-                    return (1. - math.sqrt(1. - Pow(2. * progress, 2.))) / 2.
+                    return (1. - math.sqrt(1. - ((2. * progress) ^ 2.))) / 2.
                 else
-                    return (math.sqrt(1. - Pow(-2. * progress + 2., 2.)) + 1.) / 2.
+                    return (math.sqrt(1. - ((-2. * progress + 2.) ^ 2.)) + 1.) / 2.
                 end
             end
 
             self.in_back = function(progress)
-            local c1 = 1.70158
-            local c3 = c1 + 1.
+                local c1 = 1.70158
+                local c3 = c1 + 1.
 
                 return c3 * progress * progress * progress - c1 * progress * progress
             end
 
             self.out_back = function(progress)
-            local c1 = 1.70158
-            local c3 = c1 + 1.
+                local c1 = 1.70158
+                local c3 = c1 + 1.
 
-                return 1. + c3 * Pow(progress - 1., 3.) + c1 * Pow(progress - 1., 2.)
+                return 1. + c3 * ((progress - 1.) ^ 3.) + c1 * ((progress - 1.) ^ 2.)
             end
 
             self.in_out_back = function(progress)
-            local c1 = 1.70158
-            local c2 = c1 * 1.525
+                local c1 = 1.70158
+                local c2 = c1 * 1.525
 
                 if progress < 0.5 then
-                    return (Pow(2. * progress, 2.) * ((c2 + 1.) * 2. * progress - c2)) / 2.
+                    return (((2. * progress) ^ 2.) * ((c2 + 1.) * 2. * progress - c2)) / 2.
                 else
-                    return (Pow(2. * progress - 2., 2.) * ((c2 + 1.) * (progress * 2. - 2.) + c2) + 2.) / 2.
+                    return (((2. * progress - 2.) ^ 2.) * ((c2 + 1.) * (progress * 2. - 2.) + c2) + 2.) / 2.
                 end
             end
 
             self.in_elastic = function(progress)
-            local c4 = (2. * math.pi) / 3.
+                local c4 = (2. * math.pi) / 3.
 
                 if progress == 0. then
                     return 0.
                 elseif progress == 1. then
                     return 1.
                 else
-                    return -Pow(2., 10. * progress - 10.) * math.sin((progress * 10. - 10.75) * c4)
+                    return -(2. ^ (10. * progress - 10.)) * math.sin((progress * 10. - 10.75) * c4)
                 end
             end
 
             self.out_elastic = function(progress)
-            local c4 = (2. * math.pi) / 3.
+                local c4 = (2. * math.pi) / 3.
 
                 if progress == 0. then
                     return 0.
                 elseif progress == 1. then
                     return 1.
                 else
-                    return Pow(2., -10. * progress) * math.sin((progress * 10. - 0.75) * c4) + 1.
+                    return (2. ^ (-10. * progress)) * math.sin((progress * 10. - 0.75) * c4) + 1.
                 end
             end
 
             self.in_out_elastic = function(progress)
-            local c5 = (2. * math.pi) / 4.5
+                local c5 = (2. * math.pi) / 4.5
 
                 if progress == 0. then
                     return 0.
                 elseif progress == 1. then
                     return 1.
                 elseif progress < 0.5 then
-                    return -(Pow(2., 20. * progress - 10.) * math.sin((20. * progress - 11.125) * c5)) / 2.
+                    return -((2. ^ (20. * progress - 10.)) * math.sin((20. * progress - 11.125) * c5)) / 2.
                 else
-                    return (Pow(2., -20. * progress + 10.) * math.sin((20. * progress - 11.125) * c5)) / 2. + 1.
+                    return ((2. ^ (-20. * progress + 10.)) * math.sin((20. * progress - 11.125) * c5)) / 2. + 1.
                 end
             end
 
@@ -2626,17 +2626,17 @@ Framework.new = function()
             end
 
             self.out_bounce = function(progress)
-            local n1 = 7.5625
-            local d1 = 2.75
+                local n1 = 7.5625
+                local d1 = 2.75
                 
                 if progress < 1. / d1 then
                     return n1 * progress * progress
                 elseif progress < 2. / d1 then
-                    return n1 * Pow(progress - 1.5 / d1, 2.) + 0.75
+                    return n1 * ((progress - 1.5 / d1) ^ 2.) + 0.75
                 elseif progress < 2.5 / d1 then
-                    return n1 * Pow(progress - 2.25 / d1, 2.) + 0.9375
+                    return n1 * ((progress - 2.25 / d1) ^ 2.) + 0.9375
                 else
-                    return n1 * Pow(progress - 2.625 / d1, 2.) + 0.984375
+                    return n1 * ((progress - 2.625 / d1) ^ 2.) + 0.984375
                 end
             end
 
@@ -4427,8 +4427,8 @@ Framework.new = function()
             local manualY = GetUnitY(handle)
             movementSpeedClock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
-                    self.x = self.x + (self.ms / 500) * math.cos(bj_DEGTORAD * self.face)
-                    self.y = self.y + (self.ms / 500) * math.sin(bj_DEGTORAD * self.face)
+                    self.x = self.x + (self.ms / 500) * math.cos(math.rad(self.face))
+                    self.y = self.y + (self.ms / 500) * math.sin(math.rad(self.face))
                 end, 0.002
             ).setCondition(
                 function(triggeringClock, triggeringSchedule)
@@ -4813,6 +4813,16 @@ Framework.new = function()
                 local status, val = xpcall(self._inGroup, Interface.Log.Error, group)
                 if status then return val end
             end
+
+            function self._interruptAttack()
+                BlzUnitInterruptAttack(handle)
+                return self
+            end
+
+            self.interruptAttack = function()
+                local status, val = xpcall(self._interruptAttack, Interface.Log.Error)
+                if status then return val end
+            end 
 
             function self._faceInstant(angle)
                 BlzSetUnitFacingEx(handle, angle)
@@ -5894,7 +5904,7 @@ _Abilities.Sword_Slash.new = function(IFramework)
         do
             eventHolder.event = unit.bind("on_damage_after",
                 function(source, target, attack)
-                    local rad = source.face * bj_DEGTORAD
+                    local rad = math.rad(source.face)
                     local x = source.x + 75. * math.cos(rad)
                     local y = source.y + 75. * math.sin(rad)
                     bladeEffect[source.owner.id].x = x
@@ -5994,7 +6004,7 @@ _Abilities.Dodge.new = function(IFramework)
                     end
                     local dashDuration = (distance / speed) * interval
                     local traveledDistance = 0
-                    source.faceInstant(bj_RADTODEG * (a))
+                    source.faceInstant(math.deg(a))
                     effect.x = unit.x
                     effect.y = unit.y
                     effect.z = unit.z
@@ -6013,7 +6023,7 @@ _Abilities.Dodge.new = function(IFramework)
                     )
                     eventHolder.clock.schedule_interval(
                         function(triggeringClock, triggeringSchedule)
-                            local tempUnit = source.owner.createUnit('unit', unit.x, unit.y, bj_RADTODEG * a)
+                            local tempUnit = source.owner.createUnit('unit', unit.x, unit.y, math.deg(a))
                             tempUnit.skin = source.skin
                             tempUnit.addAbility('Aloc')
                             tempUnit.setVertexColor(55, 55, 55, 65)
@@ -6266,7 +6276,7 @@ _Abilities.Blink_Strike.new = function(IFramework)
 
                     source.x = x4
                     source.y = y4
-                    source.faceInstant(bj_RADTODEG * (a + math.pi))
+                    source.faceInstant(math.deg(a + math.pi))
                     targetEffect.x = x4
                     targetEffect.y = y4
                     targetEffect.create().destroy()
@@ -6341,8 +6351,8 @@ _Abilities.Demon_Control.new = function(IFramework)
                         local cy = demonEffect.y
                         local cz = demonEffect.z
                         local a = unit.face + 180.
-                        local tx = unit.x + 95. * math.cos(bj_DEGTORAD * a)
-                        local ty = unit.y + 95. * math.sin(bj_DEGTORAD * a)
+                        local tx = unit.x + 95. * math.cos(math.rad(a))
+                        local ty = unit.y + 95. * math.sin(math.rad(a))
                         local tz = unit.z + 50.
                         local dx = tx - cx
                         local dy = ty - cy
@@ -6481,7 +6491,7 @@ _Abilities.Shadow_Strike.new = function(IFramework)
                     local y3 = y2 + 50 * math.sin(a)
                     a = a + math.pi
 
-                    local tempUnit = source.owner.createUnit('unit', x3, y3, bj_RADTODEG * a)
+                    local tempUnit = source.owner.createUnit('unit', x3, y3, math.deg(a))
                     tempUnit.skin = source.skin
                     tempUnit.addAbility('Aloc')
                     tempUnit.setVertexColor(55, 55, 55, 255)
@@ -6907,7 +6917,7 @@ _Abilities.Reapers.new = function(IFramework)
                     local rad = math.random(0., math.pi * 2)
                     local x = unit.x + distance * math.cos(rad)
                     local y = unit.y + distance * math.sin(rad)
-                    summonUnit = unit.owner.createUnit('h001', x, y, bj_RADTODEG * rad)
+                    summonUnit = unit.owner.createUnit('h001', x, y, math.deg(rad))
                     summonUnit.skin = 'h00E'
                     summonUnit.addAbility('Aloc')
                     
@@ -6921,8 +6931,8 @@ _Abilities.Reapers.new = function(IFramework)
                         end
                     )
                     summonUnit.bind("on_damage_pre",
-                        function(source, target, attack)
-                            BlzSetEventDamage(0)
+                        function(source, target, damageObject)
+                            damageObject.damage = 0
                             unit.damageTarget(target, unit.damage * 5.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
                         end
                     )
@@ -7018,14 +7028,14 @@ _Abilities.Reapers.new = function(IFramework)
                     local rad = math.random(0., math.pi * 2)
                     local x = unit.x + distance * math.cos(rad)
                     local y = unit.y + distance * math.sin(rad)
-                    summonUnit = unit.owner.createUnit('h002', x, y, bj_RADTODEG * rad)
+                    summonUnit = unit.owner.createUnit('h002', x, y, math.deg(rad))
                     summonUnit.skin = 'h00F'
                     summonUnit.addAbility('Aloc')
                     summonUnit.bind("on_attack",
                         function(source, target)
-                            BlzUnitInterruptAttack(source.handle)
+                            source.interruptAttack()
                             cooldown = math.floor(9.3 / 0.005)
-                            local rad = (source.face - 5.) * bj_DEGTORAD
+                            local rad = math.rad(source.face - 5.)
                             local x = source.x + 295. * math.cos(rad)
                             local y = source.y + 295. * math.sin(rad)
                             source.playAnimation("Spell Eight")
@@ -7161,14 +7171,14 @@ _Abilities.Reapers.new = function(IFramework)
                     local rad = math.random(0., math.pi * 2)
                     local x = unit.x + distance * math.cos(rad)
                     local y = unit.y + distance * math.sin(rad)
-                    summonUnit = unit.owner.createUnit('h002', x, y, bj_RADTODEG * rad)
+                    summonUnit = unit.owner.createUnit('h002', x, y, math.deg(rad))
                     summonUnit.skin = 'h00G'
                     summonUnit.range = 500
                     summonUnit.addAbility('Aloc')
                     summonUnit.bind("on_attack",
                         function(source, target)
                             casting = true
-                            BlzUnitInterruptAttack(source.handle)
+                            source.interruptAttack()
                             local rad = math.atan(target.y - source.y, target.x - source.x)
                             local x = source.x
                             local y = source.y
@@ -7575,7 +7585,7 @@ _Abilities.Judgement.new = function(IFramework)
                     if GetRandomInt(1, 10) == 1 then
                         local x = source.x
                         local y = source.y
-                        local baseRad = bj_DEGTORAD * source.face
+                        local baseRad = math.rad(source.face)
                         local dist = 0
                         local totalDistance = 960
                         local waves = 12
@@ -9003,12 +9013,12 @@ _Abilities.Destruction_Aura.new = function(IFramework)
             local auraEffect1 = IFramework.Effect()
             auraEffect1.model = "Auras\\Fountain of Souls.mdx"
             auraEffect1.scale = 1.0
-            auraEffect1.yaw = bj_DEGTORAD * 270.
+            auraEffect1.yaw = math.rad(270.)
             auraEffect1.create()
             local auraEffect2 = IFramework.Effect()
             auraEffect2.model = "Auras\\Pentagram Aura.mdx"
             auraEffect2.scale = 2.0
-            auraEffect2.yaw = bj_DEGTORAD * 270.
+            auraEffect2.yaw = math.rad(270.)
             auraEffect2.create()
             eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
@@ -9073,7 +9083,7 @@ _Abilities.Preservation_Aura.new = function(IFramework)
             local auraEffect = IFramework.Effect()
             auraEffect.model = "Auras\\Holy Aura.mdx"
             auraEffect.scale = 1.5
-            auraEffect.yaw = bj_DEGTORAD * 270.
+            auraEffect.yaw = math.rad(270.)
             auraEffect.create()
             eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
@@ -9134,7 +9144,7 @@ _Abilities.Nihility_Aura.new = function(IFramework)
             local auraEffect = IFramework.Effect()
             auraEffect.model = "Auras\\Jibril Aura.mdx"
             auraEffect.scale = 2.0
-            auraEffect.yaw = bj_DEGTORAD * 270.
+            auraEffect.yaw = math.rad(270.)
             auraEffect.create()
             eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
@@ -9195,7 +9205,7 @@ _Abilities.Harmony_Aura.new = function(IFramework)
             local auraEffect = IFramework.Effect()
             auraEffect.model = "Auras\\Blue Rune Aura.mdx"
             auraEffect.scale = 2.0
-            auraEffect.yaw = bj_DEGTORAD * 270.
+            auraEffect.yaw = math.rad(270.)
             auraEffect.create()
             eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
@@ -9256,12 +9266,12 @@ _Abilities.Erudition_Aura.new = function(IFramework)
             local auraEffect1 = IFramework.Effect()
             auraEffect1.model = "Auras\\Grim Reaper Aura Origin.mdx"
             auraEffect1.scale = 1.5
-            auraEffect1.yaw = bj_DEGTORAD * 270.
+            auraEffect1.yaw = math.rad(270.)
             auraEffect1.create()
             local auraEffect2 = IFramework.Effect()
             auraEffect2.model = "Auras\\Grim Reaper Aura Overhead.mdx"
             auraEffect2.scale = 1.5
-            auraEffect2.yaw = bj_DEGTORAD * 270.
+            auraEffect2.yaw = math.rad(270.)
             auraEffect2.create()
             eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
@@ -9326,7 +9336,7 @@ _Abilities.Hunt_Aura.new = function(IFramework)
             local auraEffect = IFramework.Effect()
             auraEffect.model = "Auras\\Thunder Aura.mdx"
             auraEffect.scale = 2.0
-            auraEffect.yaw = bj_DEGTORAD * 270.
+            auraEffect.yaw = math.rad(270.)
             auraEffect.create()
             eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
@@ -10308,7 +10318,7 @@ do
                     local rad = pId * (math.pi * 2 / MAX_PLAYERS)
                     local x = player.startPositionX + 350.0 * math.cos(rad)
                     local y = player.startPositionY + 350.0 * math.sin(rad)
-                    local unit = player.createUnit('Hero', x, y, bj_RADTODEG * (rad + math.pi))
+                    local unit = player.createUnit('Hero', x, y, math.deg(rad + math.pi))
     
                     -- Force Base Stats
                     unit.propername = player.name
@@ -10496,43 +10506,43 @@ do
     
                     player.bind("on_message",
                         function(player, message)
-                            local whichAbility = StringCase(SubString(message, 6, StringLength(message)), false)
-                            if whichAbility == '1' then
+                            local whichBoss = string.sub(message, 7, string.len(message))
+                            if whichBoss == '1' then
                                 areas['I000'].boss_death()
-                            elseif whichAbility == '2' then
+                            elseif whichBoss == '2' then
                                 areas['I001'].boss_death()
-                            elseif whichAbility == '3' then
+                            elseif whichBoss == '3' then
                                 areas['I002'].boss_death()
-                            elseif whichAbility == '4' then
+                            elseif whichBoss == '4' then
                                 areas['I003'].boss_death()
-                            elseif whichAbility == '5' then
+                            elseif whichBoss == '5' then
                                 areas['I004'].boss_death()
-                            elseif whichAbility == '6' then
+                            elseif whichBoss == '6' then
                                 areas['I005'].boss_death()
                             end
                             print("Executed " .. message)
                         end
                     ).setCondition(
                         function(player, message)
-                            return SubString(message, 0, 5) == "-dead"
+                            return string.sub(message, 1, 5) == "-dead"
                         end
                     )
     
                     player.bind("on_message",
                         function(player, message)
-                            local level = S2I(SubString(message, 7, StringLength(message)))
+                            local level = S2I(string.sub(message, 8, string.len(message)))
                             unit.level = level
                             print("Executed " .. message)
                         end
                     ).setCondition(
                         function(player, message)
-                            return SubString(message, 0, 6) == "-level"
+                            return string.sub(message, 1, 6) == "-level"
                         end
                     )
     
                     -- player.bind("on_message",
                     --     function(player, message)
-                    --         local alpha = S2I(SubString(message, 7, StringLength(message)))
+                    --         local alpha = S2I(string.sub(message, 8, string.len(message)))
                     --         if alpha > 255 then
                     --             alpha = 255
                     --         elseif alpha < 0 then
@@ -10543,7 +10553,7 @@ do
                     --     end
                     -- ).setCondition(
                     --     function(player, message)
-                    --         return SubString(message, 0, 6) == "-alpha"
+                    --         return string.sub(message, 1, 6) == "-alpha"
                     --     end
                     -- )
                 end
