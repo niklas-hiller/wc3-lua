@@ -10,6 +10,7 @@ Framework.new = function()
         local Runner = {}
         Runner.new = function(IFramework, scheduledTasks)
             local IFramework = IFramework
+            local GameClock = IFramework.Clock()
             local scheduledTasks = scheduledTasks
             local afterInit
 
@@ -20,16 +21,18 @@ Framework.new = function()
             end
 
             function self.run()
-                TimerStart(CreateTimer(), 0., false, 
-                    function()
+                GameClock.schedule_once(
+                    function(triggeringClock, triggeringSchedule)
                         for _, task in ipairs(scheduledTasks) do
                             task()
                         end
                         if afterInit ~= nil then 
                             xpcall(afterInit, IFramework.Log.Error, IFramework)
                         end
-                    end
+                    end, 0.0
                 )
+                
+                GameClock.start()
             end
 
             return self
