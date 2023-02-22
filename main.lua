@@ -12,11 +12,18 @@ Framework.new = function()
             local IFramework = IFramework
             local GameClock = IFramework.Clock()
             local scheduledTasks = scheduledTasks
+            local repeatingTasks = {}
             local afterInit
 
             function self.afterInit(func)
                 afterInit = func
 
+                return self
+            end
+
+            function self.schedule_interval(func, interval)
+                table.insert(repeatingTasks, {["func"] = func, ["interval"] = interval})
+                
                 return self
             end
 
@@ -28,6 +35,9 @@ Framework.new = function()
                         end
                         if afterInit ~= nil then 
                             xpcall(afterInit, IFramework.Log.Error, IFramework)
+                        end
+                        for _, task in ipairs(repeatingTasks) do
+                            GameClock.schedule_interval(task.func, task.interval)
                         end
                     end, 0.0
                 )
