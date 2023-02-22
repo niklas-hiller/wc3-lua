@@ -248,23 +248,23 @@ Aeon
 ## Hunt
 Ability 1
 - Path: Hunt
-- Name: 
-- Description: 
+- Name: Blazing Blade
+- Description: Replace auto attacks with blazing attacks, dealing AoE Damage. Additionally user now has 10% Lifesteal.
 
 Ability 2
 - Path: Hunt
-- Name: 
-- Description: 
+- Name: Fiery Hymn's Pledge
+- Description: Any Lifesteal now also restores energy shield with 100% efficiency. Also, when suffering lethal damage or energy shield breaks: Do not take any damage for the next 2 seconds. During that time gain 50% more healing efficiency. Can occur once every 60 seconds.
 
 Ability 3
 - Path: Hunt
-- Name: 
-- Description: 
+- Name: Lone Phoenix's Plume
+- Description: When dashing, cause a big fire explosion on target point.
 
 Aeon
 - Path: Hunt
-- Name: 
-- Description: 
+- Name: The Blade Supreme, Rekindled
+- Description: Enchant all previous effects somehow (to be determined)
 
 ## Path
 Available:
@@ -278,7 +278,7 @@ Available:
         - [AEON] I am Atomic
 - Preservation
     - Aura: Holy Aura
-    - Category: Tank
+    - Category: Armor & Health
     - Abilities:
         - Impale
         - Moon Halo
@@ -309,8 +309,8 @@ Available:
         - Not implemented
         - [AEON] Not implemented
 - Hunt
-    - Aura: Thunder Aura
-    - Category: Lifesteal
+    - Aura: Fire Aura 1 & 2
+    - Category: Lifesteal & Energy Shield
     - Abilities
         - Not implemented
         - Not implemented
