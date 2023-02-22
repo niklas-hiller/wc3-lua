@@ -2109,7 +2109,7 @@ Framework.new = function()
                 .addAction(
                     function()
                         Interface.Log.Debug("[PLAYER LEAVE] Name: " .. self.name .. ", Id:" .. id)
-                        self.on_leave(self)
+                        self.on_leave()
                     end
                 )
 
