@@ -2255,6 +2255,11 @@ Framework.new = function()
                         source.on_damage_after(target, damageObject)
                         target.owner.on_unit_damaged_after(source, target, damageObject)
                         target.on_damaged_after(source, damageObject)
+
+                        if source.omnivamp > 0 then
+                            source.heal(damageObject.damage * source.omnivamp)
+                            source.heal(damageObject.damage * source.manavamp)
+                        end
                     end
                 )
 
@@ -4451,6 +4456,10 @@ Framework.new = function()
             local critChance = 0
             local critDamage = 0
 
+            local omnivamp = 0
+            local manavamp = 0
+            local healingEfficiency = 1
+
             if IsHeroUnitId(GetUnitTypeId(handle)) then
                 -- Capture Hero Stats
                 --local capturedLevel = GetHeroLevel(handle)
@@ -4601,6 +4610,12 @@ Framework.new = function()
                     critChance = value
                 elseif index == "critDamage" then
                     critDamage = value
+                elseif index == "omnivamp" then
+                    omnivamp = value
+                elseif index == "manavamp" then
+                    manavamp = value
+                elseif index == "healingEfficiency" then
+                    healingEfficiency = value
                 else
                     Interface.Log.Error("Unknown attribute '" .. index .. "'.")
                 end
@@ -4709,6 +4724,12 @@ Framework.new = function()
                     return critChance
                 elseif index == "critDamage" then
                     return critDamage
+                elseif index == "omnivamp" then
+                    return omnivamp
+                elseif index == "manavamp" then
+                    return manavamp
+                elseif index == "healingEfficiency" then
+                    return healingEfficiency
                 elseif index == "acquireRange" then
                     return GetUnitAcquireRange(handle)
                 else
@@ -4894,6 +4915,22 @@ Framework.new = function()
 
             self.isHero = function()
                 local status, val = xpcall(self._isHero, Interface.Log.Error)
+                if status then return val end
+            end
+
+            function self._heal(amount, whichState)
+                if whichState == "hp" then
+                    self.hp = self.hp + amount * self.healingEfficiency
+                elseif whichState == "mp" then
+                    self.mp = self.mp + amount * self.healingEfficiency
+                else
+                    Interface.Log.Warn("Invalid State is trying to be healed. (" .. whichState .. ")")
+                end
+                return self
+            end
+
+            self.heal = function(amount, whichState)
+                local status, val = xpcall(self._heal, Interface.Log.Error, amount, whichState)
                 if status then return val end
             end
 
@@ -6138,7 +6175,7 @@ _Abilities.Blade_Dance.new = function(IFramework)
 
     metadata.name = "Blade Dance"
     metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
-    .. "|nBlades rotate around you, dealing a total of 350% damage per second."
+    .. "|nBlades rotate around you, dealing a total of 350\x25 damage per second."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
 
     function mt.__index(table, index)
@@ -6219,7 +6256,7 @@ _Abilities.Blink_Strike.new = function(IFramework)
 
     metadata.name = "Blink Strike"
     metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
-    .. "|nEach attack you blink to a random nearby enemy and deal 450% damage."
+    .. "|nEach attack you blink to a random nearby enemy and deal 450\x25 damage."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
 
     function mt.__index(table, index)
@@ -6317,7 +6354,7 @@ _Abilities.Demon_Control.new = function(IFramework)
 
     metadata.name = "Demon Control"
     metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
-    .. "|nA Demon follows you, healing you by 30% of your max hp every 40 attacks."
+    .. "|nA Demon follows you, healing you by 30\x25 of your max hp every 40 attacks."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
 
     function mt.__index(table, index)
@@ -7485,7 +7522,7 @@ _Abilities.Impale.new = function(IFramework)
 
     metadata.name = "Impale"
     metadata.description = "Path: |cffa9e8f9P|r|cff9de0f5r|r|cff91d8f2e|r|cff86d0efs|r|cff7ac9ebe|r|cff6fc1e8r|r|cff62b9e4v|r|cff57b1e1a|r|cff4ba9det|r|cff40a2dai|r|cff349ad7o|r|cff2892d4n|r"
-    .. "|nEach 3 seconds deal 750% damage to nearby enemies within 850 range, and heal your allies in the same range by 5% of your max health."
+    .. "|nEach 3 seconds deal 750\x25 damage to nearby enemies within 850 range, and heal your allies in the same range by 5\x25 of your max health."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNPreservation.blp"
 
     function mt.__index(table, index)
@@ -7558,7 +7595,7 @@ _Abilities.Judgement.new = function(IFramework)
 
     metadata.name = "Moon Halo"
     metadata.description = "Path: |cffa9e8f9P|r|cff9de0f5r|r|cff91d8f2e|r|cff86d0efs|r|cff7ac9ebe|r|cff6fc1e8r|r|cff62b9e4v|r|cff57b1e1a|r|cff4ba9det|r|cff40a2dai|r|cff349ad7o|r|cff2892d4n|r"
-    .. "|nEach attack has a 10% chance to cause a huge aoe damage infront of you, that deals 950% damage."
+    .. "|nEach attack has a 10\x25 chance to cause a huge aoe damage infront of you, that deals 950\x25 damage."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNPreservation.blp"
 
     function mt.__index(table, index)
@@ -7656,7 +7693,7 @@ _Abilities.Overload.new = function(IFramework)
 
     metadata.name = "Overload"
     metadata.description = "Path: |cffa9e8f9P|r|cff9de0f5r|r|cff91d8f2e|r|cff86d0efs|r|cff7ac9ebe|r|cff6fc1e8r|r|cff62b9e4v|r|cff57b1e1a|r|cff4ba9det|r|cff40a2dai|r|cff349ad7o|r|cff2892d4n|r"
-    .. "|nEach time you are attacked there is a 10% chance to deal a huge aoe damage around you, that deals 1000% damage."
+    .. "|nEach time you are attacked there is a 10\x25 chance to deal a huge aoe damage around you, that deals 1000\x25 damage."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNPreservation.blp"
 
     function mt.__index(table, index)
@@ -7749,7 +7786,7 @@ _Abilities.Heaven_Justice.new = function(IFramework)
 
     metadata.name = "Heaven Justice"
     metadata.description = "Path: |cffa9e8f9P|r|cff9de0f5r|r|cff91d8f2e|r|cff86d0efs|r|cff7ac9ebe|r|cff6fc1e8r|r|cff62b9e4v|r|cff57b1e1a|r|cff4ba9det|r|cff40a2dai|r|cff349ad7o|r|cff2892d4n|r"
-    .. "|nEvery 10 seconds a angel descends from the sky, casting lasers on several locations, dealing 4500% damage to enemies and healing allies by 20% of your max health."
+    .. "|nEvery 10 seconds a angel descends from the sky, casting lasers on several locations, dealing 4500\x25 damage to enemies and healing allies by 20\x25 of your max health."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNPreservationPath.blp"
 
     function mt.__index(table, index)
@@ -7878,7 +7915,7 @@ _Abilities.Interceptor.new = function(IFramework)
 
     metadata.name = "Interceptor"
     metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
-    .. "|nEach 0.1 seconds a rocket falls from the sky within 100-800 range and deals 750% damage."
+    .. "|nEach 0.1 seconds a rocket falls from the sky within 100-800 range and deals 750\x25 damage."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestruction.blp"
 
     function mt.__index(table, index)
@@ -7954,7 +7991,7 @@ _Abilities.Sacred_Storm.new = function(IFramework)
 
     metadata.name = "Sacred Storm"
     metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
-    .. "|nSummons 2 Lasers, which deal 1000% damage per second. When the two lasers collide, an area of darkness is created which causes eruptions each 0.2 seconds, that deal 500% damage."
+    .. "|nSummons 2 Lasers, which deal 1000\x25 damage per second. When the two lasers collide, an area of darkness is created which causes eruptions each 0.2 seconds, that deal 500\x25 damage."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestruction.blp"
 
     function mt.__index(table, index)
@@ -8255,7 +8292,7 @@ _Abilities.Kingdom_Come.new = function(IFramework)
 
     metadata.name = "Kingdom Come"
     metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
-    .. "|nEach second a sword falls from the sky that deals 2000% damage. Every 10th sword deals 6000% damage and is 400% larger."
+    .. "|nEach second a sword falls from the sky that deals 2000\x25 damage. Every 10th sword deals 6000\x25 damage and is 400\x25 larger."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestruction.blp"
 
     function mt.__index(table, index)
@@ -8346,7 +8383,7 @@ _Abilities.I_Am_Atomic.new = function(IFramework)
 
     metadata.name = "I am Atomic"
     metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
-    .. "|nAfter being hit 30 times, cause a huge explosion after a few seconds, that deals a maximum of 25000% damage in its epicenter."
+    .. "|nAfter being hit 30 times, cause a huge explosion after a few seconds, that deals a maximum of 25000\x25 damage in its epicenter."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestructionPath.blp"
 
     function mt.__index(table, index)
@@ -8504,7 +8541,7 @@ _Abilities.Magma_Constellation.new = function(IFramework)
 
     metadata.name = "Magma Constellation"
     metadata.description = "Path: |cffff0000H|r|cffaa0054a|r|cff5500a9r|r|cff0000fem|r|cff0054aao|r|cff00a955n|r|cff00fe00y|r"
-    .. "|nMagma Stars are rotating around you, dealing 500% damage per tick. Each star can only deal damage once every 1.0 seconds."
+    .. "|nMagma Stars are rotating around you, dealing 500\x25 damage per tick. Each star can only deal damage once every 1.0 seconds."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHarmony.blp"
 
     function mt.__index(table, index)
@@ -8624,7 +8661,7 @@ _Abilities.Blizzard.new = function(IFramework)
 
     metadata.name = "Blizzard"
     metadata.description = "Path: |cffff0000H|r|cffaa0054a|r|cff5500a9r|r|cff0000fem|r|cff0054aao|r|cff00a955n|r|cff00fe00y|r"
-    .. "|nSummons a blizzard around you, that deals 1000% damage per ice shard."
+    .. "|nSummons a blizzard around you, that deals 1000\x25 damage per ice shard."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHarmony.blp"
 
     function mt.__index(table, index)
@@ -8704,7 +8741,7 @@ _Abilities.Uncontrollable_Flames.new = function(IFramework)
 
     metadata.name = "Uncontrollable Flames"
     metadata.description = "Path: |cffff0000H|r|cffaa0054a|r|cff5500a9r|r|cff0000fem|r|cff0054aao|r|cff00a955n|r|cff00fe00y|r"
-    .. "|nCause fire eruptions around you, that deal 750% damage each."
+    .. "|nCause fire eruptions around you, that deal 750\x25 damage each."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHarmony.blp"
 
     function mt.__index(table, index)
@@ -8784,7 +8821,7 @@ _Abilities.Black_Hole.new = function(IFramework)
 
     metadata.name = "Black Hole"
     metadata.description = "Path: |cffff0000H|r|cffaa0054a|r|cff5500a9r|r|cff0000fem|r|cff0054aao|r|cff00a955n|r|cff00fe00y|r"
-    .. "|nEach 3.0 seconds spawns a orange and a purple blackhole nearby, that stays for 10 seconds. Both blackholes deal 2500% damage per second to enemies that are in it. The purple blackhole drags enemies to its center, while the orange blackhole pushes enemies away from its center. Both effects get stronger, the nearer the unit is to the blackholes center."
+    .. "|nEach 3.0 seconds spawns a orange and a purple blackhole nearby, that stays for 10 seconds. Both blackholes deal 2500\x25 damage per second to enemies that are in it. The purple blackhole drags enemies to its center, while the orange blackhole pushes enemies away from its center. Both effects get stronger, the nearer the unit is to the blackholes center."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHarmonyPath.blp"
 
     function mt.__index(table, index)
@@ -8964,6 +9001,252 @@ _Abilities.Black_Hole.new = function(IFramework)
                         blackhole.destroy()
                     end
                 end
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Blazing_Blade = {}
+_Abilities.Blazing_Blade.new = function(IFramework, DefaultAttack)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Blazing Blade"
+    metadata.description = "Replace auto attacks with blazing attacks, dealing AoE Damage. Additionally user now has 10\x25 Lifesteal."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestructionPath.blp"
+
+    local FireSlash = {}
+    FireSlash[1] = IFramework.Effect()
+    FireSlash[2] = IFramework.Effect()
+    FireSlash[1].model = "Effects\\Fire Slash 1.mdx"
+    FireSlash[2].model = "Effects\\Fire Slash 2.mdx"
+
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            DefaultAttack.remove(unit)
+
+            eventHolder.event = unit.bind("on_damage_after",
+                function(source, target, damageObject)
+                    local x = target.x
+                    local y = target.y
+                    group
+                        .inRange(x, y, 350.)
+                        .forEach(
+                            function(group, enumUnit)
+                                if not unit.isEnemy(enumUnit) then
+                                    return
+                                end
+                                unit.damageTarget(enumUnit, unit.damage * 2.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                            end
+                        )
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return attack.isAttack and source == unit
+                end
+            )
+
+            eventHolder.event = unit.bind("on_damage_pre",
+                function(source, target, damageObject)
+                    damageObject.damage = 0
+                    damageObject.crit = 0
+
+                    local rad = math.rad(source.face)
+                    local x = source.x + 75. * math.cos(rad)
+                    local y = source.y + 75. * math.sin(rad)
+                    local i = math.floor(math.random(1, 2) + 0.5)
+                    FireSlash[i].x = x
+                    FireSlash[i].y = y
+                    FireSlash[i].height = math.random(30., 100.)
+                    FireSlash[i].timeScale = math.random(0.8, 1.3)
+                    FireSlash[i].yaw = rad
+                    FireSlash[i].roll = math.random(0.7854, 2.3562)
+                    FireSlash[i].create().destroy()
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return attack.isAttack and source == unit
+                end
+            )
+
+            eventHolder.cleanup = function()
+                DefaultAttack.apply(unit)
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Fiery_Hymns_Pledge = {}
+_Abilities.Fiery_Hymns_Pledge.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Fiery Hymn's Pledge"
+    metadata.description = "Any Lifesteal now also restores energy shield with 100\x25 efficiency. Also, when suffering lethal damage or energy shield breaks: Do not take any damage for the next 4 seconds. During that time gain 50% more healing efficiency. Can occur once every 60 seconds."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestructionPath.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            local active = false
+            local cooldown = false
+            local forceTrigger = false
+
+            local readyEffect = IFramework.Effect()
+            readyEffect.model = "Effects\\Ember.mdx"
+            readyEffect.scale = 2.3
+            readyEffect.create()
+
+            local activeEffect = IFramework.Effect()
+            activeEffect.model = "Effects\\Burning Rage Orange.mdx"
+            activeEffect.scale = 2.0
+
+            local triggerEffect = IFramework.Effect()
+            triggerEffect.model = "Effects\\Flame Stomp Alt.mdx"
+            triggerEffect.scale = 1.0
+
+            local manaLast = unit.mp
+
+            eventHolder.event = unit.bind("on_damaged_pre",
+                function(source, target, damageObject)
+                    unit.manavamp = unit.omnivamp
+                    if active then
+                        damageObject.damage = 0
+                        damageObject.crit = 0
+                    end
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return target == unit
+                end
+            )
+
+            eventHolder.schedule = eventHolder.clock.schedule_interval(
+                function(triggeringClock, triggeringSchedule)
+                    readyEffect.x = unit.x
+                    readyEffect.y = unit.y
+                    readyEffect.z = unit.z + 100.
+
+                    activeEffect.x = unit.x
+                    activeEffect.y = unit.y
+                    activeEffect.z = unit.z + 200.
+                end, 0.01
+            )
+
+            eventHolder.event = unit.bind("on_death_pre",
+                function(source, target, damageObject)
+                    if not cooldown then
+                        damageObject.damage = 0
+                        damageObject.crit = 0
+                        forceTrigger = true
+                        cooldown = true
+                    end
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return target == unit
+                end
+            )
+
+            eventHolder.event = unit.bind("on_damaged_after",
+                function(source, target, damageObject)
+                    if (math.floor(manaLast) > 0 and math.floor(target.mp) == 0 and not cooldown) or forceTrigger then
+                        unit.healingEfficiency = unit.healingEfficiency + 0.5
+                        forceTrigger = false
+                        cooldown = true
+                        active = true
+                        triggerEffect.x = unit.x
+                        triggerEffect.y = unit.y
+                        triggerEffect.z = unit.z
+                        triggerEffect.create().destroy()
+                        readyEffect.destroy()
+                        activeEffect.create()
+                        eventHolder.clock.schedule_once(
+                            function(triggeringClock, triggeringSchedule)
+                                unit.healingEfficiency = unit.healingEfficiency - 0.5
+                                activeEffect.destroy()
+                                active = false
+                            end, 4.0
+                        )
+                        eventHolder.clock.schedule_once(
+                            function(triggeringClock, triggeringSchedule)
+                                readyEffect.create()
+                                cooldown = false
+                            end, 60.0
+                        )
+                    end
+                    manaLast = target.mp
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return target == unit
+                end
+            )
+
+            eventHolder.cleanup = function()
+                readyEffect.destroy()
+                triggerEffect.destroy()
+                activeEffect.destroy()
             end
         end
 
@@ -9458,6 +9741,8 @@ Abilities.new = function(IFramework)
 
     -- Hunt
     self.Hunt_Aura = _Abilities.Hunt_Aura.new(IFramework)
+    self.Blazing_Blade = _Abilities.Blazing_Blade.new(IFramework, self.Sword_Slash)
+    self.Fiery_Hymns_Pledge = _Abilities.Fiery_Hymns_Pledge.new(IFramework)
 
 
 
@@ -9779,20 +10064,20 @@ AffinitySystem.new = function(IFramework, unit)
     function self.affinityString(affinity)
         if affinity == "fire" then
             return "Fire: " .. fire .. self.affinityBonusString(affinity) ..
-                "\n - Each point increases damage by 2%%" ..
-                "\n - Each point increases critical damage by 1%%"
+                "\n - Each point increases damage by 2\x25" ..
+                "\n - Each point increases critical damage by 1\x25"
         elseif affinity == "physical" then
             return "Physical: " .. physical .. self.affinityBonusString(affinity) ..
-                "\n - Each point increases health by 2%%" ..
+                "\n - Each point increases health by 2\x25" ..
                 "\n - Each point increases armor by 1"
         elseif affinity == "lightning" then
             return "Lightning: " .. lightning .. self.affinityBonusString(affinity) ..
-                "\n - Each point increases attack speed by 2%%" ..
-                "\n - Each point increases movement speed by 0.5%%"
+                "\n - Each point increases attack speed by 2\x25" ..
+                "\n - Each point increases movement speed by 0.5\x25"
         elseif affinity == "quantum" then
             return "Quantum: " .. quantum .. self.affinityBonusString(affinity) ..
-                "\n - Each point increases critical chance by 0.2%%" ..
-                "\n - Each point increases quantum shield by 1.5%%"
+                "\n - Each point increases critical chance by 0.2\x25" ..
+                "\n - Each point increases quantum shield by 1.5\x25"
         end
     end
 
@@ -9806,7 +10091,7 @@ AffinitySystem.new = function(IFramework, unit)
 
         -- Fire
         local BASE_DAMAGE = 10              -- 10 Damage
-        local BASE_CRIT_DAMAGE = 2.0        -- 200% Critical Damage
+        local BASE_CRIT_DAMAGE = 2.0        -- 200\x25 Critical Damage
 
         -- Physical
         local BASE_HEALTH = 20              -- 20 Health
@@ -9817,30 +10102,30 @@ AffinitySystem.new = function(IFramework, unit)
         local BASE_MOVEMENTSPEED = 270      -- 270 Movement Speed
 
         -- Quantum
-        local BASE_CRIT_CHANCE = 10.0       -- 10% Critical Chance
-        local BASE_QUANTUM_SHIELD = 0.0     -- 0% of HP as Quantum Shield
+        local BASE_CRIT_CHANCE = 10.0       -- 10\x25 Critical Chance
+        local BASE_QUANTUM_SHIELD = 0.0     -- 0\x25 of HP as Quantum Shield
 
         -- Fire related
-        local FIRE_DAMAGE_FACTOR = 0.02 -- 2% Damage
-        local FIRE_CRITICAL_DAMAGE_FACTOR = 0.01 -- 1% Critical Damage
+        local FIRE_DAMAGE_FACTOR = 0.02 -- 2\x25 Damage
+        local FIRE_CRITICAL_DAMAGE_FACTOR = 0.01 -- 1\x25 Critical Damage
         unit.damage = math.floor(BASE_DAMAGE + unit.level * DAMAGE_PER_LEVEL_ABSOLUT + DAMAGE_PER_LEVEL_FAKTOR ^ unit.level) * (1 + (fire + bonusFire) * FIRE_DAMAGE_FACTOR)
         unit.critDamage = BASE_CRIT_DAMAGE + (fire + bonusFire) * FIRE_CRITICAL_DAMAGE_FACTOR
 
         -- Physical related
-        local PHYSICAL_HEALTH_FACTOR = 0.02 -- 2% Health
+        local PHYSICAL_HEALTH_FACTOR = 0.02 -- 2\x25 Health
         local PHYSICAL_ARMOR_FACTOR = 1 -- 1 Armor
         unit.maxhp = math.floor(BASE_HEALTH + unit.level * HEALTH_PER_LEVEL_ABSOLUT + HEALTH_PER_LEVEL_FAKTOR ^ unit.level) * (1 + (physical + bonusPhysical) * PHYSICAL_HEALTH_FACTOR)
         unit.armor = BASE_ARMOR + (physical + bonusPhysical) * PHYSICAL_ARMOR_FACTOR
 
         -- Lightning related
-        local LIGHTNING_ATTACKSPEED_FACTOR = 0.02 -- 2% Attack Speed
-        local LIGHTNING_MOVEMENTSPEED_FACTOR = 0.005 -- 0.5% Movement Speed
+        local LIGHTNING_ATTACKSPEED_FACTOR = 0.02 -- 2\x25 Attack Speed
+        local LIGHTNING_MOVEMENTSPEED_FACTOR = 0.005 -- 0.5\x25 Movement Speed
         unit.attackspeed = BASE_ATTACKSPEED * (1 + (lightning + bonusLightning) * LIGHTNING_ATTACKSPEED_FACTOR)
         unit.ms = BASE_MOVEMENTSPEED * (1 + (lightning + bonusLightning) * LIGHTNING_MOVEMENTSPEED_FACTOR)
 
         -- Quantum related
-        local QUANTUM_CRITICAL_CHANCE_FACTOR = 0.2 -- 0.2% Critical Chance
-        local QUANTUM_QUANTUM_SHIELD_FACTOR = 0.015 -- 1.5% Quantum Shield
+        local QUANTUM_CRITICAL_CHANCE_FACTOR = 0.2 -- 0.2\x25 Critical Chance
+        local QUANTUM_QUANTUM_SHIELD_FACTOR = 0.015 -- 1.5\x25 Quantum Shield
         unit.critChance = BASE_CRIT_CHANCE + (quantum + bonusQuantum) * QUANTUM_CRITICAL_CHANCE_FACTOR
         unit.maxmp = unit.maxhp * (BASE_QUANTUM_SHIELD + (quantum + bonusQuantum) * QUANTUM_QUANTUM_SHIELD_FACTOR)
 
@@ -9910,14 +10195,13 @@ AffinitySystem.new = function(IFramework, unit)
                     target.mp = 0
                     quantumShield.destroy()
                     quantumShieldCooldown = true
-                    local currentManaPercent = 0.0
                     local tickrate = 0.01
                     local rechargeTime = 10.0
+                    local rechargeRate = (rechargeTime * tickrate) / 100
                     clock.schedule_interval(
                         function(triggeringClock, triggeringSchedule)
-                            currentManaPercent = currentManaPercent + (rechargeTime * tickrate)
-                            target.mp = target.maxmp * (currentManaPercent / 100.)
-                            if currentManaPercent >= 100.0 then
+                            target.mp = target.mp + target.maxmp * rechargeRate
+                            if target.mp >= target.maxmp then
                                 quantumShieldCooldown = false
                                 quantumShield.create()
                                 triggeringClock.unschedule(triggeringSchedule)
@@ -10132,9 +10416,9 @@ do
                             ["disabled"] = false
                         },
                         [2] = {
-                            ["code"] = nil,
+                            ["code"] = Ability.Blazing_Blade,
                             ["shop"] = 'IA22',
-                            ["disabled"] = true
+                            ["disabled"] = false
                         },
                         [3] = {
                             ["code"] = Ability.Blade_Dance,
@@ -10176,9 +10460,9 @@ do
                             ["disabled"] = false
                         },
                         [2] = {
-                            ["code"] = nil,
+                            ["code"] = Ability.Fiery_Hymns_Pledge,
                             ["shop"] = 'IA42',
-                            ["disabled"] = true
+                            ["disabled"] = false
                         },
                         [3] = {
                             ["code"] = nil,
