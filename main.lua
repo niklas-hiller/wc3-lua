@@ -10028,12 +10028,12 @@ _Abilities.Nihility_Aura.new = function(IFramework)
 
         do
             local auraEffect1 = IFramework.Effect()
-            auraEffect1.model = "Auras\\Flame Aura 1.mdx"
+            auraEffect1.model = "Auras\\Fire Aura 1.mdx"
             auraEffect1.scale = 2.0
             auraEffect1.yaw = math.rad(270.)
             auraEffect1.create()
             local auraEffect2 = IFramework.Effect()
-            auraEffect2.model = "Auras\\Flame Aura 2.mdx"
+            auraEffect2.model = "Auras\\Fire Aura 2.mdx"
             auraEffect2.scale = 2.0
             auraEffect2.yaw = math.rad(270.)
             auraEffect2.create()
