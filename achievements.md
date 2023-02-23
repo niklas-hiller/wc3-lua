@@ -249,22 +249,22 @@ Aeon
 Ability 1
 - Path: Hunt
 - Name: Blazing Blade
-- Description: Replace auto attacks with blazing attacks, dealing AoE Damage. Additionally user now has 10% Lifesteal.
+- Description: Replace auto attacks with blazing attacks, dealing 250% AoE Damage. Additionally user now has 10% more Omnivamp.
 
 Ability 2
 - Path: Hunt
 - Name: Fiery Hymn's Pledge
-- Description: Any Lifesteal now also restores energy shield with 100% efficiency. Also, when suffering lethal damage or energy shield breaks: Do not take any damage for the next 2 seconds. During that time gain 50% more healing efficiency. Can occur once every 60 seconds.
+- Description: Any Omnivamp now also restores energy shield with 100% efficiency. Also, when suffering lethal damage or energy shield breaks: Do not take any damage for the next 4 seconds. During that time gain 50% more healing efficiency. Can occur once every 60 seconds.
 
 Ability 3
 - Path: Hunt
 - Name: Lone Phoenix's Plume
-- Description: When dashing, cause a big fire explosion on target point.
+- Description: When taking damage, blink behind enemy, spawn a blackhole dragging nearby enemies, and cause a fire eruptions infront of you that deal 450% damage each. Can occur once every 8 seconds. Additionally user now has 10% more Omnivamp.
 
 Aeon
 - Path: Hunt
-- Name: The Blade Supreme, Rekindled
-- Description: Enchant all previous effects somehow (to be determined)
+- Name: To Blaze Eternal
+- Description: Three instances of fire lasers are surrounding around you (Damage: 250% | 200% | 150%). Additionally between each instance (+ between you and first instance), cause fire eruptions that deal 350% damage.
 
 ## Path
 Available:

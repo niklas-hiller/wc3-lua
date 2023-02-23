@@ -2257,8 +2257,8 @@ Framework.new = function()
                         target.on_damaged_after(source, damageObject)
 
                         if source.omnivamp > 0 then
-                            source.heal(damageObject.damage * source.omnivamp)
-                            source.heal(damageObject.damage * source.manavamp)
+                            source.heal(damageObject.damage * source.omnivamp, "hp")
+                            source.heal(damageObject.damage * source.manavamp, "mp")
                         end
                     end
                 )
@@ -8845,7 +8845,6 @@ _Abilities.Black_Hole.new = function(IFramework)
                 local spawnInterval = 3.0
                 local totalDuration = 10.0
                 local tickrate = 0.01
-                local range = 700.
                 local damageRange = 250.
                 local damageFactor = 25. * tickrate
                 local minDist = 150.
@@ -8853,7 +8852,7 @@ _Abilities.Black_Hole.new = function(IFramework)
                 local change = 1.0 -- < 0 for push, > 0 for pull
                 local lowestDistanceFactor = 0.6
                 local highestDistanceFactor = 3.0
-                local distanceFactor =(highestDistanceFactor - lowestDistanceFactor) / range
+                local distanceFactor =(highestDistanceFactor - lowestDistanceFactor) / maxDist
                 local maxBlackholes = math.ceil(totalDuration / spawnInterval)
                 for index = 1, maxBlackholes, 1 do
                     local blackhole = IFramework.Effect()
@@ -8882,7 +8881,7 @@ _Abilities.Black_Hole.new = function(IFramework)
                                 currentDuration = currentDuration + tickrate
                                 -- Pull/Push enemies
                                 group
-                                    .inRange(blackholeX, blackholeY, range)
+                                    .inRange(blackholeX, blackholeY, maxDist)
                                     .forEach(
                                         function(group, enumUnit)
                                             if not unit.isEnemy(enumUnit) then
@@ -8927,7 +8926,6 @@ _Abilities.Black_Hole.new = function(IFramework)
                 local spawnInterval = 3.0
                 local totalDuration = 10.0
                 local tickrate = 0.01
-                local range = 700.
                 local damageRange = 250.
                 local damageFactor = 25. * tickrate
                 local minDist = 150.
@@ -8935,7 +8933,7 @@ _Abilities.Black_Hole.new = function(IFramework)
                 local change = -1.0 -- < 0 for push, > 0 for pull
                 local lowestDistanceFactor = 0.6
                 local highestDistanceFactor = 3.0
-                local distanceFactor =(highestDistanceFactor - lowestDistanceFactor) / range
+                local distanceFactor =(highestDistanceFactor - lowestDistanceFactor) / maxDist
                 local maxBlackholes = math.ceil(totalDuration / spawnInterval)
                 for index = 1, maxBlackholes, 1 do
                     local blackhole = IFramework.Effect()
@@ -8964,7 +8962,7 @@ _Abilities.Black_Hole.new = function(IFramework)
                                 currentDuration = currentDuration + tickrate
                                 -- Pull/Push enemies
                                 group
-                                    .inRange(blackholeX, blackholeY, range)
+                                    .inRange(blackholeX, blackholeY, maxDist)
                                     .forEach(
                                         function(group, enumUnit)
                                             if not unit.isEnemy(enumUnit) then
@@ -9029,14 +9027,18 @@ _Abilities.Blazing_Blade.new = function(IFramework, DefaultAttack)
     local mt = {}
 
     metadata.name = "Blazing Blade"
-    metadata.description = "Replace auto attacks with blazing attacks, dealing AoE Damage. Additionally user now has 10\x25 Lifesteal."
-    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestructionPath.blp"
+    metadata.description = "Replace auto attacks with blazing attacks, dealing AoE Damage. Additionally user now has 10\x25 Omnivamp."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHunt.blp"
 
     local FireSlash = {}
     FireSlash[1] = IFramework.Effect()
     FireSlash[2] = IFramework.Effect()
     FireSlash[1].model = "Effects\\Fire Slash 1.mdx"
     FireSlash[2].model = "Effects\\Fire Slash 2.mdx"
+
+    local flameCrack = IFramework.Effect()
+    flameCrack.model = "Effects\\Flame Crack.mdx"
+    flameCrack.scale = 1.5
 
 
     function mt.__index(table, index)
@@ -9055,11 +9057,18 @@ _Abilities.Blazing_Blade.new = function(IFramework, DefaultAttack)
 
         do
             DefaultAttack.remove(unit)
+            unit.omnivamp = unit.omnivamp + 0.1
 
             eventHolder.event = unit.bind("on_damage_after",
                 function(source, target, damageObject)
-                    local x = target.x
-                    local y = target.y
+                    local dx = target.x - source.x
+                    local dy = target.y - source.y
+                    local rad = math.atan(dy, dx)
+                    local x = source.x + 120. * Cos(rad)
+                    local y = source.y + 120. * Sin(rad)
+                    flameCrack.x = x
+                    flameCrack.y = y
+                    flameCrack.create().destroy()
                     group
                         .inRange(x, y, 350.)
                         .forEach(
@@ -9067,7 +9076,7 @@ _Abilities.Blazing_Blade.new = function(IFramework, DefaultAttack)
                                 if not unit.isEnemy(enumUnit) then
                                     return
                                 end
-                                unit.damageTarget(enumUnit, unit.damage * 2.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                                unit.damageTarget(enumUnit, unit.damage * 2.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
                             end
                         )
                 end
@@ -9088,10 +9097,8 @@ _Abilities.Blazing_Blade.new = function(IFramework, DefaultAttack)
                     local i = math.floor(math.random(1, 2) + 0.5)
                     FireSlash[i].x = x
                     FireSlash[i].y = y
-                    FireSlash[i].height = math.random(30., 100.)
-                    FireSlash[i].timeScale = math.random(0.8, 1.3)
+                    FireSlash[i].height = 70.
                     FireSlash[i].yaw = rad
-                    FireSlash[i].roll = math.random(0.7854, 2.3562)
                     FireSlash[i].create().destroy()
                 end
             ).setCondition(
@@ -9102,6 +9109,7 @@ _Abilities.Blazing_Blade.new = function(IFramework, DefaultAttack)
 
             eventHolder.cleanup = function()
                 DefaultAttack.apply(unit)
+                unit.omnivamp = unit.omnivamp - 0.1
             end
         end
 
@@ -9131,7 +9139,7 @@ _Abilities.Fiery_Hymns_Pledge.new = function(IFramework)
 
     metadata.name = "Fiery Hymn's Pledge"
     metadata.description = "Any Lifesteal now also restores energy shield with 100\x25 efficiency. Also, when suffering lethal damage or energy shield breaks: Do not take any damage for the next 4 seconds. During that time gain 50% more healing efficiency. Can occur once every 60 seconds."
-    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestructionPath.blp"
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHunt.blp"
 
     function mt.__index(table, index)
         if index == "metadata" then
@@ -9244,9 +9252,408 @@ _Abilities.Fiery_Hymns_Pledge.new = function(IFramework)
             )
 
             eventHolder.cleanup = function()
+                unit.manavamp = 0
+                if active then
+                    unit.healingEfficiency = unit.healingEfficiency - 0.5
+                end
                 readyEffect.destroy()
                 triggerEffect.destroy()
                 activeEffect.destroy()
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Lone_Phoenixs_Plume = {}
+_Abilities.Lone_Phoenixs_Plume.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "Lone Phoenix's Plume"
+    metadata.description = "When about to be damaged, negate damage, blink behind enemy, put blackhole on enemy and drag nearby enemies and do firewave towards enemy, cooldown 8 seconds"
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHunt.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            unit.omnivamp = unit.omnivamp + 0.1
+
+            local blackhole = IFramework.Effect()
+            blackhole.model = "Effects\\Black Hole.mdx"
+            blackhole.scale = 0.5
+
+            local fireExplosion = IFramework.Effect()
+            fireExplosion.model = "Effects\\Conflagrate.mdx"
+            fireExplosion.scale = 2.0
+
+            local totalDuration = 0.3
+            local tickrate = 0.01
+            local minDist = 150.
+            local maxDist = 850.
+            local change = 1.0 -- < 0 for push, > 0 for pull
+            local lowestDistanceFactor = 0.6 * 2
+            local highestDistanceFactor = 3.0 * 2
+            local distanceFactor = (highestDistanceFactor - lowestDistanceFactor) / maxDist
+
+            local cooldown = false
+
+            eventHolder.event = unit.bind("on_damaged_pre",
+                function(source, target, damageObject)
+                    if not cooldown then
+                        forceTrigger = true
+                        cooldown = true
+
+                        local tx = target.x
+                        local ty = target.y
+
+                        local dx = tx - source.x
+                        local dy = ty - source.y
+                        local rad = math.atan(dy, dx)
+                        local x = source.x + 50. * math.cos(rad + math.pi)
+                        local y = source.y + 50. * math.sin(rad + math.pi)
+                        
+                        target.teleportTo(x, y)
+                        target.faceInstant(math.deg(rad))
+                        target.issueOrder("attack", source)
+
+                        blackhole.x = tx
+                        blackhole.y = ty
+                        blackhole.create()
+
+                        local currentDuration = 0.
+                        eventHolder.schedule = eventHolder.clock.schedule_interval(
+                            function(triggeringClock, triggeringSchedule)
+                                currentDuration = currentDuration + tickrate
+                                -- Pull/Push enemies
+                                group
+                                    .inRange(tx, ty, maxDist)
+                                    .forEach(
+                                        function(group, enumUnit)
+                                            if not unit.isEnemy(enumUnit) then
+                                                return
+                                            end
+                                            local dx = tx - enumUnit.x
+                                            local dy = ty - enumUnit.y
+                                            local dist = math.sqrt(dx * dx + dy * dy)
+                                            if dist < 75. then
+                                                return
+                                            end
+                                            local distanceFactor = highestDistanceFactor - distanceFactor * dist
+                                            local rad = math.atan(dy, dx)
+                                            enumUnit.x = enumUnit.x + (change * distanceFactor) * math.cos(rad)
+                                            enumUnit.y = enumUnit.y + (change * distanceFactor) * math.sin(rad)
+                                        end
+                                    )
+                                if currentDuration >= totalDuration then
+                                    blackhole.destroy()
+                                    triggeringClock.unschedule(triggeringSchedule)
+                                end
+                            end, tickrate
+                        )
+                        eventHolder.schedule = eventHolder.clock.schedule_once(
+                            function(triggeringClock, triggeringSchedule)
+                                local increment = 1
+                                triggeringClock.schedule_interval(
+                                    function(triggeringClock, triggeringSchedule)
+                                        local newX = x + 150. * increment * math.cos(rad)
+                                        local newY = y + 150. * increment * math.sin(rad)
+                                        fireExplosion.x = newX
+                                        fireExplosion.y = newY
+                                        fireExplosion.create().destroy()
+                                        group
+                                            .inRange(newX, newY, 350.)
+                                            .forEach(
+                                                function(group, enumUnit)
+                                                    if not unit.isEnemy(enumUnit) then
+                                                        return
+                                                    end
+                                                    unit.damageTarget(enumUnit, unit.damage * 4.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                                                end
+                                            )
+                                        increment = increment + 1
+                                        if increment > 5 then
+                                            triggeringClock.unschedule(triggeringSchedule)
+                                        end
+                                    end, 0.05
+                                )
+                            end, totalDuration - 0.15
+                        )
+
+                        eventHolder.clock.schedule_once(
+                            function(triggeringClock, triggeringSchedule)
+                                cooldown = false
+                            end, 8.0
+                        )
+                    end
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return target == unit
+                end
+            )
+
+            eventHolder.cleanup = function()
+                blackhole.destroy()
+                unit.omnivamp = unit.omnivamp - 0.1
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.The_Blade_Supreme_Rekindled = {}
+_Abilities.The_Blade_Supreme_Rekindled.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = "The Blade Supreme, Rekindled"
+    metadata.description = "Ability Description"
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHuntPath.blp"
+
+    local fireExplosion = IFramework.Effect()
+    fireExplosion.model = "Effects\\Flame Explosion.mdx"
+    fireExplosion.scale = 1.0
+    
+    local fireEffect = IFramework.Effect()
+    fireEffect.model = "Effects\\Fire Laser Effect.mdx"
+    fireEffect.scale = 1.0
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            local size = 800
+
+            do
+                -- generate outer flame points
+                local angle = 0
+                local tickrate = math.pi / 12
+                local max = 2 * math.pi
+                eventHolder.schedule = eventHolder.clock.schedule_interval(
+                    function(triggeringClock, triggeringSchedule)
+                        local x = unit.x + size*math.cos(angle)
+                        local y = unit.y + size*math.sin(angle)
+
+                        fireEffect.x = x
+                        fireEffect.y = y
+                        fireEffect.create().destroy()
+
+                        group
+                            .inRange(x, y, 250.)
+                            .forEach(
+                                function(group, enumUnit)
+                                    if not unit.isEnemy(enumUnit) then
+                                        return
+                                    end
+                                    unit.damageTarget(enumUnit, unit.damage * 2.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                                end
+                            )
+
+                        angle = angle + tickrate
+                        if angle > max then
+                            angle = 0
+                        end
+                    end, tickrate / 2
+                )
+            end
+            
+            do
+                -- generate inner flame points
+                local angle = 0
+                local tickrate = math.pi / 12
+                local max = 2 * math.pi
+                eventHolder.schedule = eventHolder.clock.schedule_interval(
+                    function(triggeringClock, triggeringSchedule)
+                        local x = unit.x + size/2*math.cos(angle)
+                        local y = unit.y + size/2*math.sin(angle)
+
+                        fireEffect.x = x
+                        fireEffect.y = y
+                        fireEffect.create().destroy()
+
+                        group
+                            .inRange(x, y, 250.)
+                            .forEach(
+                                function(group, enumUnit)
+                                    if not unit.isEnemy(enumUnit) then
+                                        return
+                                    end
+                                    unit.damageTarget(enumUnit, unit.damage * 2.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                                end
+                            )
+
+                        angle = angle + tickrate
+                        if angle > max then
+                            angle = 0
+                        end
+                    end, tickrate / 2
+                )
+            end
+            
+            do
+                -- generate flame tip points
+                local angle = 0
+                local tickrate = math.pi / 6
+                local max = 2 * math.pi
+                eventHolder.schedule = eventHolder.clock.schedule_interval(
+                    function(triggeringClock, triggeringSchedule)
+                        local x = unit.x + size*1.2*math.cos(angle)
+                        local y = unit.y + size*1.2*math.sin(angle)
+
+                        fireEffect.x = x
+                        fireEffect.y = y
+                        fireEffect.create().destroy()
+
+                        group
+                            .inRange(x, y, 250.)
+                            .forEach(
+                                function(group, enumUnit)
+                                    if not unit.isEnemy(enumUnit) then
+                                        return
+                                    end
+                                    unit.damageTarget(enumUnit, unit.damage * 1.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                                end
+                            )
+
+                        angle = angle + tickrate
+                        if angle > max then
+                            angle = 0
+                        end
+                    end, tickrate / 2
+                )
+            end
+
+            do
+                -- generate fire explosions
+                local count = 0
+                eventHolder.schedule = eventHolder.clock.schedule_interval(
+                    function(triggeringClock, triggeringSchedule)
+                        local angle = 0
+                        local tickrate = math.pi / 6
+                        local max = 2 * math.pi
+
+                        local x
+                        local y
+                        if count == 0 then
+                            for angle = 0, max, tickrate do
+                                x = unit.x + size*0.25*math.cos(angle)
+                                y = unit.y + size*0.25*math.sin(angle)
+                                fireExplosion.x = x
+                                fireExplosion.y = y
+                                fireExplosion.create().destroy()
+                                group
+                                    .inRange(x, y, 350.)
+                                    .forEach(
+                                        function(group, enumUnit)
+                                            if not unit.isEnemy(enumUnit) then
+                                                return
+                                            end
+                                            unit.damageTarget(enumUnit, unit.damage * 3.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                                        end
+                                    )
+                            end
+                        elseif count == 1 then
+                            for angle = 0, max, tickrate do
+                                x = unit.x + size*0.75*math.cos(angle)
+                                y = unit.y + size*0.75*math.sin(angle)
+                                fireExplosion.x = x
+                                fireExplosion.y = y
+                                fireExplosion.create().destroy()
+                                group
+                                    .inRange(x, y, 350.)
+                                    .forEach(
+                                        function(group, enumUnit)
+                                            if not unit.isEnemy(enumUnit) then
+                                                return
+                                            end
+                                            unit.damageTarget(enumUnit, unit.damage * 3.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                                        end
+                                    )
+                            end
+                        elseif count == 2 then
+                            for angle = 0, max, tickrate do
+                                x = unit.x + size*1.1*math.cos(angle)
+                                y = unit.y + size*1.1*math.sin(angle)
+                                fireExplosion.x = x
+                                fireExplosion.y = y
+                                fireExplosion.create().destroy()
+                                group
+                                    .inRange(x, y, 350.)
+                                    .forEach(
+                                        function(group, enumUnit)
+                                            if not unit.isEnemy(enumUnit) then
+                                                return
+                                            end
+                                            unit.damageTarget(enumUnit, unit.damage * 3.5, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS)
+                                        end
+                                    )
+                            end
+                        end
+
+                        
+
+                        count = count + 1
+                        if count > 2 then
+                            count = 0
+                        end
+                    end, 0.75
+                )
             end
         end
 
@@ -9616,21 +10023,30 @@ _Abilities.Hunt_Aura.new = function(IFramework)
         local eventHolder = EventHolder.new(IFramework)
 
         do
-            local auraEffect = IFramework.Effect()
-            auraEffect.model = "Auras\\Thunder Aura.mdx"
-            auraEffect.scale = 2.0
-            auraEffect.yaw = math.rad(270.)
-            auraEffect.create()
+            local auraEffect1 = IFramework.Effect()
+            auraEffect1.model = "Auras\\Flame Aura 1.mdx"
+            auraEffect1.scale = 2.0
+            auraEffect1.yaw = math.rad(270.)
+            auraEffect1.create()
+            local auraEffect2 = IFramework.Effect()
+            auraEffect2.model = "Auras\\Flame Aura 2.mdx"
+            auraEffect2.scale = 2.0
+            auraEffect2.yaw = math.rad(270.)
+            auraEffect2.create()
             eventHolder.schedule = eventHolder.clock.schedule_interval(
                 function(triggeringClock, triggeringSchedule)
-                    auraEffect.x = unit.x
-                    auraEffect.y = unit.y
-                    auraEffect.z = unit.z
+                    auraEffect1.x = unit.x
+                    auraEffect1.y = unit.y
+                    auraEffect1.z = unit.z
+                    auraEffect2.x = unit.x
+                    auraEffect2.y = unit.y
+                    auraEffect2.z = unit.z
                 end, 0.01
             )
 
             eventHolder.cleanup = function()
-                auraEffect.destroy()
+                auraEffect1.destroy()
+                auraEffect2.destroy()
             end
         end
 
@@ -9743,7 +10159,8 @@ Abilities.new = function(IFramework)
     self.Hunt_Aura = _Abilities.Hunt_Aura.new(IFramework)
     self.Blazing_Blade = _Abilities.Blazing_Blade.new(IFramework, self.Sword_Slash)
     self.Fiery_Hymns_Pledge = _Abilities.Fiery_Hymns_Pledge.new(IFramework)
-
+    self.Lone_Phoenixs_Plume = _Abilities.Lone_Phoenixs_Plume.new(IFramework)
+    self.The_Blade_Supreme_Rekindled = _Abilities.The_Blade_Supreme_Rekindled.new(IFramework)
 
 
     -- Leftovers
@@ -10371,14 +10788,14 @@ do
                     ["description"] = "You chose the path of "
                     .. "|cffaae5b7H|r|cff89daa9u|r|cff69d09bn|r|cff49c68et|r.",
                     ["icon"] = "ReplaceableTextures/CommandButtons/BTNHuntPath.blp",
-                    ["unlocks"] = nil,
+                    ["unlocks"] = Ability.The_Blade_Supreme_Rekindled,
                     ["aura"] = Ability.Hunt_Aura,
                     ["requires"] = {
-                        [1] = nil,
-                        [2] = nil,
-                        [3] = nil
+                        [1] = Ability.Blazing_Blade,
+                        [2] = Ability.Fiery_Hymns_Pledge,
+                        [3] = Ability.Lone_Phoenixs_Plume
                     },
-                    ["disabled"] = true
+                    ["disabled"] = false
                 }
             }
     
@@ -10504,9 +10921,9 @@ do
                             ["disabled"] = false
                         },
                         [2] = {
-                            ["code"] = nil,
+                            ["code"] = Ability.Lone_Phoenixs_Plume,
                             ["shop"] = 'IA62',
-                            ["disabled"] = true
+                            ["disabled"] = false
                         },
                         [3] = {
                             ["code"] = Ability.Demon_Control,
