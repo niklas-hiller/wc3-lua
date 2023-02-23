@@ -182,24 +182,24 @@ Aeon
 - Name: Michaels Blessing
 - Description: Every 10 seconds a angel descends from the sky, casting lasers on several locations, dealing 4500% damage to enemies and healing allies by 20% of your max health.
 
-## Nihility
+## Hunt
 Ability 1
-- Path: Nihility
+- Path: Hunt
 - Name: Blade Dance
 - Description: Blades rotate around you, dealing a total of 350% damage per second.
 
 Ability 2
-- Path: Nihility
+- Path: Hunt
 - Name: Blink Strike
 - Description: Each attack you blink to a random nearby enemy and deal 450% damage.
 
 Ability 3
-- Path: Nihility
+- Path: Hunt
 - Name: Demon Control
 - Description: A Demon follows you, healing you by 30% of your max hp every 40 attacks.
 
 Aeon
-- Path: Nihility
+- Path: Hunt
 - Name: Shadow Strike
 - Description: Each attack spawns a illusion, with a duration of 5 seconds, that copies your damage, attack speed and blink strike.
 
@@ -245,24 +245,24 @@ Aeon
 - Name: 
 - Description: 
 
-## Hunt
+## Nihility
 Ability 1
-- Path: Hunt
+- Path: Nihility
 - Name: Blazing Blade
 - Description: Replace auto attacks with blazing attacks, dealing 250% AoE Damage. Additionally user now has 10% more Omnivamp.
 
 Ability 2
-- Path: Hunt
+- Path: Nihility
 - Name: Fiery Hymn's Pledge
 - Description: Any Omnivamp now also restores energy shield with 100% efficiency. Also, when suffering lethal damage or energy shield breaks: Do not take any damage for the next 4 seconds. During that time gain 50% more healing efficiency. Can occur once every 60 seconds.
 
 Ability 3
-- Path: Hunt
+- Path: Nihility
 - Name: Lone Phoenix's Plume
 - Description: When taking damage, blink behind enemy, spawn a blackhole dragging nearby enemies, and cause a fire eruptions infront of you that deal 450% damage each. Can occur once every 8 seconds. Additionally user now has 10% more Omnivamp.
 
 Aeon
-- Path: Hunt
+- Path: Nihility
 - Name: To Blaze Eternal
 - Description: Three instances of fire lasers are surrounding around you (Damage: 250% | 200% | 150%). Additionally between each instance (+ between you and first instance), cause fire eruptions that deal 350% damage.
 
@@ -284,7 +284,7 @@ Available:
         - Moon Halo
         - Overload
         - [AEON] Heaven Justice
-- Nihility
+- Hunt
     - Aura: Jibril Aura
     - Category: Fast
     - Abilities:
@@ -308,21 +308,21 @@ Available:
         - Not implemented
         - Not implemented
         - [AEON] Not implemented
-- Hunt
+- Nihility
     - Aura: Fire Aura 1 & 2
     - Category: Lifesteal & Energy Shield
     - Abilities
-        - Not implemented
-        - Not implemented
-        - Not implemented
-        - [AEON] Not implemented
+        - Blazing Blade
+        - Fiery Hymn's Pledge
+        - Lone Phoenix's Plume
+        - [AEON] To Blaze Eternal
 
 Assigned:
 - A = Harmony
 - B = Destruction
 - C = Preservation
-- D = Hunt
-- E = Nihility
+- D = Nihility
+- E = Hunt
 - F = Erudition
 
 # Boss 1

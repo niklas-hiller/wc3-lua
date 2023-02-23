@@ -6174,9 +6174,9 @@ _Abilities.Blade_Dance.new = function(IFramework)
     local mt = {}
 
     metadata.name = "Blade Dance"
-    metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
+    metadata.description = "Path: |cffaae5b7H|r|cff89daa9u|r|cff69d09bn|r|cff49c68et|r"
     .. "|nBlades rotate around you, dealing a total of 350\x25 damage per second."
-    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHunt.blp"
 
     function mt.__index(table, index)
         if index == "metadata" then
@@ -6255,9 +6255,9 @@ _Abilities.Blink_Strike.new = function(IFramework)
     local mt = {}
 
     metadata.name = "Blink Strike"
-    metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
+    metadata.description = "Path: |cffaae5b7H|r|cff89daa9u|r|cff69d09bn|r|cff49c68et|r"
     .. "|nEach attack you blink to a random nearby enemy and deal 450\x25 damage."
-    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHunt.blp"
 
     function mt.__index(table, index)
         if index == "metadata" then
@@ -6353,9 +6353,9 @@ _Abilities.Demon_Control.new = function(IFramework)
     local mt = {}
 
     metadata.name = "Demon Control"
-    metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
+    metadata.description = "Path: |cffaae5b7H|r|cff89daa9u|r|cff69d09bn|r|cff49c68et|r"
     .. "|nA Demon follows you, healing you by 30\x25 of your max hp every 40 attacks."
-    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHunt.blp"
 
     function mt.__index(table, index)
         if index == "metadata" then
@@ -6478,9 +6478,9 @@ _Abilities.Shadow_Strike.new = function(IFramework)
     local mt = {}
 
     metadata.name = "Shadow Strike"
-    metadata.description = "Path:|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r"
+    metadata.description = "Path: |cffaae5b7H|r|cff89daa9u|r|cff69d09bn|r|cff49c68et|r"
     .. "|nEach attack spawns a illusion, with a duration of 5 seconds, that copies your damage, attack speed and blink strike."
-    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihilityPath.blp"
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHuntPath.blp"
 
     function mt.__index(table, index)
         if index == "metadata" then
@@ -7914,7 +7914,7 @@ _Abilities.Interceptor.new = function(IFramework)
     local mt = {}
 
     metadata.name = "Interceptor"
-    metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
+    metadata.description = "Path: |cffe585fbD|r|cffe07ff7e|r|cffdb79f3s|r|cffd774eft|r|cffd26eebr|r|cffce69e8u|r|cffc963e4c|r|cffc55ee0t|r|cffc058dci|r|cffbb52d9o|r|cffb74dd5n|r"
     .. "|nEach 0.1 seconds a rocket falls from the sky within 100-800 range and deals 750\x25 damage."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestruction.blp"
 
@@ -7990,7 +7990,7 @@ _Abilities.Sacred_Storm.new = function(IFramework)
     local mt = {}
 
     metadata.name = "Sacred Storm"
-    metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
+    metadata.description = "Path: |cffe585fbD|r|cffe07ff7e|r|cffdb79f3s|r|cffd774eft|r|cffd26eebr|r|cffce69e8u|r|cffc963e4c|r|cffc55ee0t|r|cffc058dci|r|cffbb52d9o|r|cffb74dd5n|r"
     .. "|nSummons 2 Lasers, which deal 1000\x25 damage per second. When the two lasers collide, an area of darkness is created which causes eruptions each 0.2 seconds, that deal 500\x25 damage."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestruction.blp"
 
@@ -8291,7 +8291,7 @@ _Abilities.Kingdom_Come.new = function(IFramework)
     local mt = {}
 
     metadata.name = "Kingdom Come"
-    metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
+    metadata.description = "Path: |cffe585fbD|r|cffe07ff7e|r|cffdb79f3s|r|cffd774eft|r|cffd26eebr|r|cffce69e8u|r|cffc963e4c|r|cffc55ee0t|r|cffc058dci|r|cffbb52d9o|r|cffb74dd5n|r"
     .. "|nEach second a sword falls from the sky that deals 2000\x25 damage. Every 10th sword deals 6000\x25 damage and is 400\x25 larger."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestruction.blp"
 
@@ -8382,7 +8382,7 @@ _Abilities.I_Am_Atomic.new = function(IFramework)
     local mt = {}
 
     metadata.name = "I am Atomic"
-    metadata.description = "Path: |cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r"
+    metadata.description = "Path: |cffe585fbD|r|cffe07ff7e|r|cffdb79f3s|r|cffd774eft|r|cffd26eebr|r|cffce69e8u|r|cffc963e4c|r|cffc55ee0t|r|cffc058dci|r|cffbb52d9o|r|cffb74dd5n|r"
     .. "|nAfter being hit 30 times, cause a huge explosion after a few seconds, that deals a maximum of 25000\x25 damage in its epicenter."
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNDestructionPath.blp"
 
@@ -9027,8 +9027,9 @@ _Abilities.Blazing_Blade.new = function(IFramework, DefaultAttack)
     local mt = {}
 
     metadata.name = "Blazing Blade"
-    metadata.description = "Replace auto attacks with blazing attacks, dealing AoE Damage. Additionally user now has 10\x25 Omnivamp."
-    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHunt.blp"
+    metadata.description = "Path: |cfffc7f61N|r|cfff87359i|r|cfff56751h|r|cfff25a49i|r|cffef4e41l|r|cffec4239i|r|cffe93632t|r|cffe62a2ay|r"
+    .. "|nReplace auto attacks with blazing attacks, dealing 250\x25 AoE Damage. Additionally user now has 10\x25 more Omnivamp."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
 
     local FireSlash = {}
     FireSlash[1] = IFramework.Effect()
@@ -9138,8 +9139,9 @@ _Abilities.Fiery_Hymns_Pledge.new = function(IFramework)
     local mt = {}
 
     metadata.name = "Fiery Hymn's Pledge"
-    metadata.description = "Any Lifesteal now also restores energy shield with 100\x25 efficiency. Also, when suffering lethal damage or energy shield breaks: Do not take any damage for the next 4 seconds. During that time gain 50% more healing efficiency. Can occur once every 60 seconds."
-    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHunt.blp"
+    metadata.description = "Path: |cfffc7f61N|r|cfff87359i|r|cfff56751h|r|cfff25a49i|r|cffef4e41l|r|cffec4239i|r|cffe93632t|r|cffe62a2ay|r"
+    .. "|nAny Omnivamp now also restores energy shield with 100\x25 efficiency. Also, when suffering lethal damage or energy shield breaks: Do not take any damage for the next 4 seconds. During that time gain 50\x25 more healing efficiency. Can occur once every 60 seconds."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
 
     function mt.__index(table, index)
         if index == "metadata" then
@@ -9287,8 +9289,9 @@ _Abilities.Lone_Phoenixs_Plume.new = function(IFramework)
     local mt = {}
 
     metadata.name = "Lone Phoenix's Plume"
-    metadata.description = "When about to be damaged, negate damage, blink behind enemy, put blackhole on enemy and drag nearby enemies and do firewave towards enemy, cooldown 8 seconds"
-    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHunt.blp"
+    metadata.description = "Path: |cfffc7f61N|r|cfff87359i|r|cfff56751h|r|cfff25a49i|r|cffef4e41l|r|cffec4239i|r|cffe93632t|r|cffe62a2ay|r"
+    .. "|nWhen taking damage, blink behind enemy, spawn a blackhole dragging nearby enemies, and cause a fire eruptions infront of you that deal 450\x25 damage each. Can occur once every 8 seconds. Additionally user now has 10\x25 more Omnivamp."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihility.blp"
 
     function mt.__index(table, index)
         if index == "metadata" then
@@ -9443,17 +9446,18 @@ _Abilities.Lone_Phoenixs_Plume.new = function(IFramework)
     return self
 end
 
-_Abilities.The_Blade_Supreme_Rekindled = {}
-_Abilities.The_Blade_Supreme_Rekindled.new = function(IFramework)
+_Abilities.To_Blaze_Eternal = {}
+_Abilities.To_Blaze_Eternal.new = function(IFramework)
     local self = {}
     local _eventHolder = {}
     local group = IFramework.Group()
     local metadata = MetaData.new()
     local mt = {}
 
-    metadata.name = "The Blade Supreme, Rekindled"
-    metadata.description = "Ability Description"
-    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHuntPath.blp"
+    metadata.name = "To Blaze Eternal"
+    metadata.description = "Path: |cfffc7f61N|r|cfff87359i|r|cfff56751h|r|cfff25a49i|r|cffef4e41l|r|cffec4239i|r|cffe93632t|r|cffe62a2ay|r"
+    .. "|nThree instances of fire lasers are surrounding around you (Damage: 250\x25 | 200\x25 | 150\x25). Additionally between each instance (+ between you and first instance), cause fire eruptions that deal 350\x25 damage."
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNNihilityPath.blp"
 
     local fireExplosion = IFramework.Effect()
     fireExplosion.model = "Effects\\Flame Explosion.mdx"
@@ -9804,8 +9808,8 @@ _Abilities.Preservation_Aura.new = function(IFramework)
     return self
 end
 
-_Abilities.Nihility_Aura = {}
-_Abilities.Nihility_Aura.new = function(IFramework)
+_Abilities.Hunt_Aura = {}
+_Abilities.Hunt_Aura.new = function(IFramework)
     local self = {}
     local _eventHolder = {}
     local group = IFramework.Group()
@@ -9996,8 +10000,8 @@ _Abilities.Erudition_Aura.new = function(IFramework)
     return self
 end
 
-_Abilities.Hunt_Aura = {}
-_Abilities.Hunt_Aura.new = function(IFramework)
+_Abilities.Nihility_Aura = {}
+_Abilities.Nihility_Aura.new = function(IFramework)
     local self = {}
     local _eventHolder = {}
     local group = IFramework.Group()
@@ -10120,13 +10124,13 @@ Abilities.new = function(IFramework)
     self.Sword_Slash = _Abilities.Sword_Slash.new(IFramework)
     self.Dodge = _Abilities.Dodge.new(IFramework)
 
-    -- Nihility
+    -- Hunt
     self.Blink_Strike = _Abilities.Blink_Strike.new(IFramework)
     self.Demon_Control = _Abilities.Demon_Control.new(IFramework)
     self.Blade_Dance = _Abilities.Blade_Dance.new(IFramework)
 
     self.Shadow_Strike = _Abilities.Shadow_Strike.new(IFramework)
-    self.Nihility_Aura = _Abilities.Nihility_Aura.new(IFramework)
+    self.Hunt_Aura = _Abilities.Hunt_Aura.new(IFramework)
 
     -- Preservation
     self.Overload = _Abilities.Overload.new(IFramework)
@@ -10155,12 +10159,13 @@ Abilities.new = function(IFramework)
     -- Erudition
     self.Erudition_Aura = _Abilities.Erudition_Aura.new(IFramework)
 
-    -- Hunt
-    self.Hunt_Aura = _Abilities.Hunt_Aura.new(IFramework)
+    -- Nihility
     self.Blazing_Blade = _Abilities.Blazing_Blade.new(IFramework, self.Sword_Slash)
     self.Fiery_Hymns_Pledge = _Abilities.Fiery_Hymns_Pledge.new(IFramework)
     self.Lone_Phoenixs_Plume = _Abilities.Lone_Phoenixs_Plume.new(IFramework)
-    self.The_Blade_Supreme_Rekindled = _Abilities.The_Blade_Supreme_Rekindled.new(IFramework)
+
+    self.To_Blaze_Eternal = _Abilities.To_Blaze_Eternal.new(IFramework)
+    self.Nihility_Aura = _Abilities.Nihility_Aura.new(IFramework)
 
 
     -- Leftovers
@@ -10716,7 +10721,7 @@ do
                 [1] = {
                     ["name"] = "Destruction",
                     ["description"] = "You chose the path of "
-                    .. "|cfffa795dD|r|cfff87158e|r|cfff66953s|r|cfff4624et|r|cfff25a49r|r|cfff05344u|r|cffee4b3fc|r|cffec443at|r|cffea3c35i|r|cffe83531o|r|cffe62d2cn|r.",
+                    .. "|cffe585fbD|r|cffe07ff7e|r|cffdb79f3s|r|cffd774eft|r|cffd26eebr|r|cffce69e8u|r|cffc963e4c|r|cffc55ee0t|r|cffc058dci|r|cffbb52d9o|r|cffb74dd5n|r.",
                     ["icon"] = "ReplaceableTextures/CommandButtons/BTNDestructionPath.blp",
                     ["unlocks"] = Ability.I_Am_Atomic,
                     ["aura"] = Ability.Destruction_Aura,
@@ -10742,12 +10747,12 @@ do
                     ["disabled"] = false
                 },
                 [3] = {
-                    ["name"] = "Nihility",
+                    ["name"] = "Hunt",
                     ["description"] = "You chose the path of "
-                    .. "|cffe182f9N|r|cffdb7af3i|r|cffd573eeh|r|cffcf6be9i|r|cffc963e4l|r|cffc35cdfi|r|cffbd54dat|r|cffb74dd5y|r.",
-                    ["icon"] = "ReplaceableTextures/CommandButtons/BTNNihilityPath.blp",
+                    .. "|cffaae5b7H|r|cff89daa9u|r|cff69d09bn|r|cff49c68et|r.",
+                    ["icon"] = "ReplaceableTextures/CommandButtons/BTNHuntPath.blp",
                     ["unlocks"] = Ability.Shadow_Strike,
-                    ["aura"] = Ability.Nihility_Aura,
+                    ["aura"] = Ability.Hunt_Aura,
                     ["requires"] = {
                         [1] = Ability.Blade_Dance,
                         [2] = Ability.Blink_Strike,
@@ -10784,12 +10789,12 @@ do
                     ["disabled"] = true
                 },
                 [6] = {
-                    ["name"] = "Hunt",
+                    ["name"] = "Nihility",
                     ["description"] = "You chose the path of "
-                    .. "|cffaae5b7H|r|cff89daa9u|r|cff69d09bn|r|cff49c68et|r.",
-                    ["icon"] = "ReplaceableTextures/CommandButtons/BTNHuntPath.blp",
-                    ["unlocks"] = Ability.The_Blade_Supreme_Rekindled,
-                    ["aura"] = Ability.Hunt_Aura,
+                    .. "|cfffc7f61N|r|cfff87359i|r|cfff56751h|r|cfff25a49i|r|cffef4e41l|r|cffec4239i|r|cffe93632t|r|cffe62a2ay|r.",
+                    ["icon"] = "ReplaceableTextures/CommandButtons/BTNNihilityPath.blp",
+                    ["unlocks"] = Ability.To_Blaze_Eternal,
+                    ["aura"] = Ability.Nihility_Aura,
                     ["requires"] = {
                         [1] = Ability.Blazing_Blade,
                         [2] = Ability.Fiery_Hymns_Pledge,
