@@ -10492,25 +10492,142 @@ Abilities.new = function(IFramework)
 end
 
 AreaConfiguration = {}
-AreaConfiguration.new = function(disabled, skin, level, damage, health, xp)
+AreaConfiguration.new = function(IFramework)
     local self = {}
 
-    self.disabled = disabled or false
-    self.creepSkin = skin
-    self.creepLevel = level -- 1 | 20 | 35 | 50 | 65 | 80 Wenn Hero Level < Unit Level - 5 dann keine EXP! ; Maximal 20 Level über Creep, sonst keine XP
-    self.creepDamage = damage -- 10 | 65 | 175 | 290 | 450 | 875
-    self.creepAttackspeed = 0.9 + 0.005 * level
-    self.creepMovementspeed = 340 + level
-    self.creepHealth = health -- 50 | 487.5 | 1.750 | 3.625 | 6.750 | 17.500
-    self.creepArmor = 0
-    self.creepLimit = 75
-    self.creepXP = xp -- 5 | 20 | 60 | 450 | 2500 | 20000
+    local disabled = false
+    local skin = 'hpea'
+    local level = 1 -- 1 | 20 | 35 | 50 | 65 | 80 Wenn Hero Level < Unit Level - 5 dann keine EXP! ; Maximal 20 Level über Creep, sonst keine XP
+    local damage = 1 -- 10 | 65 | 175 | 290 | 450 | 875
+    local health = 1 -- 50 | 487.5 | 1.750 | 3.625 | 6.750 | 17.500
+    local armor = 0
+    local limit = 0
+    local xp = 0 -- 5 | 20 | 60 | 450 | 2500 | 20000
+    local required = 0 -- 100 | 175 | 225 | 250 | 275 | 300
+
+    self.bossDisabled = false
 
     self.bossSkin = 'h000'
     self.bossDamage = 1000
     self.bossAttackspeed = 0.7
     self.bossMovementspeed = 380
     self.bossHealth = 30000
+
+    local mt = {}
+
+    -- Quest Getter
+    function mt.__index(table, index)
+        if index == "disabled" then
+            return disabled
+        elseif index == "skin" then
+            return skin
+        elseif index == "level" then
+            return level
+        elseif index == "damage" then
+            return damage
+        elseif index == "attackspeed" then
+            return 0.9 + 0.005 * level
+        elseif index == "movementspeed" then
+            return 340 + level
+        elseif index == "health" then
+            return health
+        elseif index == "armor" then
+            return armor
+        elseif index == "limit" then
+            return limit
+        elseif index == "xp" then
+            return xp
+        elseif index == "required" then
+            return required
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+
+    function mt.__newindex(_table, index, value)
+        if index == "disabled" then
+            disabled = value
+        elseif index == "skin" then
+            skin = value
+        elseif index == "level" then
+            level = value
+        elseif index == "damage" then
+            damage = value
+        -- elseif index == "attackspeed" then
+        --     attackspeed = value
+        -- elseif index == "movementspeed" then
+        --     movementspeed = value
+        elseif index == "health" then
+            health = value
+        elseif index == "armor" then
+            armor = value
+        elseif index == "limit" then
+            limit = value
+        elseif index == "xp" then
+            xp = value
+        elseif index == "required" then
+            required = value
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+
+    function self.Disabled(disabled)
+        self.disabled = disabled
+        return self
+    end
+
+    function self.Skin(skin)
+        self.skin = skin
+        return self
+    end
+
+    function self.Level(level)
+        self.level = level
+        return self
+    end
+
+    function self.Damage(damage)
+        self.damage = damage
+        return self
+    end
+
+    -- function self.Attackspeed(attackspeed)
+    --     self.attackspeed = attackspeed
+    --     return self
+    -- end
+
+    -- function self.Movementspeed(movementspeed)
+    --     self.movementspeed = movementspeed
+    --     return self
+    -- end
+
+    function self.Health(health)
+        self.health = health
+        return self
+    end
+
+    function self.Armor(armor)
+        self.armor = armor
+        return self
+    end
+
+    function self.Limit(limit)
+        self.limit = limit
+        return self
+    end
+
+    function self.Xp(xp)
+        self.xp = xp
+        return self
+    end
+
+    function self.Required(required)
+        self.required = required
+        return self
+    end
+
+    setmetatable(self, mt)
 
     return self
 end
@@ -10529,7 +10646,6 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
     
     local killcount = 0
     local bossSpawned = false
-    local bossSpawnDisabled = false
     local BOSS_SPAWN_AMOUNT = 300
 
     self.x = GetRectCenterX(rect)
@@ -10541,6 +10657,9 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
 
     function mt.__newindex(table, index, value)
         if index == "killcount" then
+            if configuration.bossDisabled then
+                return
+            end
             killcount = value
             group
                 .inRect(rect)
@@ -10552,7 +10671,7 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
                         enumUnit.owner.food = killcount
                     end
                 )
-            if killcount >= BOSS_SPAWN_AMOUNT and not bossSpawnDisabled and not bossSpawned then
+            if killcount >= configuration.required and not bossSpawned then
                 self.spawnBoss()
             end
         else
@@ -10618,15 +10737,15 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
 
         if unit == nil then
             local unit = enemyPlayer.createUnit('unit', self.getRandomX(), self.getRandomY(), math.random(0, 360))
-            unit.skin = self.configuration.creepSkin
-            unit.damage = self.configuration.creepDamage
-            unit.attackspeed = self.configuration.creepAttackspeed
-            unit.ms = self.configuration.creepMovementspeed
-            unit.maxhp = self.configuration.creepHealth
-            unit.hp = self.configuration.creepHealth
-            unit.level = self.configuration.creepLevel
-            unit.armor = self.configuration.creepArmor
-            local xp = self.configuration.creepXP
+            unit.skin = self.configuration.skin
+            unit.damage = self.configuration.damage
+            unit.attackspeed = self.configuration.attackspeed
+            unit.ms = self.configuration.movementspeed
+            unit.maxhp = self.configuration.health
+            unit.hp = self.configuration.health
+            unit.level = self.configuration.level
+            unit.armor = self.configuration.armor
+            local xp = self.configuration.xp
             unit.bind("on_death_pre",
                 function(source, target, damageObject)
                     damageObject.damage = 0
@@ -10714,7 +10833,7 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
 
     function self.reset()
         self.removeAllEnemies()
-        for _ = 0, configuration.creepLimit, 1 do
+        for _ = 0, configuration.limit, 1 do
             self.spawnUnit()
         end
     end
@@ -11295,13 +11414,66 @@ do
             end
     
             local areaConfigurations = {
-                --                                   Skin    Level      ATK        HP      XP
-                [1] = AreaConfiguration.new(false,  'h007',      1,      10,       50,      5),   -- ATK: 10  | HP: 50
-                [2] = AreaConfiguration.new(true,   'h008',     20,      65,     3850,     20),   -- ATK: 65  | HP: 3850
-                [3] = AreaConfiguration.new(true,   'h009',     35,     175,     8750,     60),   -- ATK: 175 | HP: 8750
-                [4] = AreaConfiguration.new(true,   'h00A',     50,     290,    14750,    450),   -- ATK: 290 | HP: 14750
-                [5] = AreaConfiguration.new(true,   'h00B',     65,     450,    31250,   2500),   -- ATK: 450 | HP: 31250
-                [6] = AreaConfiguration.new(true,   'h00C',     80,     875,    78500,  20000)    -- ATK: 875 | HP: 78500
+                [1] = AreaConfiguration
+                        .new(IFramework)
+                        .Disabled(false)
+                        .Skin('h007')
+                        .Level(1)
+                        .Damage(10)
+                        .Health(50)
+                        .Xp(5)
+                        .Limit(75)
+                        .Required(100),
+                [2] = AreaConfiguration
+                        .new(IFramework)
+                        .Disabled(true)
+                        .Skin('h008')
+                        .Level(20)
+                        .Damage(65)
+                        .Health(3850)
+                        .Xp(20)
+                        .Limit(75)
+                        .Required(175),
+                [3] = AreaConfiguration
+                        .new(IFramework)
+                        .Disabled(true)
+                        .Skin('h009')
+                        .Level(35)
+                        .Damage(175)
+                        .Health(8750)
+                        .Xp(60)
+                        .Limit(75)
+                        .Required(225),
+                [4] = AreaConfiguration
+                        .new(IFramework)
+                        .Disabled(true)
+                        .Skin('h00A')
+                        .Level(50)
+                        .Damage(290)
+                        .Health(14750)
+                        .Xp(450)
+                        .Limit(75)
+                        .Required(250),
+                [5] = AreaConfiguration
+                        .new(IFramework)
+                        .Disabled(true)
+                        .Skin('h00B')
+                        .Level(65)
+                        .Damage(450)
+                        .Health(31250)
+                        .Xp(2500)
+                        .Limit(75)
+                        .Required(275),
+                [6] = AreaConfiguration
+                        .new(IFramework)
+                        .Disabled(true)
+                        .Skin('h00C')
+                        .Level(80)
+                        .Damage(875)
+                        .Health(78500)
+                        .Xp(20000)
+                        .Limit(75)
+                        .Required(300)
             }
     
             local areas = {
@@ -11551,10 +11723,62 @@ do
                             print("id: " .. player.id)
                         end
                     )
-    
+
                     -- Default Abilities
                     Ability.Sword_Slash.apply(unit)
                     Ability.Dodge.apply(unit)
+
+                    player.bind("on_message",
+                        function(player, message)
+                            local whichBoss = string.sub(message, 10, string.len(message))
+                            if whichBoss == '1' then
+                                areaConfigurations[1].bossDisabled = true
+                            elseif whichBoss == '2' then
+                                areaConfigurations[2].bossDisabled = true
+                            elseif whichBoss == '3' then
+                                areaConfigurations[3].bossDisabled = true
+                            elseif whichBoss == '4' then
+                                areaConfigurations[4].bossDisabled = true
+                            elseif whichBoss == '5' then
+                                areaConfigurations[5].bossDisabled = true
+                            elseif whichBoss == '6' then
+                                areaConfigurations[6].bossDisabled = true
+                            else
+                                return
+                            end
+                            print("Executed " .. message)
+                        end
+                    ).setCondition(
+                        function(player, message)
+                            return string.sub(message, 1, 8) == "-disable"
+                        end
+                    )
+
+                    player.bind("on_message",
+                        function(player, message)
+                            local whichBoss = string.sub(message, 9, string.len(message))
+                            if whichBoss == '1' then
+                                areaConfigurations[1].bossDisabled = false
+                            elseif whichBoss == '2' then
+                                areaConfigurations[2].bossDisabled = false
+                            elseif whichBoss == '3' then
+                                areaConfigurations[3].bossDisabled = false
+                            elseif whichBoss == '4' then
+                                areaConfigurations[4].bossDisabled = false
+                            elseif whichBoss == '5' then
+                                areaConfigurations[5].bossDisabled = false
+                            elseif whichBoss == '6' then
+                                areaConfigurations[6].bossDisabled = false
+                            else
+                                return
+                            end
+                            print("Executed " .. message)
+                        end
+                    ).setCondition(
+                        function(player, message)
+                            return string.sub(message, 1, 7) == "-enable"
+                        end
+                    )
     
                     player.bind("on_message",
                         function(player, message)
@@ -11571,6 +11795,8 @@ do
                                 areas['I004'].boss_death()
                             elseif whichBoss == '6' then
                                 areas['I005'].boss_death()
+                            else
+                                return
                             end
                             print("Executed " .. message)
                         end
