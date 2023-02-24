@@ -19,6 +19,12 @@ Framework.new = function()
             local repeatingTasks = {}
             local afterInit
 
+            function self.beforeInit(func)
+                beforeInit = func
+
+                return self
+            end
+
             function self.afterInit(func)
                 afterInit = func
 
@@ -34,11 +40,16 @@ Framework.new = function()
             function self.run()
                 GameClock.schedule_once(
                     function(triggeringClock, triggeringSchedule)
+                        if beforeInit ~= nil then
+                            beforeInit(IFramework)
+                        end
+
                         print("Map uses Niklas#0786's Framework v" .. VERSION .. ". (" .. RELEASE_DATE .. ")")
                         print("For more information check: " .. DISCORD)
                         for _, task in ipairs(scheduledTasks) do
                             task()
                         end
+
                         if afterInit ~= nil then 
                             xpcall(afterInit, IFramework.Log.Error, IFramework)
                         end
@@ -5923,6 +5934,171 @@ Framework.new = function()
     --     if status then return val end
     -- end
 
+    do
+        -- Framework Quest
+        local Quest = {}
+        Quest.new = function(whichPlayer)
+            local self = {}
+
+            local handle = CreateQuest()
+            local title
+            local description
+            local icon
+            
+            local mt = {}
+
+            -- Quest Getter
+            function mt.__index(table, index)
+                if index == "handle" then
+                    return handle
+                elseif index == "title" then
+                    return title
+                elseif index == "description" then
+                    return description
+                elseif index == "icon" then
+                    return icon
+                elseif index == "required" then
+                    return IsQuestRequired(handle)
+                elseif index == "completed" then
+                    return IsQuestCompleted(handle)
+                elseif index == "discovered" then
+                    return IsQuestDiscovered(handle)
+                elseif index == "failed" then
+                    return IsQuestFailed(handle)
+                elseif index == "enabled" then
+                    return IsQuestEnabled(handle)
+                else
+                    Interface.Log.Error("Unknown attribute '" .. index .. "'.")
+                end
+            end
+
+            function mt.__newindex(_table, index, value)
+                if index == "title" then
+                    title = value
+                    QuestSetTitle(handle, title)
+                elseif index == "description" then
+                    description = value
+                    QuestSetDescription(handle, description)
+                elseif index == "icon" then
+                    icon = value
+                    QuestSetIconPath(handle, icon)
+                elseif index == "required" then
+                    QuestSetRequired(handle, value)
+                elseif index == "completed" then
+                    QuestSetCompleted(handle, value)
+                elseif index == "discovered" then
+                    QuestSetDiscovered(handle, value)
+                elseif index == "failed" then
+                    QuestSetFailed(handle, value)
+                elseif index == "enabled" then
+                    QuestSetEnabled(handle, value)
+                else
+                    Interface.Log.Error("Unknown attribute '" .. index .. "'.")
+                end
+            end
+
+            function self._setTitle(title)
+                self.title = title
+                return self
+            end
+
+            self.Title = function(title)
+                local status, val = xpcall(self._setTitle, Interface.Log.Error, title)
+                if status then return val end
+            end
+
+            function self._setDescription(description)
+                self.description = description
+                return self
+            end
+
+            self.Description = function(description)
+                local status, val = xpcall(self._setDescription, Interface.Log.Error, description)
+                if status then return val end
+            end
+
+            function self._setIcon(icon)
+                self.icon = icon
+                return self
+            end
+
+            self.Icon = function(icon)
+                local status, val = xpcall(self._setIcon, Interface.Log.Error, icon)
+                if status then return val end
+            end
+            
+            function self._setRequired(required)
+                self.required = required
+                return self
+            end
+
+            self.Required = function(required)
+                local status, val = xpcall(self._setRequired, Interface.Log.Error, required)
+                if status then return val end
+            end
+
+            function self._setCompleted(completed)
+                self.completed = completed
+                return self
+            end
+
+            self.Completed = function(completed)
+                local status, val = xpcall(self._setCompleted, Interface.Log.Error, completed)
+                if status then return val end
+            end
+
+            function self._setDiscovered(discovered)
+                self.discovered = discovered
+                return self
+            end
+
+            self.Discovered = function(discovered)
+                local status, val = xpcall(self._setDiscovered, Interface.Log.Error, discovered)
+                if status then return val end
+            end
+
+            function self._setFailed(failed)
+                self.failed = failed
+                return self
+            end
+
+            self.Failed = function(failed)
+                local status, val = xpcall(self._setFailed, Interface.Log.Error, failed)
+                if status then return val end
+            end
+
+            function self._setEnabled(enabled)
+                self.enabled = enabled
+                return self
+            end
+
+            self.Enabled = function(enabled)
+                local status, val = xpcall(self._setEnabled, Interface.Log.Error, enabled)
+                if status then return val end
+            end
+
+            function self._destroy()
+                DestroyQuest(handle)
+                self = nil
+            end
+
+            self.destroy = function()
+                local status, val = xpcall(self._destroy, Interface.Log.Error)
+                if status then return val end
+            end
+
+            setmetatable(self, mt)
+
+            return self
+
+        end
+
+        Quest.name = "Quest"
+
+        Initializer
+            .AddTransient(Quest)
+    end
+
     -- Delete pre-placed units
     Initializer.schedule(
         function(IFramework)
@@ -10807,6 +10983,21 @@ do
     Framework
     .new()
     .initialize()
+    .beforeInit(
+        function(IFramework)
+            IFramework.Quest()
+                .Title("Required Test Title")
+                .Description("Required Test Description")
+                .Icon("ReplaceableTextures/CommandButtons/BTNDestructionPath.blp")
+                .Required(true)
+
+            IFramework.Quest()
+                .Title("Optional Test Title")
+                .Description("Optional Test Description")
+                .Icon("ReplaceableTextures/CommandButtons/BTNNihilityPath.blp")
+                .Required(false)
+        end
+    )
     .afterInit(
         function(IFramework)
             -- Hide Hero Attributes
