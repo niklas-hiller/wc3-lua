@@ -9,6 +9,7 @@ Framework.new = function()
     do
         local Runner = {}
         Runner.new = function(IFramework, scheduledTasks)
+            local self = {}
             local IFramework = IFramework
             local GameClock = IFramework.Clock()
             local scheduledTasks = scheduledTasks
@@ -10348,7 +10349,7 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
     local killcount = 0
     local bossSpawned = false
     local bossSpawnDisabled = false
-    local BOSS_SPAWN_AMOUNT = 1000
+    local BOSS_SPAWN_AMOUNT = 300
 
     self.x = GetRectCenterX(rect)
     self.y = GetRectCenterY(rect)
@@ -10360,9 +10361,17 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
     function mt.__newindex(table, index, value)
         if index == "killcount" then
             killcount = value
-            --print(killcount)
-            if killcount >= BOSS_SPAWN_AMOUNT and not bossSpawnDisabled then
-                --print("boss spawned")
+            group
+                .inRect(rect)
+                .forEach(
+                    function(group, enumUnit)
+                        if enumUnit.owner == enemyPlayer then
+                            return
+                        end
+                        enumUnit.owner.food = killcount
+                    end
+                )
+            if killcount >= BOSS_SPAWN_AMOUNT and not bossSpawnDisabled and not bossSpawned then
                 self.spawnBoss()
             end
         else
@@ -10399,10 +10408,17 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
 
     function self.spawnBoss()
         bossSpawned = true
-        killcount = 0
         self.removeAllEnemies()
+
+        clock.schedule_once(
+            function(triggeringClock, triggeringSchedule)
+                
+            end, 15.0
+        )
         
         -- Todo: spawn boss
+
+        killcount = 0
     end
 
     function self.getRandomX()
@@ -10510,6 +10526,9 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
             self.maxX - change, self.minY + change
         )
         unit.owner.setCameraPosition(self.x, self.y)
+
+        unit.owner.foodcap = BOSS_SPAWN_AMOUNT
+        unit.owner.food = killcount
     end
 
     function self.reset()
@@ -10779,7 +10798,7 @@ AffinitySystem.new = function(IFramework, unit)
 end
 
 do
-    -- Initiate IFramework
+    -- Initiate Framework
     Framework
     .new()
     .initialize()
@@ -11319,6 +11338,9 @@ do
                                 player.startPositionX + change, player.startPositionY - change
                             )
                             unit.owner.setCameraPosition(x, y)
+                            
+                            unit.owner.food = 0
+                            unit.owner.foodcap = 0
                         end
                     ).setCondition(
                         function(player, message)
