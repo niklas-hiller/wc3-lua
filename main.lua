@@ -5,6 +5,8 @@ Framework.new = function()
     -- All Interfaces of the Framework
     local Interface = {}
     local Initializer
+    local VERSION = "1.0.0"
+    local RELEASE_DATE = "2023-02-24"
 
     do
         local Runner = {}
@@ -31,6 +33,7 @@ Framework.new = function()
             function self.run()
                 GameClock.schedule_once(
                     function(triggeringClock, triggeringSchedule)
+                        print("Map uses Framework v" .. VERSION .. ". (" .. RELEASE_DATE .. ")")
                         for _, task in ipairs(scheduledTasks) do
                             task()
                         end
