@@ -10525,7 +10525,7 @@ AreaConfiguration.new = function(IFramework)
     local firstclear
 
     local Boss = {}
-    Boss.new = function (base)
+    Boss.new = function(base)
         local self = {}
 
         local base = base
@@ -10577,6 +10577,7 @@ AreaConfiguration.new = function(IFramework)
             elseif index == "movementspeed" then
                 movementspeed = value
             elseif index == "health" then
+                print("Changed Boss HP to " .. value)
                 health = value
             elseif index == "armor" then
                 armor = value
@@ -10679,10 +10680,6 @@ AreaConfiguration.new = function(IFramework)
             level = value
         elseif index == "damage" then
             damage = value
-        -- elseif index == "attackspeed" then
-        --     attackspeed = value
-        -- elseif index == "movementspeed" then
-        --     movementspeed = value
         elseif index == "health" then
             health = value
         elseif index == "armor" then
@@ -10720,16 +10717,6 @@ AreaConfiguration.new = function(IFramework)
         return self
     end
 
-    -- function self.Attackspeed(attackspeed)
-    --     self.attackspeed = attackspeed
-    --     return self
-    -- end
-
-    -- function self.Movementspeed(movementspeed)
-    --     self.movementspeed = movementspeed
-    --     return self
-    -- end
-
     function self.Health(health)
         self.health = health
         return self
@@ -10766,12 +10753,11 @@ AreaConfiguration.new = function(IFramework)
 end
 
 Area = {}
-Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
+Area.new = function(IFramework, rect, configuration)
     local self = {}
     local mt = {}
 
     self.configuration = configuration
-    self.onFirstBossDeath = onFirstBossDeath
     local firstDeath = true
     local clock = IFramework.Clock()
     local group = IFramework.Group()
@@ -10854,6 +10840,7 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
                 boss.skin = self.configuration.Boss.skin
                 boss.level = self.configuration.Boss.level
                 boss.damage = self.configuration.Boss.damage
+                boss.maxhp = self.configuration.Boss.health
                 boss.hp = self.configuration.Boss.health
                 boss.armor = self.configuration.Boss.armor
                 boss.attackspeed = self.configuration.Boss.attackspeed
@@ -10863,7 +10850,7 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
 
 
                 -- Configure boss death
-                local bossDeath = boss.bind("on_death",
+                boss.bind("on_death",
                     function()
                         bossSpawned = false
                         self.boss_death()
@@ -10874,8 +10861,10 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
                 -- Configure boss reset
                 triggeringClock.schedule_interval(
                     function(triggeringClock, triggeringSchedule)
+                        if not bossSpawned then
+                            triggeringClock.unschedule(triggeringSchedule)
+                        end
                         if self.countPlayers() == 0 then
-                            boss.unbind(bossDeath)
                             bossSpawned = false
                             boss.remove()
                             self.reset()
@@ -11592,157 +11581,164 @@ do
                 orbs[index] = orb
             end
     
-            local areaConfigurations = {
-                [1] = AreaConfiguration
-                        .new(IFramework)
-                        .Disabled(false)
-                        .Skin('h007')
-                        .Level(1)
-                        .Damage(10)
-                        .Health(50)
-                        .Xp(5)
-                        .Limit(75)
-                        .Required(100)
-                        .FirstClear(
-                            function(area)
-                                print("The Boss of Area 1 was defeated! Players can now enter the second area!")
-                                area.configuration.disabled = false
-                                orbs[1].visible = true
-                            end
-                        )
-                        .Boss.Disabled(false)
-                        .Boss.Skin('h000')
-                        .Boss.Level(15)
-                        .Boss.Damage(100)
-                        .Boss.Health(975)
-                        .Boss.Armor(0)
-                        .Boss.Attackspeed(0.7)
-                        .Boss.Movementspeed(375),
-                [2] = AreaConfiguration
-                        .new(IFramework)
-                        .Disabled(true)
-                        .Skin('h008')
-                        .Level(20)
-                        .Damage(65)
-                        .Health(3850)
-                        .Xp(20)
-                        .Limit(75)
-                        .Required(175)
-                        .FirstClear(
-                            function(area)
-                                print("The Boss of Area 2 was defeated! Players can now enter the third area!")
-                                area.configuration.disabled = false
-                                orbs[2].visible = true
-                            end
-                        )
-                        .Boss.Disabled(false)
-                        .Boss.Skin('h001')
-                        .Boss.Level(30)
-                        .Boss.Damage(225)
-                        .Boss.Health(47500)
-                        .Boss.Armor(10)
-                        .Boss.Attackspeed(0.75)
-                        .Boss.Movementspeed(375),
-                [3] = AreaConfiguration
-                        .new(IFramework)
-                        .Disabled(true)
-                        .Skin('h009')
-                        .Level(35)
-                        .Damage(175)
-                        .Health(8750)
-                        .Xp(60)
-                        .Limit(75)
-                        .Required(225)
-                        .FirstClear(
-                            function(area)
-                                print("The Boss of Area 3 was defeated! Players can now enter the fourth area!")
-                                area.configuration.disabled = false
-                                orbs[3].visible = true
-                            end
-                        )
-                        .Boss.Disabled(false)
-                        .Boss.Skin('h002')
-                        .Boss.Level(45)
-                        .Boss.Damage()
-                        .Boss.Health(115000)
-                        .Boss.Armor(20)
-                        .Boss.Attackspeed(0.775)
-                        .Boss.Movementspeed(375),
-                [4] = AreaConfiguration
-                        .new(IFramework)
-                        .Disabled(true)
-                        .Skin('h00A')
-                        .Level(50)
-                        .Damage(290)
-                        .Health(14750)
-                        .Xp(450)
-                        .Limit(75)
-                        .Required(250)
-                        .FirstClear(
-                            function(area)
-                                print("The Boss of Area 4 was defeated! Players can now enter the fifth area!")
-                                area.configuration.disabled = false
-                                orbs[4].visible = true
-                            end
-                        )
-                        .Boss.Disabled(false)
-                        .Boss.Skin('h003')
-                        .Boss.Level(60)
-                        .Boss.Damage(500)
-                        .Boss.Health(187500)
-                        .Boss.Armor(40)
-                        .Boss.Attackspeed(0.8)
-                        .Boss.Movementspeed(375),
-                [5] = AreaConfiguration
-                        .new(IFramework)
-                        .Disabled(true)
-                        .Skin('h00B')
-                        .Level(65)
-                        .Damage(450)
-                        .Health(31250)
-                        .Xp(2500)
-                        .Limit(75)
-                        .Required(275)
-                        .FirstClear(
-                            function(area)
-                                print("The Boss of Area 5 was defeated! Players can now enter the sixth area!")
-                                area.configuration.disabled = false
-                                orbs[5].visible = true
-                            end
-                        )
-                        .Boss.Disabled(false)
-                        .Boss.Skin('h004')
-                        .Boss.Level(75)
-                        .Boss.Damage()
-                        .Boss.Health(425000)
-                        .Boss.Armor(65)
-                        .Boss.Attackspeed(0.85)
-                        .Boss.Movementspeed(375),
-                [6] = AreaConfiguration
-                        .new(IFramework)
-                        .Disabled(true)
-                        .Skin('h00C')
-                        .Level(80)
-                        .Damage(875)
-                        .Health(78500)
-                        .Xp(20000)
-                        .Limit(75)
-                        .Required(300)
-                        .FirstClear(
-                            function()
-                                print("The Boss of Area 6 was defeated! A mysterious space rift (not) opened! (Not implemented yet)")
-                                orbs[6].visible = true
-                            end
-                        )
-                        .Boss.Disabled(false)
-                        .Boss.Skin('h005')
-                        .Boss.Level(90)
-                        .Boss.Damage(1725)
-                        .Boss.Health(875000)
-                        .Boss.Armor(80)
-                        .Boss.Attackspeed(0.9)
-                        .Boss.Movementspeed(375)
-            }
+            local areaConfigurations = {}
+            do
+                areaConfigurations[1] = AreaConfiguration
+                    .new(IFramework)
+                    .Disabled(false)
+                    .Skin('h007')
+                    .Level(1)
+                    .Damage(10)
+                    .Health(50)
+                    .Xp(5)
+                    .Limit(75)
+                    .Required(100)
+                    .FirstClear(
+                        function(area)
+                            print("The Boss of Area 1 was defeated! Players can now enter the second area!")
+                            areaConfigurations[2].disabled = false
+                            orbs[1].visible = true
+                        end
+                    )
+                    .Boss.Disabled(false)
+                    .Boss.Skin('h000')
+                    .Boss.Level(15)
+                    .Boss.Damage(100)
+                    .Boss.Health(15000)
+                    .Boss.Armor(0)
+                    .Boss.Attackspeed(0.7)
+                    .Boss.Movementspeed(375)
+
+                areaConfigurations[2] = AreaConfiguration
+                    .new(IFramework)
+                    .Disabled(true)
+                    .Skin('h008')
+                    .Level(20)
+                    .Damage(65)
+                    .Health(3850)
+                    .Xp(20)
+                    .Limit(75)
+                    .Required(175)
+                    .FirstClear(
+                        function(area)
+                            print("The Boss of Area 2 was defeated! Players can now enter the third area!")
+                            areaConfigurations[3].disabled = false
+                            orbs[2].visible = true
+                        end
+                    )
+                    .Boss.Disabled(false)
+                    .Boss.Skin('h001')
+                    .Boss.Level(30)
+                    .Boss.Damage(225)
+                    .Boss.Health(475000)
+                    .Boss.Armor(10)
+                    .Boss.Attackspeed(0.75)
+                    .Boss.Movementspeed(375)
+
+                areaConfigurations[3] = AreaConfiguration
+                    .new(IFramework)
+                    .Disabled(true)
+                    .Skin('h009')
+                    .Level(35)
+                    .Damage(175)
+                    .Health(8750)
+                    .Xp(60)
+                    .Limit(75)
+                    .Required(225)
+                    .FirstClear(
+                        function(area)
+                            print("The Boss of Area 3 was defeated! Players can now enter the fourth area!")
+                            areaConfigurations[4].disabled = false
+                            orbs[3].visible = true
+                        end
+                    )
+                    .Boss.Disabled(false)
+                    .Boss.Skin('h002')
+                    .Boss.Level(45)
+                    .Boss.Damage(365)
+                    .Boss.Health(1150000)
+                    .Boss.Armor(20)
+                    .Boss.Attackspeed(0.775)
+                    .Boss.Movementspeed(375)
+
+                areaConfigurations[4] = AreaConfiguration
+                    .new(IFramework)
+                    .Disabled(true)
+                    .Skin('h00A')
+                    .Level(50)
+                    .Damage(290)
+                    .Health(14750)
+                    .Xp(450)
+                    .Limit(75)
+                    .Required(250)
+                    .FirstClear(
+                        function(area)
+                            print("The Boss of Area 4 was defeated! Players can now enter the fifth area!")
+                            areaConfigurations[5].disabled = false
+                            orbs[4].visible = true
+                        end
+                    )
+                    .Boss.Disabled(false)
+                    .Boss.Skin('h003')
+                    .Boss.Level(60)
+                    .Boss.Damage(625)
+                    .Boss.Health(1875000)
+                    .Boss.Armor(40)
+                    .Boss.Attackspeed(0.8)
+                    .Boss.Movementspeed(375)
+
+                areaConfigurations[5] = AreaConfiguration
+                    .new(IFramework)
+                    .Disabled(true)
+                    .Skin('h00B')
+                    .Level(65)
+                    .Damage(450)
+                    .Health(31250)
+                    .Xp(2500)
+                    .Limit(75)
+                    .Required(275)
+                    .FirstClear(
+                        function(area)
+                            print("The Boss of Area 5 was defeated! Players can now enter the sixth area!")
+                            areaConfigurations[6].disabled = false
+                            orbs[5].visible = true
+                        end
+                    )
+                    .Boss.Disabled(false)
+                    .Boss.Skin('h004')
+                    .Boss.Level(75)
+                    .Boss.Damage(1025)
+                    .Boss.Health(4250000)
+                    .Boss.Armor(65)
+                    .Boss.Attackspeed(0.85)
+                    .Boss.Movementspeed(375)
+
+                areaConfigurations[6] = AreaConfiguration
+                    .new(IFramework)
+                    .Disabled(true)
+                    .Skin('h00C')
+                    .Level(80)
+                    .Damage(875)
+                    .Health(78500)
+                    .Xp(20000)
+                    .Limit(75)
+                    .Required(300)
+                    .FirstClear(
+                        function()
+                            print("The Boss of Area 6 was defeated! A mysterious space rift (not) opened! (Not implemented yet)")
+                            orbs[6].visible = true
+                        end
+                    )
+                    .Boss.Disabled(false)
+                    .Boss.Skin('h005')
+                    .Boss.Level(90)
+                    .Boss.Damage(2175)
+                    .Boss.Health(8750000)
+                    .Boss.Armor(80)
+                    .Boss.Attackspeed(0.9)
+                    .Boss.Movementspeed(375)
+            end
+            
     
             local areas = {
                 ['I000'] = Area.new(IFramework, gg_rct_Bottom_Left_Room_BL, areaConfigurations[1]),
