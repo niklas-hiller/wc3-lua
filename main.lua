@@ -34,7 +34,7 @@ Framework.new = function()
             function self.run()
                 GameClock.schedule_once(
                     function(triggeringClock, triggeringSchedule)
-                        print("Map uses Framework v" .. VERSION .. ". (" .. RELEASE_DATE .. ")")
+                        print("Map uses Niklas#0786's Framework v" .. VERSION .. ". (" .. RELEASE_DATE .. ")")
                         print("For more information check: " .. DISCORD)
                         for _, task in ipairs(scheduledTasks) do
                             task()
