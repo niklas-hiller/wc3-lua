@@ -5575,6 +5575,24 @@ Framework.new = function()
                 if status then return val end
             end
 
+            function self._inRectFiltered(rect, filter)
+                units = {}
+                GroupEnumUnitsInRect(handle, rect, Filter(
+                    function()
+                        local filterUnit = GetFilterUnit()
+                        if filter(group, filterUnit) then
+                            table.insert(units, filterUnit)
+                        end
+                    end
+                ))
+                return self
+            end
+
+            self.inRectFiltered = function(rect, filter)
+                local status, val = xpcall(self._inRectFiltered, Interface.Log.Error, rect, filter)
+                if status then return val end
+            end
+
             function self._inRangeFiltered(x, y, range, filter)
                 units = {}
                 GroupEnumUnitsInRange(handle, x, y, range, Filter(
@@ -10504,18 +10522,122 @@ AreaConfiguration.new = function(IFramework)
     local limit = 0
     local xp = 0 -- 5 | 20 | 60 | 450 | 2500 | 20000
     local required = 0 -- 100 | 175 | 225 | 250 | 275 | 300
+    local firstclear
 
-    self.bossDisabled = false
+    local Boss = {}
+    Boss.new = function (base)
+        local self = {}
 
-    self.bossSkin = 'h000'
-    self.bossDamage = 1000
-    self.bossAttackspeed = 0.7
-    self.bossMovementspeed = 380
-    self.bossHealth = 30000
+        local base = base
+        local disabled = false
+        local skin = 'hpea'
+        local level = 1
+        local damage = 1
+        local attackspeed = 0.7
+        local movementspeed = 350
+        local health = 1
+        local armor = 0
 
+        local mt = {}
+
+        -- Getter
+        function mt.__index(table, index)
+            if index == "disabled" then
+                return disabled
+            elseif index == "skin" then
+                return skin
+            elseif index == "level" then
+                return level
+            elseif index == "damage" then
+                return damage
+            elseif index == "attackspeed" then
+                return attackspeed
+            elseif index == "movementspeed" then
+                return movementspeed
+            elseif index == "health" then
+                return health
+            elseif index == "armor" then
+                return armor
+            else
+                IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+            end
+        end
+
+        function mt.__newindex(_table, index, value)
+            if index == "disabled" then
+                disabled = value
+            elseif index == "skin" then
+                skin = value
+            elseif index == "level" then
+                level = value
+            elseif index == "damage" then
+                damage = value
+            elseif index == "attackspeed" then
+                attackspeed = value
+            elseif index == "movementspeed" then
+                movementspeed = value
+            elseif index == "health" then
+                health = value
+            elseif index == "armor" then
+                armor = value
+            else
+                IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+            end
+        end
+
+        function self.Base()
+            return base
+        end
+
+        function self.Disabled(disabled)
+            self.disabled = disabled
+            return base
+        end
+    
+        function self.Skin(skin)
+            self.skin = skin
+            return base
+        end
+    
+        function self.Level(level)
+            self.level = level
+            return base
+        end
+    
+        function self.Damage(damage)
+            self.damage = damage
+            return base
+        end
+    
+        function self.Attackspeed(attackspeed)
+            self.attackspeed = attackspeed
+            return base
+        end
+    
+        function self.Movementspeed(movementspeed)
+            self.movementspeed = movementspeed
+            return base
+        end
+    
+        function self.Health(health)
+            self.health = health
+            return base
+        end
+    
+        function self.Armor(armor)
+            self.armor = armor
+            return base
+        end
+
+        setmetatable(self, mt)
+
+        return self
+    end
+
+    local boss = Boss.new(self)
     local mt = {}
 
-    -- Quest Getter
+    -- Getter
     function mt.__index(table, index)
         if index == "disabled" then
             return disabled
@@ -10539,6 +10661,10 @@ AreaConfiguration.new = function(IFramework)
             return xp
         elseif index == "required" then
             return required
+        elseif index == "firstclear" then
+            return firstclear
+        elseif index == "Boss" then
+            return boss
         else
             IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
         end
@@ -10567,6 +10693,8 @@ AreaConfiguration.new = function(IFramework)
             xp = value
         elseif index == "required" then
             required = value
+        elseif index == "firstclear" then
+            firstclear = value
         else
             IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
         end
@@ -10627,6 +10755,11 @@ AreaConfiguration.new = function(IFramework)
         return self
     end
 
+    function self.FirstClear(func)
+        self.firstclear = func
+        return self
+    end
+
     setmetatable(self, mt)
 
     return self
@@ -10646,7 +10779,6 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
     
     local killcount = 0
     local bossSpawned = false
-    local BOSS_SPAWN_AMOUNT = 300
 
     self.x = GetRectCenterX(rect)
     self.y = GetRectCenterY(rect)
@@ -10657,7 +10789,10 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
 
     function mt.__newindex(table, index, value)
         if index == "killcount" then
-            if configuration.bossDisabled then
+            if self.configuration.Boss.disabled then
+                return
+            end
+            if value > self.configuration.required then
                 return
             end
             killcount = value
@@ -10671,7 +10806,7 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
                         enumUnit.owner.food = killcount
                     end
                 )
-            if killcount >= configuration.required and not bossSpawned then
+            if killcount >= self.configuration.required and not bossSpawned then
                 self.spawnBoss()
             end
         else
@@ -10702,23 +10837,53 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
     function self.boss_death()
         if firstDeath then
             firstDeath = false
-            self.onFirstBossDeath()
+            self.configuration.firstclear(self)
         end
     end
 
     function self.spawnBoss()
-        bossSpawned = true
         self.removeAllEnemies()
 
+        print("Area Boss will spawn in 15 seconds. (Entry will close after Boss Spawn!)")
         clock.schedule_once(
             function(triggeringClock, triggeringSchedule)
-                
+                bossSpawned = true
+                local boss = enemyPlayer.createUnit('Boss', self.x, self.y, 270.)
+
+                -- Configure boss stats
+                boss.skin = self.configuration.Boss.skin
+                boss.level = self.configuration.Boss.level
+                boss.damage = self.configuration.Boss.damage
+                boss.hp = self.configuration.Boss.health
+                boss.armor = self.configuration.Boss.armor
+                boss.attackspeed = self.configuration.Boss.attackspeed
+                boss.ms = self.configuration.Boss.movementspeed
+
+                -- Configure boss abilities
+
+
+                -- Configure boss death
+                local bossDeath = boss.bind("on_death",
+                    function()
+                        bossSpawned = false
+                        self.boss_death()
+                        self.reset()
+                    end
+                )
+
+                -- Configure boss reset
+                triggeringClock.schedule_interval(
+                    function(triggeringClock, triggeringSchedule)
+                        if self.countPlayers() == 0 then
+                            boss.unbind(bossDeath)
+                            bossSpawned = false
+                            boss.remove()
+                            self.reset()
+                        end
+                    end, 1.0
+                )
             end, 15.0
         )
-        
-        -- Todo: spawn boss
-
-        killcount = 0
     end
 
     function self.getRandomX()
@@ -10731,7 +10896,7 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
 
     function self.spawnUnit(unit)
 
-        if bossSpawned then
+        if bossSpawned or killcount >= self.configuration.required then
             return
         end
 
@@ -10808,9 +10973,22 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
             .inGroup(unit)
     end
 
+    function self.countPlayers()
+        return group
+            .inRectFiltered(rect,
+                function(group, filterUnit)
+                    return filterUnit.owner ~= enemyPlayer
+                end
+            ).size
+    end
+
     function self.enter(unit)
-        if configuration.disabled then
+        if self.configuration.disabled then
             print("Clear previous Area!")
+            return
+        end
+        if bossSpawned then
+            print("Boss fight is currently in progress.")
             return
         end
         if self.contains(unit) then
@@ -10827,13 +11005,14 @@ Area.new = function(IFramework, rect, configuration, onFirstBossDeath)
         )
         unit.owner.setCameraPosition(self.x, self.y)
 
-        unit.owner.foodcap = BOSS_SPAWN_AMOUNT
-        unit.owner.food = killcount
+        unit.owner.foodcap = self.configuration.required
+        unit.owner.food = self.killcount
     end
 
     function self.reset()
         self.removeAllEnemies()
-        for _ = 0, configuration.limit, 1 do
+        self.killcount = 0
+        for _ = 0, self.configuration.limit, 1 do
             self.spawnUnit()
         end
     end
@@ -11423,7 +11602,22 @@ do
                         .Health(50)
                         .Xp(5)
                         .Limit(75)
-                        .Required(100),
+                        .Required(100)
+                        .FirstClear(
+                            function(area)
+                                print("The Boss of Area 1 was defeated! Players can now enter the second area!")
+                                area.configuration.disabled = false
+                                orbs[1].visible = true
+                            end
+                        )
+                        .Boss.Disabled(false)
+                        .Boss.Skin('h000')
+                        .Boss.Level(15)
+                        .Boss.Damage(100)
+                        .Boss.Health(975)
+                        .Boss.Armor(0)
+                        .Boss.Attackspeed(0.7)
+                        .Boss.Movementspeed(375),
                 [2] = AreaConfiguration
                         .new(IFramework)
                         .Disabled(true)
@@ -11433,7 +11627,22 @@ do
                         .Health(3850)
                         .Xp(20)
                         .Limit(75)
-                        .Required(175),
+                        .Required(175)
+                        .FirstClear(
+                            function(area)
+                                print("The Boss of Area 2 was defeated! Players can now enter the third area!")
+                                area.configuration.disabled = false
+                                orbs[2].visible = true
+                            end
+                        )
+                        .Boss.Disabled(false)
+                        .Boss.Skin('h001')
+                        .Boss.Level(30)
+                        .Boss.Damage(225)
+                        .Boss.Health(47500)
+                        .Boss.Armor(10)
+                        .Boss.Attackspeed(0.75)
+                        .Boss.Movementspeed(375),
                 [3] = AreaConfiguration
                         .new(IFramework)
                         .Disabled(true)
@@ -11443,7 +11652,22 @@ do
                         .Health(8750)
                         .Xp(60)
                         .Limit(75)
-                        .Required(225),
+                        .Required(225)
+                        .FirstClear(
+                            function(area)
+                                print("The Boss of Area 3 was defeated! Players can now enter the fourth area!")
+                                area.configuration.disabled = false
+                                orbs[3].visible = true
+                            end
+                        )
+                        .Boss.Disabled(false)
+                        .Boss.Skin('h002')
+                        .Boss.Level(45)
+                        .Boss.Damage()
+                        .Boss.Health(115000)
+                        .Boss.Armor(20)
+                        .Boss.Attackspeed(0.775)
+                        .Boss.Movementspeed(375),
                 [4] = AreaConfiguration
                         .new(IFramework)
                         .Disabled(true)
@@ -11453,7 +11677,22 @@ do
                         .Health(14750)
                         .Xp(450)
                         .Limit(75)
-                        .Required(250),
+                        .Required(250)
+                        .FirstClear(
+                            function(area)
+                                print("The Boss of Area 4 was defeated! Players can now enter the fifth area!")
+                                area.configuration.disabled = false
+                                orbs[4].visible = true
+                            end
+                        )
+                        .Boss.Disabled(false)
+                        .Boss.Skin('h003')
+                        .Boss.Level(60)
+                        .Boss.Damage(500)
+                        .Boss.Health(187500)
+                        .Boss.Armor(40)
+                        .Boss.Attackspeed(0.8)
+                        .Boss.Movementspeed(375),
                 [5] = AreaConfiguration
                         .new(IFramework)
                         .Disabled(true)
@@ -11463,7 +11702,22 @@ do
                         .Health(31250)
                         .Xp(2500)
                         .Limit(75)
-                        .Required(275),
+                        .Required(275)
+                        .FirstClear(
+                            function(area)
+                                print("The Boss of Area 5 was defeated! Players can now enter the sixth area!")
+                                area.configuration.disabled = false
+                                orbs[5].visible = true
+                            end
+                        )
+                        .Boss.Disabled(false)
+                        .Boss.Skin('h004')
+                        .Boss.Level(75)
+                        .Boss.Damage()
+                        .Boss.Health(425000)
+                        .Boss.Armor(65)
+                        .Boss.Attackspeed(0.85)
+                        .Boss.Movementspeed(375),
                 [6] = AreaConfiguration
                         .new(IFramework)
                         .Disabled(true)
@@ -11474,50 +11728,29 @@ do
                         .Xp(20000)
                         .Limit(75)
                         .Required(300)
+                        .FirstClear(
+                            function()
+                                print("The Boss of Area 6 was defeated! A mysterious space rift (not) opened! (Not implemented yet)")
+                                orbs[6].visible = true
+                            end
+                        )
+                        .Boss.Disabled(false)
+                        .Boss.Skin('h005')
+                        .Boss.Level(90)
+                        .Boss.Damage(1725)
+                        .Boss.Health(875000)
+                        .Boss.Armor(80)
+                        .Boss.Attackspeed(0.9)
+                        .Boss.Movementspeed(375)
             }
     
             local areas = {
-                ['I000'] = Area.new(IFramework, gg_rct_Bottom_Left_Room_BL, areaConfigurations[1],
-                    function()
-                        print("The Boss of Area 1 was defeated! Players can now enter the second area!")
-                        areaConfigurations[2].disabled = false
-                        orbs[1].visible = true
-                    end
-                ),
-                ['I001'] = Area.new(IFramework, gg_rct_Bottom_Left_Room_BR, areaConfigurations[2],
-                    function()
-                        print("The Boss of Area 2 was defeated! Players can now enter the third area!")
-                        areaConfigurations[3].disabled = false
-                        orbs[2].visible = true
-                    end
-                ),
-                ['I002'] = Area.new(IFramework, gg_rct_Bottom_Left_Room_TL, areaConfigurations[3],
-                    function()
-                        print("The Boss of Area 3 was defeated! Players can now enter the fourth area!")
-                        areaConfigurations[4].disabled = false
-                        orbs[3].visible = true
-                    end
-                ),
-                ['I003'] = Area.new(IFramework, gg_rct_Bottom_Right_Room_BL, areaConfigurations[4],
-                    function()
-                        print("The Boss of Area 4 was defeated! Players can now enter the fifth area!")
-                        areaConfigurations[5].disabled = false
-                        orbs[4].visible = true
-                    end
-                ),
-                ['I004'] = Area.new(IFramework, gg_rct_Bottom_Right_Room_BR, areaConfigurations[5],
-                    function()
-                        print("The Boss of Area 5 was defeated! Players can now enter the sixth area!")
-                        areaConfigurations[6].disabled = false
-                        orbs[5].visible = true
-                    end
-                ),
-                ['I005'] = Area.new(IFramework, gg_rct_Bottom_Right_Room_TR, areaConfigurations[6],
-                    function()
-                        print("The Boss of Area 6 was defeated! A mysterious space rift (not) opened! (Not implemented yet)")
-                        orbs[6].visible = true
-                    end
-                )
+                ['I000'] = Area.new(IFramework, gg_rct_Bottom_Left_Room_BL, areaConfigurations[1]),
+                ['I001'] = Area.new(IFramework, gg_rct_Bottom_Left_Room_BR, areaConfigurations[2]),
+                ['I002'] = Area.new(IFramework, gg_rct_Bottom_Left_Room_TL, areaConfigurations[3]),
+                ['I003'] = Area.new(IFramework, gg_rct_Bottom_Right_Room_BL, areaConfigurations[4]),
+                ['I004'] = Area.new(IFramework, gg_rct_Bottom_Right_Room_BR, areaConfigurations[5]),
+                ['I005'] = Area.new(IFramework, gg_rct_Bottom_Right_Room_TR, areaConfigurations[6])
             }
     
             local MAX_PLAYERS = 8
@@ -11732,17 +11965,17 @@ do
                         function(player, message)
                             local whichBoss = string.sub(message, 10, string.len(message))
                             if whichBoss == '1' then
-                                areaConfigurations[1].bossDisabled = true
+                                areaConfigurations[1].Boss.disabled = true
                             elseif whichBoss == '2' then
-                                areaConfigurations[2].bossDisabled = true
+                                areaConfigurations[2].Boss.disabled = true
                             elseif whichBoss == '3' then
-                                areaConfigurations[3].bossDisabled = true
+                                areaConfigurations[3].Boss.disabled = true
                             elseif whichBoss == '4' then
-                                areaConfigurations[4].bossDisabled = true
+                                areaConfigurations[4].Boss.disabled = true
                             elseif whichBoss == '5' then
-                                areaConfigurations[5].bossDisabled = true
+                                areaConfigurations[5].Boss.disabled = true
                             elseif whichBoss == '6' then
-                                areaConfigurations[6].bossDisabled = true
+                                areaConfigurations[6].Boss.disabled = true
                             else
                                 return
                             end
@@ -11758,17 +11991,17 @@ do
                         function(player, message)
                             local whichBoss = string.sub(message, 9, string.len(message))
                             if whichBoss == '1' then
-                                areaConfigurations[1].bossDisabled = false
+                                areaConfigurations[1].Boss.disabled = false
                             elseif whichBoss == '2' then
-                                areaConfigurations[2].bossDisabled = false
+                                areaConfigurations[2].Boss.disabled = false
                             elseif whichBoss == '3' then
-                                areaConfigurations[3].bossDisabled = false
+                                areaConfigurations[3].Boss.disabled = false
                             elseif whichBoss == '4' then
-                                areaConfigurations[4].bossDisabled = false
+                                areaConfigurations[4].Boss.disabled = false
                             elseif whichBoss == '5' then
-                                areaConfigurations[5].bossDisabled = false
+                                areaConfigurations[5].Boss.disabled = false
                             elseif whichBoss == '6' then
-                                areaConfigurations[6].bossDisabled = false
+                                areaConfigurations[6].Boss.disabled = false
                             else
                                 return
                             end
