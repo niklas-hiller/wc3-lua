@@ -60,43 +60,140 @@ Framework.new = function()
                 table.insert(scheduled, func)
             end
 
-            function self.inject(class, objectType, ...)
-                if objectType == 'Transient' then
-                    table.insert(transients, {["class"] = class})
-                elseif objectType == 'Singleton' then
-                    table.insert(singletons, {["class"] = class, ["args"] = ...})
-                elseif objectType == 'Multiton' then
-                    table.insert(multitons, {["class"] = class, ["argGroups"] = ...})
+            local Transient = {}
+            Transient.new = function(class)
+                local self = {}
+                local targetClass = class
+                local mt = {}
+
+                function mt.__index(table, index)
+                    if index == "class" then
+                        return targetClass
+                    end
                 end
+
+                setmetatable(self, mt)
+
+                return self
             end
 
-            function self.initialize()
-                print("Loaded Modules: ")
+            function self.AddTransient(class)
+                local transient = Transient.new(class)
+                table.insert(transients, transient)
+                return transient
+            end
+
+            local function LoadTransients()
                 local loadedModules = {}
+
                 for _, transient in ipairs(transients) do
                     local class = transient.class
                     table.insert(loadedModules, class)
                     Interface[class.name] = class.new
                 end
 
+                return loadedModules
+            end
+
+            local Singleton = {}
+            Singleton.new = function(class)
+                local self = {}
+                local targetClass = class
+                local values = nil
+                local mt = {}
+
+                function mt.__index(table, index)
+                    if index == "class" then
+                        return targetClass
+                    elseif index == "values" then
+                        return values
+                    end
+                end
+
+                -- Expects format: param1, param2, param3
+                function self.Values(...)
+                    values = ...
+                    return self
+                end
+
+                setmetatable(self, mt)
+
+                return self
+            end
+
+            function self.AddSingleton(class)
+                local singleton = Singleton.new(class)
+                table.insert(singletons, singleton)
+                return singleton
+            end
+
+            local function LoadSingletons()
+                local loadedModules = {}
+
                 for _, singleton in ipairs(singletons) do
                     local class = singleton.class
                     table.insert(loadedModules, class)
-                    Interface[class.name] = class.new(singleton.args)
+                    Interface[class.name] = class.new(singleton.values)
                 end
+
+                return loadedModules
+            end
+
+            local Multiton = {}
+            Multiton.new = function(class)
+                local self = {}
+                local targetClass = class
+                local values = nil
+                local mt = {}
+
+                function mt.__index(table, index)
+                    if index == "class" then
+                        return targetClass
+                    elseif index == "values" then
+                        return values
+                    end
+                end
+
+                -- Expects format: {{param1, param2, param3}, {param1, param2, param3}, {param1, param2, param3}}
+                function self.Values(...)
+                    values = ...
+                    return self
+                end
+
+                setmetatable(self, mt)
+
+                return self
+            end
+
+            function self.AddMultiton(class)
+                local multiton = Multiton.new(class)
+                table.insert(multitons, multiton)
+                return multiton
+            end
+
+            local function LoadMultitons()
+                local loadedModules = {}
 
                 for _, multiton in ipairs(multitons) do
                     local instances = {}
                     local class = multiton.class
                     table.insert(loadedModules, class)
                     Interface[class.name] = {}
-                    for _, args in ipairs(multiton.argGroups) do
-                        table.insert(instances, class.new(table.unpack(args)))
+                    for _, values in ipairs(multiton.values) do
+                        table.insert(instances, class.new(table.unpack(values)))
                     end
                     Interface[class.name] = function(index)
                         return instances[index + 1]
                     end
                 end
+
+                return loadedModules
+            end
+
+            function self.initialize()
+                LoadTransients()
+                LoadSingletons()
+                LoadMultitons()
 
                 return Runner.new(Interface, scheduled)
             end
@@ -269,7 +366,9 @@ Framework.new = function()
 
         -- Only this is required outside
         Configuration.name = "Configuration"
-        Initializer.inject(Configuration, "Singleton")
+
+        Initializer
+            .AddSingleton(Configuration)
     end
 
     do
@@ -307,7 +406,10 @@ Framework.new = function()
         end
 
         Log.name = "Log"
-        Initializer.inject(Log, "Singleton", 2)
+
+        Initializer
+            .AddSingleton(Log)
+            .Values(2)
     end
 
     do
@@ -344,7 +446,8 @@ Framework.new = function()
         end
 
         Indexer.name = "Indexer"
-        Initializer.inject(Indexer, "Singleton")
+        Initializer
+            .AddSingleton(Indexer)
     end
 
     local _GetTriggerUnit = GetTriggerUnit
@@ -992,7 +1095,9 @@ Framework.new = function()
         end
 
         Trigger.name = "Trigger"
-        Initializer.inject(Trigger, "Transient")
+        
+        Initializer
+            .AddTransient(Trigger)
     end
 
     do
@@ -1120,7 +1225,9 @@ Framework.new = function()
         end
 
         EventDispatcher.name = "EventDispatcher"
-        Initializer.inject(EventDispatcher, "Transient")
+
+        Initializer
+            .AddTransient(EventDispatcher)
     end
 
     do
@@ -1405,7 +1512,9 @@ Framework.new = function()
         end
 
         Effect.name = "Effect"
-        Initializer.inject(Effect, "Transient")
+        
+        Initializer
+            .AddTransient(Effect)
         Interface.EffectHelper = {}
         Interface.EffectHelper.refreshAll = refreshAll
     end
@@ -2431,7 +2540,10 @@ Framework.new = function()
             table.insert(playerIds, {playerId})
         end
         Player.name = "Player"
-        Initializer.inject(Player, "Multiton", playerIds)
+
+        Initializer
+            .AddMultiton(Player)
+            .Values(playerIds)
     end
 
     do
@@ -2658,7 +2770,9 @@ Framework.new = function()
         end
 
         Easing.name = "Easing"
-        Initializer.inject(Easing, "Singleton")
+        
+        Initializer
+            .AddSingleton(Easing)
     end
 
     --[[
@@ -3593,7 +3707,8 @@ Framework.new = function()
         end
 
         Camera.name = "Camera"
-        Initializer.inject(Camera, "Singleton")
+        Initializer
+            .AddSingleton(Camera)
     end
 
     do
@@ -3759,7 +3874,9 @@ Framework.new = function()
         end
         
         Keyboard.name = "Keyboard"
-        Initializer.inject(Keyboard, "Transient")
+
+        Initializer
+            .AddTransient(Keyboard)
     end
 
     do
@@ -3882,7 +3999,9 @@ Framework.new = function()
         end
 
         Mouse.name = "Mouse"
-        Initializer.inject(Mouse, "Transient")
+
+        Initializer
+            .AddTransient(Mouse)
     end
 
     do
@@ -4009,7 +4128,8 @@ Framework.new = function()
         end
 
         Window.name = "Window"
-        Initializer.inject(Window, "Singleton")
+        Initializer
+            .AddSingleton(Window)
     end
 
     -- Framework Terrain
@@ -4035,7 +4155,8 @@ Framework.new = function()
         end
 
         Terrain.name = "Terrain"
-        Initializer.inject(Terrain, "Singleton")
+        Initializer
+            .AddSingleton(Terrain)
     end
 
     
@@ -4177,7 +4298,9 @@ Framework.new = function()
         end
 
         Clock.name = "Clock"
-        Initializer.inject(Clock, "Transient")
+        
+        Initializer
+            .AddTransient(Clock)
     end
 
     do
@@ -4340,7 +4463,8 @@ Framework.new = function()
         end
 
         SoundLoader.name = "SoundLoader"
-        Initializer.inject(SoundLoader, "Singleton")
+        Initializer
+            .AddSingleton(SoundLoader)
     end
 
 
@@ -5340,7 +5464,9 @@ Framework.new = function()
         end
 
         Unit.name = "Unit"
-        Initializer.inject(Unit, "Transient")
+        
+        Initializer
+            .AddTransient(Unit)
     end
 
     do
@@ -5591,7 +5717,9 @@ Framework.new = function()
         end
 
         Group.name = "Group"
-        Initializer.inject(Group, "Transient")
+        
+        Initializer
+            .AddTransient(Group)
     end
 
     --[[
