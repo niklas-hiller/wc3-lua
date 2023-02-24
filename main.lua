@@ -7,6 +7,7 @@ Framework.new = function()
     local Initializer
     local VERSION = "1.0.0"
     local RELEASE_DATE = "2023-02-24"
+    local DISCORD = "https://discord.gg/example"
 
     do
         local Runner = {}
@@ -34,6 +35,7 @@ Framework.new = function()
                 GameClock.schedule_once(
                     function(triggeringClock, triggeringSchedule)
                         print("Map uses Framework v" .. VERSION .. ". (" .. RELEASE_DATE .. ")")
+                        print("For more information check: " .. DISCORD)
                         for _, task in ipairs(scheduledTasks) do
                             task()
                         end
