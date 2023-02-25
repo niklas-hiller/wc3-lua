@@ -326,31 +326,133 @@ Assigned:
 - F = Erudition
 
 # Boss 1
+## Abilities
 - A1
 - B1
 - C1
+## Drops
+- Skyward Sword (3%)
+- Aquila Favonia (3%)
+- Stigmata (0.01%)
 
 # Boss 2
+## Abilities
 - A2
 - D1
 - E1
+## Drops
+- Primoridal Jade Cutter (3%)
+- Light of Foliar (3%)
+- Stigmata (0.05%)
 
 # Boss 3
+## Abilities
 - C2
 - F1
 - E2
+## Drops
+- Key of Khaj Nisut (3%)
+- Summit Shaper (3%)
+- Stigmata (0.1%)
 
 # Boss 4
+## Abilities
 - C3
 - D2
 - F2
+## Drops
+- Freedom Sworn (3%)
+- Stigmata (0.3%)
 
 # Boss 5
+## Abilities
 - A3
 - F3
 - B2
+## Drops
+- Haran Geppaku Futsu (3%)
+- Stigmata (0.75%)
 
 # Boss 6
+## Abilities
 - B3
 - D3
 - E3
+## Drops:
+- Mistsplitter Reforged (3%)
+- Stigmata (2.5%)
+
+
+# Items
+
+## Weapons
+Weapons can, just like the player, gain experience under the same conditions. 
+Weapons only gain 20% of the experience and are capped at Level 90.
+Weapon Damage is calculated as Base Damage.
+- Cinnabar Spindle
+    - Damage: ...
+    - Effect: ...
+- Aquila Favonia
+    - Damage: ...
+    - Effect: ...
+- Skyward Blade
+    - Damage: ...
+    - Effect: ...
+- Primoridal Jade Cutter
+    - Damage: ...
+    - Effect: ...
+- Light of Foliar
+    - Damage: ...
+    - Effect: ...
+- Key of Khaj Nisut
+    - Damage: ...
+    - Effect: ...
+- Summit Shaper
+    - Damage: ...
+    - Effect: ...
+- Freedom Sworn
+    - Damage: ...
+    - Effect: ...
+- Haran Geppaku Futsu
+    - Damage: ...
+    - Effect: ...
+- Mistsplitter Reforged
+    - Damage: ...
+    - Effect: ...
+
+## Stigmata
+- Benares
+    - 2-Piece: ...
+    - 3-Piece: ...
+- Herrscher
+    - 2-Piece: ...
+    - 3-Piece: ...
+- Holmes
+    - 2-Piece: ...
+    - 3-Piece: ...
+- Kafka
+    - 2-Piece: ...
+    - 3-Piece: ...
+- Welt
+    - 2-Piece: ...
+    - 3-Piece: ...
+### Top
+- Benares (T)
+- Herrscher (T)
+- Holmes (T)
+- Kafka (T)
+- Welt (T)
+
+### Middle
+- Benares (M)
+- Herrscher (M)
+- Holmes (M)
+- Kafka (M)
+- Welt (M)
+
+### Bottom
+- Benares (B)
+- Herrscher (B)
+- Holmes (B)
+- Kafka (B)
+- Welt (B)
