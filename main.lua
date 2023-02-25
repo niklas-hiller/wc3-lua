@@ -11774,7 +11774,10 @@ do
                     unit.propername = player.name
                     unit.skin = 'hS02'
 
-                    UnitAddItemById(unit.handle, FourCC('IWSB'))
+                    UnitAddItemToSlotById(unit.handle, FourCC('IWSB'), 0) -- Weapon
+                    UnitAddItemToSlotById(unit.handle, FourCC('ISBT'), 1) -- Stigmata (T)
+                    UnitAddItemToSlotById(unit.handle, FourCC('ISBM'), 3) -- Stigmata (M)
+                    UnitAddItemToSlotById(unit.handle, FourCC('ISBB'), 5) -- Stigmata (B)
     
                     -- Init Affinity System
                     local affinitySys = AffinitySystem.new(IFramework, unit)
