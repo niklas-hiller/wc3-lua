@@ -283,7 +283,7 @@ Weapon Damage is calculated as Base Damage.
 ## Stigmata
 Stigmata can be dropped from ANY Boss, only the drop chance increases on stronger bosses.
 When Player has 3-Piece Stigmata, they will have a Wings Effect.
-Usually 2-Piece effect is just some minor stat gain, while 3-Piece effect is some new passive.
+Usually 2-Piece effect is just some minor stat gain, while 3-Piece effect unlocks a new active (R).
 - Benares
     - 2-Piece: ...
     - 3-Piece: ...
