@@ -11772,7 +11772,9 @@ do
     
                     -- Force Base Stats
                     unit.propername = player.name
-                    unit.skin = 'h006'
+                    unit.skin = 'hS02'
+
+                    UnitAddItemById(unit.handle, FourCC('IWSB'))
     
                     -- Init Affinity System
                     local affinitySys = AffinitySystem.new(IFramework, unit)
