@@ -177,68 +177,61 @@ Available:
         - Lone Phoenix's Plume
         - [AEON] To Blaze Eternal
 
-Assigned:
-- A = Harmony
-- B = Destruction
-- C = Preservation
-- D = Nihility
-- E = Hunt
-- F = Erudition
-
-# Boss 1
-## Abilities
-- A1
-- B1
-- C1
-## Drops
+# Bosses
+## Boss 1
+### Abilities
+- Harmony 1
+- Destruction 1
+- Preservation 1
+### Drops
 - Skyward Sword (3%)
 - Aquila Favonia (3%)
 - Stigmata (0.01%)
 
-# Boss 2
-## Abilities
-- A2
-- D1
-- E1
-## Drops
+## Boss 2
+### Abilities
+- Harmony 2
+- Nihility 1
+- Hunt 1
+### Drops
 - Primoridal Jade Cutter (3%)
 - Light of Foliar (3%)
 - Stigmata (0.05%)
 
-# Boss 3
-## Abilities
-- C2
-- F1
-- E2
-## Drops
+## Boss 3
+### Abilities
+- Preservation 2
+- Erudition 1
+- Hunt 2
+### Drops
 - Key of Khaj Nisut (3%)
 - Summit Shaper (3%)
 - Stigmata (0.1%)
 
-# Boss 4
-## Abilities
-- C3
-- D2
-- F2
-## Drops
+## Boss 4
+### Abilities
+- Preservation 3
+- Nihility 2
+- Erudition 2
+### Drops
 - Freedom Sworn (3%)
 - Stigmata (0.3%)
 
-# Boss 5
-## Abilities
-- A3
-- F3
-- B2
-## Drops
+## Boss 5
+### Abilities
+- Harmony 3
+- Erudition 3
+- Destruction 2
+### Drops
 - Haran Geppaku Futsu (3%)
 - Stigmata (0.75%)
 
-# Boss 6
-## Abilities
-- B3
-- D3
-- E3
-## Drops:
+## Boss 6
+### Abilities
+- Destruction 3
+- Nihility 3
+- Hunt 3
+### Drops:
 - Mistsplitter Reforged (3%)
 - Stigmata (2.5%)
 
