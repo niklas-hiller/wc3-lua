@@ -283,39 +283,98 @@ Weapon Damage is calculated as Base Damage.
 ## Stigmata
 Stigmata can be dropped from ANY Boss, only the drop chance increases on stronger bosses.
 When Player has 3-Piece Stigmata, they will have a Wings Effect.
-Usually 2-Piece effect is just some minor stat gain, while 3-Piece effect unlocks a new active (R).
 - Benares
-    - 2-Piece: ...
-    - 3-Piece: ...
+    - 2-Piece: Increases Damage Reduction by 40%.
+    - 3-Piece: Regenerate 3.5% Max HP per second, and gain increasing Damage Reduction with missing health, capped at 10% HP (0%-40%)
 - Herrscher
-    - 2-Piece: ...
-    - 3-Piece: ...
+    - 2-Piece: Doubles Quantum Shield Strength, excessive Critical Chance is converted to Critical Damage (1:3)
+    - 3-Piece: Doubles Critical Damage when Quantum Shield is active.
 - Holmes
-    - 2-Piece: ...
-    - 3-Piece: ...
+    - 2-Piece: Your critical chance is always 100%.
+    - 3-Piece: Doubles Attack Speed.
 - Kafka
-    - 2-Piece: ...
-    - 3-Piece: ...
+    - 2-Piece: Increases Omnivamp by 15%.
+    - 3-Piece: Every 5 seconds, apply a random buff (Attack, Defense, Speed) to you and allies in the same area, with a duration of 10 seconds.
 - Welt
-    - 2-Piece: ...
-    - 3-Piece: ...
+    - 2-Piece: Increases all affinities by 40%
+    - 3-Piece: Spawns three drones nearby, that shoot at random enemies, dealing 350% damage per attack
 ### Top
 - Benares (T)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
 - Herrscher (T)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
 - Holmes (T)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
 - Kafka (T)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
 - Welt (T)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
 
 ### Middle
 - Benares (M)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
 - Herrscher (M)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
 - Holmes (M)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
 - Kafka (M)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
 - Welt (M)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
 
 ### Bottom
 - Benares (B)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
 - Herrscher (B)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
 - Holmes (B)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
 - Kafka (B)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
 - Welt (B)
+    - Fire
+    - Physical
+    - Lightning
+    - Quantum
