@@ -244,7 +244,7 @@ Assigned:
 
 
 # Items
-
+Items are representated as spellbooks, which contains all items, the player has of that type.
 ## Weapons
 Weapons can, just like the player, gain experience under the same conditions. 
 Weapons only gain 20% of the experience and are capped at Level 90.
@@ -285,9 +285,9 @@ Stigmata can be dropped from ANY Boss, only the drop chance increases on stronge
 When Player has 3-Piece Stigmata, they will have a Wings Effect.
 - Benares
     - 2-Piece: Increases Damage Reduction by 40%.
-    - 3-Piece: Regenerate 3.5% Max HP per second, and gain increasing Damage Reduction with missing health, capped at 10% HP (0%-40%)
+    - 3-Piece: Regenerate 3.5% Max HP per second, and gain increasing Damage Reduction with missing health, capped at 10% HP (0%-40%).
 - Herrscher
-    - 2-Piece: Doubles Quantum Shield Strength, excessive Critical Chance is converted to Critical Damage (1:3)
+    - 2-Piece: Doubles Quantum Shield Strength, excessive Critical Chance is converted to Critical Damage (1:3).
     - 3-Piece: Doubles Critical Damage when Quantum Shield is active.
 - Holmes
     - 2-Piece: Your critical chance is always 100%.
@@ -296,85 +296,85 @@ When Player has 3-Piece Stigmata, they will have a Wings Effect.
     - 2-Piece: Increases Omnivamp by 15%.
     - 3-Piece: Every 5 seconds, apply a random buff (Attack, Defense, Speed) to you and allies in the same area, with a duration of 10 seconds.
 - Welt
-    - 2-Piece: Increases all affinities by 40%
-    - 3-Piece: Spawns three drones nearby, that shoot at random enemies, dealing 350% damage per attack
+    - 2-Piece: Increases all affinities by 40%.
+    - 3-Piece: Spawns three drones nearby, that shoot at random enemies, dealing 350% damage per attack.
 ### Top
 - Benares (T)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
 - Herrscher (T)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
 - Holmes (T)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
 - Kafka (T)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
 - Welt (T)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
 
 ### Middle
 - Benares (M)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
 - Herrscher (M)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
 - Holmes (M)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
 - Kafka (M)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
 - Welt (M)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
 
 ### Bottom
 - Benares (B)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
 - Herrscher (B)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
 - Holmes (B)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
 - Kafka (B)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
 - Welt (B)
-    - Fire
-    - Physical
-    - Lightning
-    - Quantum
+    - Fire (+ 0)
+    - Physical (+ 0)
+    - Lightning (+ 0)
+    - Quantum (+ 0)
