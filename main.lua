@@ -10398,6 +10398,271 @@ _Abilities.Nihility_Aura.new = function(IFramework)
     return self
 end
 
+_Abilities.Benares_Aura = {}
+_Abilities.Benares_Aura.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            print("Apply Benares Aura", unit)
+            local auraEffect = IFramework.Effect()
+            auraEffect.model = "Wings\\Benares Wings.mdx"
+            auraEffect.attachTo(unit, "chest")
+
+            eventHolder.cleanup = function()
+                auraEffect.destroy()
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Herrscher_Aura = {}
+_Abilities.Herrscher_Aura.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            print("Apply Herrscher Aura", unit)
+            local auraEffect = IFramework.Effect()
+            auraEffect.model = "Wings\\Herrscher Wings.mdx"
+            auraEffect.attachTo(unit, "chest")
+
+            eventHolder.cleanup = function()
+                auraEffect.destroy()
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Holmes_Aura = {}
+_Abilities.Holmes_Aura.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            print("Apply Holmes Aura", unit)
+            local auraEffect = IFramework.Effect()
+            auraEffect.model = "Wings\\Holmes Wings.mdx"
+            auraEffect.attachTo(unit, "chest")
+
+            eventHolder.cleanup = function()
+                auraEffect.destroy()
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Kafka_Aura = {}
+_Abilities.Kafka_Aura.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            print("Apply Kafka Aura", unit)
+            local auraEffect = IFramework.Effect()
+            auraEffect.model = "Wings\\Kafka Wings.mdx"
+            auraEffect.attachTo(unit, "chest")
+
+            eventHolder.cleanup = function()
+                auraEffect.destroy()
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Welt_Aura = {}
+_Abilities.Welt_Aura.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            print("Apply Welt Aura", unit)
+            local auraEffect = IFramework.Effect()
+            auraEffect.model = "Wings\\Welt Wings.mdx"
+            auraEffect.attachTo(unit, "chest")
+
+            eventHolder.cleanup = function()
+                auraEffect.destroy()
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
 _Abilities.Template = {}
 _Abilities.Template.new = function(IFramework)
     local self = {}
@@ -10494,6 +10759,13 @@ Abilities.new = function(IFramework)
 
     self.To_Blaze_Eternal = _Abilities.To_Blaze_Eternal.new(IFramework)
     self.Nihility_Aura = _Abilities.Nihility_Aura.new(IFramework)
+
+    -- Item Effects
+    self.Benares_Aura = _Abilities.Benares_Aura.new(IFramework)
+    self.Herrscher_Aura = _Abilities.Herrscher_Aura.new(IFramework)
+    self.Holmes_Aura = _Abilities.Holmes_Aura.new(IFramework)
+    self.Kafka_Aura = _Abilities.Kafka_Aura.new(IFramework)
+    self.Welt_Aura = _Abilities.Welt_Aura.new(IFramework)
 
 
     -- Leftovers
@@ -11016,7 +11288,7 @@ Area.new = function(IFramework, rect, configuration)
 end
 
 ItemSystem = {}
-ItemSystem.new = function(IFramework, unit)
+ItemSystem.new = function(IFramework, Ability, unit)
     local self = {}
     
     local Item = {}
@@ -11038,6 +11310,8 @@ ItemSystem.new = function(IFramework, unit)
                 return requirement
             elseif index == "set" then
                 return set
+            elseif index == "itemId" then
+                return itemId
             else
                 IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
             end
@@ -11081,7 +11355,7 @@ ItemSystem.new = function(IFramework, unit)
         end
 
         function self.equip()
-            base.replaceItem(itemId)
+            base.replaceItem(self)
         end
 
         unit.bind("on_spell_effect",
@@ -11105,6 +11379,7 @@ ItemSystem.new = function(IFramework, unit)
         local itemId = FourCC(itemId)
         UnitAddItemToSlotById(unit.handle, itemId, slot)
         local handle = UnitItemInSlot(unit.handle, slot)
+        local current = nil
         local items = {}
 
         local mt = {}
@@ -11118,10 +11393,28 @@ ItemSystem.new = function(IFramework, unit)
             end
         end
 
-        function self.replaceItem(itemId)
+        function self.replaceItem(item)
+            -- Item Replace Logic
+            local previous = current
+            current = item
+            if current == previous then
+                return
+            end
+
+            -- Wc3 Logic
             RemoveItem(handle)
-            UnitAddItemToSlotById(unit.handle, itemId, slot)
+            UnitAddItemToSlotById(unit.handle, current.itemId, slot)
             handle = UnitItemInSlot(unit.handle, slot)
+
+            -- Set Logic
+            if previous == nil then
+                current.set.count = current.set.count + 1
+                return
+            end
+            if previous.set ~= current.set then
+                previous.set.count = previous.set.count - 1
+                current.set.count = current.set.count + 1
+            end
         end
 
         function self.unlockAll()
@@ -11145,6 +11438,29 @@ ItemSystem.new = function(IFramework, unit)
     local Set = {}
     Set.new = function()
         local self = {}
+        local count = 0
+        local setEffects = {}
+
+        local mt = {}
+
+        -- Getter
+        function mt.__index(table, index)
+            if index == "count" then
+                return count
+            else
+                IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+            end
+        end
+
+        -- Setter
+        function mt.__newindex(_table, index, value)
+            if index == "count" then
+                count = value
+                self.checkEffects()
+            else
+                IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+            end
+        end
 
         local SetEffect = {}
         SetEffect.new = function(base)
@@ -11153,6 +11469,8 @@ ItemSystem.new = function(IFramework, unit)
             local required
             local onApply
             local onRemove
+            local count = 0
+            local active = false
 
             local mt = {}
 
@@ -11197,67 +11515,97 @@ ItemSystem.new = function(IFramework, unit)
                 return self
             end
 
+            function self.apply()
+                if active then
+                    return
+                end
+                active = true
+                self.onApply(unit)
+            end
+
+            function self.remove()
+                if not active then
+                    return
+                end
+                active = false
+                self.onRemove(unit)
+            end
+
             setmetatable(self, mt)
 
             return self
         end
 
+        function self.checkEffects()
+            print("Checking Effecs", self.count)
+            for k, v in pairs(setEffects) do
+                if self.count >= v.required then
+                    v.apply()
+                elseif self.count < v.required then
+                    v.remove()
+                end
+            end
+        end
+
         function self.AddEffect()
             local setEffect = SetEffect.new(self)
+            table.insert(setEffects, setEffect)
             return setEffect
         end
+
+        setmetatable(self, mt)
 
         return self
     end
 
     local Benares = Set.new()
-        .AddEffect()
-            .Required(2)
-            .OnApply(nil, nil)
-            .Build()
+        -- .AddEffect()
+        --     .Required(2)
+        --     .OnApply(nil, nil)
+        --     .Build()
         .AddEffect()
             .Required(3)
-            .OnApply(nil, nil)
+            .OnApply(Ability.Benares_Aura.apply, Ability.Benares_Aura.remove)
             .Build()
     
     local Herrscher = Set.new()
-        .AddEffect()
-            .Required(2)
-            .OnApply(nil, nil)
-            .Build()
+        -- .AddEffect()
+        --     .Required(2)
+        --     .OnApply(nil, nil)
+        --     .Build()
         .AddEffect()
             .Required(3)
-            .OnApply(nil, nil)
+            .OnApply(Ability.Herrscher_Aura.apply, Ability.Herrscher_Aura.remove)
             .Build()
     
     local Holmes = Set.new()
-        .AddEffect()
-            .Required(2)
-            .OnApply(nil, nil)
-            .Build()
+        -- .AddEffect()
+        --     .Required(2)
+        --     .OnApply(nil, nil)
+        --     .Build()
         .AddEffect()
             .Required(3)
-            .OnApply(nil, nil)
+            .OnApply(Ability.Holmes_Aura.apply, Ability.Holmes_Aura.remove)
             .Build()
     
     local Kafka = Set.new()
-        .AddEffect()
-            .Required(2)
-            .OnApply(nil, nil)
-            .Build()
+        -- .AddEffect()
+        --     .Required(2)
+        --     .OnApply(nil, nil)
+        --     .Build()
         .AddEffect()
             .Required(3)
-            .OnApply(nil, nil)
+            .OnApply(Ability.Kafka_Aura.apply, Ability.Kafka_Aura.remove)
             .Build()
     
     local Welt = Set.new()
-        .AddEffect()
-            .Required(2)
-            .OnApply(nil, nil)
-            .Build()
+        -- .AddEffect()
+        --     .Required(2)
+        --     .OnApply(nil, nil)
+        --     .Build()
         .AddEffect()
             .Required(3)
-            .OnApply(nil, nil)
+            .OnApply(Ability.Welt_Aura.apply, Ability.Welt_Aura.remove)
             .Build()
 
     local weapon = Spellbook.new('IWSB', 0)
@@ -12138,11 +12486,11 @@ do
     
                     -- Force Base Stats
                     unit.propername = player.name
-                    unit.skin = 'hS02'
+                    unit.skin = 'hS00'
     
                     -- Init Affinity System
                     local affinitySys = AffinitySystem.new(IFramework, unit)
-                    local itemSys = ItemSystem.new(IFramework, unit)
+                    local itemSys = ItemSystem.new(IFramework, Ability, unit)
     
                     local abilitySelection = {}
                     local pathChosen = nil
