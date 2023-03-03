@@ -11015,6 +11015,372 @@ Area.new = function(IFramework, rect, configuration)
     return self
 end
 
+ItemSystem = {}
+ItemSystem.new = function(IFramework, unit)
+    local self = {}
+    
+    local Item = {}
+    Item.new = function(base, itemId, abilId)
+        local self = {}
+
+        local base = base
+        local itemId = FourCC(itemId)
+        local selector = FourCC(abilId)
+
+        local requirement
+        local set
+
+        local mt = {}
+
+        -- Getter
+        function mt.__index(table, index)
+            if index == "requirement" then
+                return requirement
+            elseif index == "set" then
+                return set
+            else
+                IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+            end
+        end
+
+        function mt.__newindex(_table, index, value)
+            if index == "requirement" then
+                requirement = FourCC(value)
+            elseif index == "set" then
+                set = value
+            else
+                IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+            end
+        end
+
+        function self.Build()
+            -- currently nothing to do
+            return base
+        end
+
+        function self.Requirement(requirement)
+            self.requirement = requirement
+            return self
+        end
+
+        function self.Set(set)
+            self.set = set
+            return self
+        end
+
+        function self.lock()
+            if self.requirement == nil then return self end
+            SetPlayerTechResearched(unit.owner.handle, self.requirement, 0)
+            return self
+        end
+
+        function self.unlock()
+            if self.requirement == nil then return self end
+            SetPlayerTechResearched(unit.owner.handle, self.requirement, 1)
+            return self
+        end
+
+        function self.equip()
+            base.replaceItem(itemId)
+        end
+
+        unit.bind("on_spell_effect",
+            function(source, spell)
+                self.equip()
+            end
+        ).setCondition(
+            function(source, spell)
+                return spell.id == selector and source == unit
+            end
+        )
+
+        setmetatable(self, mt)
+
+        return self
+    end
+
+    local Spellbook = {}
+    Spellbook.new = function(itemId, slot)
+        local self = {}
+        local itemId = FourCC(itemId)
+        UnitAddItemToSlotById(unit.handle, itemId, slot)
+        local handle = UnitItemInSlot(unit.handle, slot)
+        local items = {}
+
+        local mt = {}
+
+        -- Getter
+        function mt.__index(table, index)
+            if index == "handle" then
+                return handle
+            else
+                IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+            end
+        end
+
+        function self.replaceItem(itemId)
+            RemoveItem(handle)
+            UnitAddItemToSlotById(unit.handle, itemId, slot)
+            handle = UnitItemInSlot(unit.handle, slot)
+        end
+
+        function self.unlockAll()
+            for k, v in pairs(items) do
+                v.unlock()
+            end
+            return self
+        end
+
+        function self.AddItem(itemId, abilId)
+            local item = Item.new(self, itemId, abilId)
+            table.insert(items, item)
+            return item
+        end
+
+        setmetatable(self, mt)
+        
+        return self
+    end
+
+    local Set = {}
+    Set.new = function()
+        local self = {}
+
+        local SetEffect = {}
+        SetEffect.new = function(base)
+            local self = {}
+            local base = base
+            local required
+            local onApply
+            local onRemove
+
+            local mt = {}
+
+            -- Getter
+            function mt.__index(table, index)
+                if index == "required" then
+                    return required
+                elseif index == "onApply" then
+                    return onApply
+                elseif index == "onRemove" then
+                    return onRemove
+                else
+                    IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+                end
+            end
+
+            function mt.__newindex(_table, index, value)
+                if index == "required" then
+                    required = value
+                elseif index == "onApply" then
+                    onApply = value
+                elseif index == "onRemove" then
+                    onRemove = value
+                else
+                    IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+                end
+            end
+
+            function self.Build()
+                -- currently nothing to do
+                return base
+            end
+
+            function self.Required(required)
+                self.required = required
+                return self
+            end
+
+            function self.OnApply(onApply, onRemove)
+                self.onApply = onApply
+                self.onRemove = onRemove
+                return self
+            end
+
+            setmetatable(self, mt)
+
+            return self
+        end
+
+        function self.AddEffect()
+            local setEffect = SetEffect.new(self)
+            return setEffect
+        end
+
+        return self
+    end
+
+    local Benares = Set.new()
+        .AddEffect()
+            .Required(2)
+            .OnApply(nil, nil)
+            .Build()
+        .AddEffect()
+            .Required(3)
+            .OnApply(nil, nil)
+            .Build()
+    
+    local Herrscher = Set.new()
+        .AddEffect()
+            .Required(2)
+            .OnApply(nil, nil)
+            .Build()
+        .AddEffect()
+            .Required(3)
+            .OnApply(nil, nil)
+            .Build()
+    
+    local Holmes = Set.new()
+        .AddEffect()
+            .Required(2)
+            .OnApply(nil, nil)
+            .Build()
+        .AddEffect()
+            .Required(3)
+            .OnApply(nil, nil)
+            .Build()
+    
+    local Kafka = Set.new()
+        .AddEffect()
+            .Required(2)
+            .OnApply(nil, nil)
+            .Build()
+        .AddEffect()
+            .Required(3)
+            .OnApply(nil, nil)
+            .Build()
+    
+    local Welt = Set.new()
+        .AddEffect()
+            .Required(2)
+            .OnApply(nil, nil)
+            .Build()
+        .AddEffect()
+            .Required(3)
+            .OnApply(nil, nil)
+            .Build()
+
+    local weapon = Spellbook.new('IWSB', 0)
+        .AddItem('IW00', 'AW00')
+            .Build()
+        .AddItem('IW01', 'AW01')
+            .Requirement('R001')
+            .Build()
+        .AddItem('IW02', 'AW02')
+            .Requirement('R002')
+            .Build()
+        .AddItem('IW03', 'AW03')
+            .Requirement('R003')
+            .Build()
+        .AddItem('IW04', 'AW04')
+            .Requirement('R004')
+            .Build()
+        .AddItem('IW05', 'AW05')
+            .Requirement('R005')
+            .Build()
+        .AddItem('IW06', 'AW06')
+            .Requirement('R006')
+            .Build()
+        .AddItem('IW07', 'AW07')
+            .Requirement('R007')
+            .Build()
+        .AddItem('IW08', 'AW08')
+            .Requirement('R008')
+            .Build()
+        .AddItem('IW09', 'AW09')
+            .Requirement('R009')
+            .Build()
+        .unlockAll()
+
+    local stigmaT = Spellbook.new('ISBT', 1)
+        -- Benares
+        .AddItem('IS01', 'AS01')
+            .Requirement('R00L')
+            .Set(Benares)
+            .Build()
+        -- Herrscher
+        .AddItem('IS04', 'AS04')
+            .Requirement('R00I')
+            .Set(Herrscher)
+            .Build()
+        -- Holmes
+        .AddItem('IS07', 'AS07')
+            .Requirement('R00F')
+            .Set(Holmes)
+            .Build()
+        -- Kafka
+        .AddItem('IS10', 'AS10')
+            .Requirement('R00B')
+            .Set(Kafka)
+            .Build()
+        -- Welt
+        .AddItem('IS13', 'AS13')
+            .Requirement('R00N')
+            .Set(Welt)
+            .Build()
+        .unlockAll()
+
+    local stigmaM = Spellbook.new('ISBM', 3)
+        -- Benares
+        .AddItem('IS02', 'AS02')
+            .Requirement('R00K')
+            .Set(Benares)
+            .Build()
+        -- Herrscher
+        .AddItem('IS05', 'AS05')
+            .Requirement('R00H')
+            .Set(Herrscher)
+            .Build()
+        -- Holmes
+        .AddItem('IS08', 'AS08')
+            .Requirement('R00E')
+            .Set(Holmes)
+            .Build()
+        -- Kafka
+        .AddItem('IS11', 'AS11')
+            .Requirement('R00C')
+            .Set(Kafka)
+            .Build()
+        -- Welt
+        .AddItem('IS14', 'AS14')
+            .Requirement('R00O')
+            .Set(Welt)
+            .Build()
+        .unlockAll()
+
+    local stigmaB = Spellbook.new('ISBB', 5)
+        -- Benares
+        .AddItem('IS03', 'AS03')
+            .Requirement('R00J')
+            .Set(Benares)
+            .Build()
+        -- Herrscher
+        .AddItem('IS06', 'AS06')
+            .Requirement('R00G')
+            .Set(Herrscher)
+            .Build()
+        -- Holmes
+        .AddItem('IS09', 'AS09')
+            .Requirement('R00A')
+            .Set(Holmes)
+            .Build()
+        -- Kafka
+        .AddItem('IS12', 'AS12')
+            .Requirement('R00D')
+            .Set(Kafka)
+            .Build()
+        -- Welt
+        .AddItem('IS15', 'AS15')
+            .Requirement('R00M')
+            .Set(Welt)
+            .Build()
+        .unlockAll()
+
+    SetPlayerTechResearched(unit.owner.handle, FourCC('R000'), 1)
+
+    return self
+end
+
 AffinitySystem = {}
 AffinitySystem.new = function(IFramework, unit)
     local self = {}
@@ -11773,14 +12139,10 @@ do
                     -- Force Base Stats
                     unit.propername = player.name
                     unit.skin = 'hS02'
-
-                    UnitAddItemToSlotById(unit.handle, FourCC('IWSB'), 0) -- Weapon
-                    UnitAddItemToSlotById(unit.handle, FourCC('ISBT'), 1) -- Stigmata (T)
-                    UnitAddItemToSlotById(unit.handle, FourCC('ISBM'), 3) -- Stigmata (M)
-                    UnitAddItemToSlotById(unit.handle, FourCC('ISBB'), 5) -- Stigmata (B)
     
                     -- Init Affinity System
                     local affinitySys = AffinitySystem.new(IFramework, unit)
+                    local itemSys = ItemSystem.new(IFramework, unit)
     
                     local abilitySelection = {}
                     local pathChosen = nil
