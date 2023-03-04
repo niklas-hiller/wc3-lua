@@ -11415,11 +11415,24 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
 
             local tooltip = BlzGetAbilityExtendedTooltip(selector, 0)
             if unit.owner.isLocal() then
-                tooltip = 
-                    "|cfffc7f61F|r|cfff4624ei|r|cffed463cr|r|cffe62a2ae|r: " .. self.fire .. "\n" ..
-                    "|cffcfcfcfP|r|cffc7c7c7h|r|cffc0c0c0y|r|cffb9b9b9s|r|cffb2b2b2i|r|cffabababc|r|cffa4a4a4a|r|cff9d9d9dl|r: " .. self.physical .. "\n" ..
-                    "|cffe585fbL|r|cffdf7ef6i|r|cffd977f1g|r|cffd370ech|r|cffce69e8t|r|cffc862e3n|r|cffc25bdei|r|cffbc54d9n|r|cffb74dd5g|r: " .. self.lightning .. "\n" ..
-                    "|cffc2c2f9Q|r|cffafadefu|r|cff9c99e5a|r|cff8985dbn|r|cff7670d1t|r|cff635cc8u|r|cff5048bem|r: " .. self.quantum
+                local tooltip = ""
+
+                if self.fire > 0 then
+                    tooltip = tooltip .. "|cfffc7f61F|r|cfff4624ei|r|cffed463cr|r|cffe62a2ae|r: " .. self.fire .. "\n"
+                end
+                if self.physical > 0 then
+                    tooltip = tooltip .. "|cffcfcfcfP|r|cffc7c7c7h|r|cffc0c0c0y|r|cffb9b9b9s|r|cffb2b2b2i|r|cffabababc|r|cffa4a4a4a|r|cff9d9d9dl|r: " .. self.physical .. "\n"
+                end
+                if self.lightning > 0 then
+                    tooltip = tooltip .. "|cffe585fbL|r|cffdf7ef6i|r|cffd977f1g|r|cffd370ech|r|cffce69e8t|r|cffc862e3n|r|cffc25bdei|r|cffbc54d9n|r|cffb74dd5g|r: " .. self.lightning .. "\n"
+                end
+                if self.quantum > 0 then
+                    tooltip = tooltip .. "|cffc2c2f9Q|r|cffafadefu|r|cff9c99e5a|r|cff8985dbn|r|cff7670d1t|r|cff635cc8u|r|cff5048bem|r: " .. self.quantum .. "\n"
+                end
+
+                if self.set ~= nil then
+                    tooltip = tooltip .. "\n" .. self.set.getTooltip()
+                end
             end
             BlzSetAbilityExtendedTooltip(selector, tooltip, 0)
 
@@ -11558,9 +11571,13 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
         SetEffect.new = function(base)
             local self = {}
             local base = base
+
+            local name = ""
+            local description = ""
             local required
             local onApply
             local onRemove
+
             local count = 0
             local active = false
 
@@ -11568,7 +11585,11 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
 
             -- Getter
             function mt.__index(table, index)
-                if index == "required" then
+                if index == "name" then
+                    return name
+                elseif index == "description" then
+                    return description
+                elseif index == "required" then
                     return required
                 elseif index == "onApply" then
                     return onApply
@@ -11580,7 +11601,11 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             end
 
             function mt.__newindex(_table, index, value)
-                if index == "required" then
+                if index == "name" then
+                    name = value
+                elseif index == "description" then
+                    description = value
+                elseif index == "required" then
                     required = value
                 elseif index == "onApply" then
                     onApply = value
@@ -11594,6 +11619,16 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             function self.Build()
                 -- currently nothing to do
                 return base
+            end
+
+            function self.Name(name)
+                self.name = name
+                return self
+            end
+
+            function self.Description(description)
+                self.description = description
+                return self
             end
 
             function self.Required(required)
@@ -11628,6 +11663,16 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             return self
         end
 
+        function self.getTooltip()
+            local tooltip = ""
+
+            for k,v in ipairs(setEffects) do
+                tooltip = tooltip .. "|cff0a5983" .. v.name .. "|r (" .. v.required .. "pc): " .. v.description .. "\n"
+            end
+
+            return tooltip
+        end
+
         function self.checkEffects()
             print("Checking Effecs", self.count)
             for k, v in pairs(setEffects) do
@@ -11653,51 +11698,71 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
     local stigmaValue = 150
 
     local Benares = Set.new()
-        -- .AddEffect()
-        --     .Required(2)
-        --     .OnApply(nil, nil)
-        --     .Build()
         .AddEffect()
+            .Name("Moon Dragon")
+            .Description("Some Effect...")
+            .Required(2)
+            .OnApply(nil, nil)
+            .Build()
+        .AddEffect()
+            .Name("Creation of Honkai")
+            .Description("Some Effect...")
             .Required(3)
             .OnApply(Ability.Benares_Aura.apply, Ability.Benares_Aura.remove)
             .Build()
     
     local Herrscher = Set.new()
-        -- .AddEffect()
-        --     .Required(2)
-        --     .OnApply(nil, nil)
-        --     .Build()
         .AddEffect()
+            .Name("Time Sanctuary")
+            .Description("Some Effect...")
+            .Required(2)
+            .OnApply(nil, nil)
+            .Build()
+        .AddEffect()
+            .Name("When Finality Emerges")
+            .Description("Some Effect...")
             .Required(3)
             .OnApply(Ability.Herrscher_Aura.apply, Ability.Herrscher_Aura.remove)
             .Build()
     
     local Holmes = Set.new()
-        -- .AddEffect()
-        --     .Required(2)
-        --     .OnApply(nil, nil)
-        --     .Build()
         .AddEffect()
+            .Name("Stradivari")
+            .Description("Some Effect...")
+            .Required(2)
+            .OnApply(nil, nil)
+            .Build()
+        .AddEffect()
+            .Name("Abductive Reasoning")
+            .Description("Some Effect...")
             .Required(3)
             .OnApply(Ability.Holmes_Aura.apply, Ability.Holmes_Aura.remove)
             .Build()
     
     local Kafka = Set.new()
-        -- .AddEffect()
-        --     .Required(2)
-        --     .OnApply(nil, nil)
-        --     .Build()
         .AddEffect()
+            .Name("K's Processing")
+            .Description("Some Effect...")
+            .Required(2)
+            .OnApply(nil, nil)
+            .Build()
+        .AddEffect()
+            .Name("Surreal Milieu")
+            .Description("Some Effect...")
             .Required(3)
             .OnApply(Ability.Kafka_Aura.apply, Ability.Kafka_Aura.remove)
             .Build()
     
     local Welt = Set.new()
-        -- .AddEffect()
-        --     .Required(2)
-        --     .OnApply(nil, nil)
-        --     .Build()
         .AddEffect()
+            .Name("Legacy")
+            .Description("Some Effect...")
+            .Required(2)
+            .OnApply(nil, nil)
+            .Build()
+        .AddEffect()
+            .Name("Cosmic Bastion")
+            .Description("Some Effect...")
             .Required(3)
             .OnApply(Ability.Welt_Aura.apply, Ability.Welt_Aura.remove)
             .Build()
