@@ -1987,6 +1987,16 @@ Framework.new = function()
                 if status then return val end
             end
 
+            function self._setTechResearched(techId, level)
+                SetPlayerTechResearched(handle, FourCC(techId), level)
+                return self
+            end
+
+            self.setTechResearched = function(techId, level)
+                local status, val = xpcall(self._setTechResearched, Interface.Log.Error, techId, level)
+                if status then return val end
+            end
+
             local eventDispatcher = Interface.EventDispatcher(
                 {"on_leave", "on_message", "on_sync", "on_createUnit",
                 "on_unit_select", "on_unit_deselect", "on_unit_death_pre", "on_unit_death",
@@ -11288,8 +11298,9 @@ Area.new = function(IFramework, rect, configuration)
 end
 
 ItemSystem = {}
-ItemSystem.new = function(IFramework, Ability, unit)
+ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
     local self = {}
+    local ONLY_SPAWN_TECH = 'R000'
     
     local Item = {}
     Item.new = function(base, itemId, abilId)
@@ -11299,6 +11310,12 @@ ItemSystem.new = function(IFramework, Ability, unit)
         local itemId = FourCC(itemId)
         local selector = FourCC(abilId)
 
+        local damage = 0
+        local fire = 0
+        local physical = 0
+        local lightning = 0
+        local quantum = 0
+
         local requirement
         local set
 
@@ -11306,7 +11323,17 @@ ItemSystem.new = function(IFramework, Ability, unit)
 
         -- Getter
         function mt.__index(table, index)
-            if index == "requirement" then
+            if index == "damage" then
+                return damage
+            elseif index == "fire" then
+                return fire
+            elseif index == "physical" then
+                return physical
+            elseif index == "lightning" then
+                return lightning
+            elseif index == "quantum" then
+                return quantum
+            elseif index == "requirement" then
                 return requirement
             elseif index == "set" then
                 return set
@@ -11318,8 +11345,20 @@ ItemSystem.new = function(IFramework, Ability, unit)
         end
 
         function mt.__newindex(_table, index, value)
-            if index == "requirement" then
-                requirement = FourCC(value)
+            if index == "damage" then
+                damage = value
+            elseif index == "fire" then
+                fire = math.floor(value)
+            elseif index == "physical" then
+                physical = math.floor(value)
+            elseif index == "lightning" then
+                lightning = math.floor(value)
+            elseif index == "quantum" then
+                quantum = math.floor(value)
+            elseif index == "requirement" then
+                requirement = value
+            elseif index == "requirement" then
+                requirement = value
             elseif index == "set" then
                 set = value
             else
@@ -11330,6 +11369,19 @@ ItemSystem.new = function(IFramework, Ability, unit)
         function self.Build()
             -- currently nothing to do
             return base
+        end
+
+        function self.Damage(damage)
+            self.damage = damage
+            return self
+        end
+
+        function self.Affinities(fire, physical, lightning, quantum)
+            self.fire = fire
+            self.physical = physical
+            self.lightning = lightning
+            self.quantum = quantum
+            return self
         end
 
         function self.Requirement(requirement)
@@ -11344,18 +11396,52 @@ ItemSystem.new = function(IFramework, Ability, unit)
 
         function self.lock()
             if self.requirement == nil then return self end
-            SetPlayerTechResearched(unit.owner.handle, self.requirement, 0)
+            unit.owner.setTechResearched(self.requirement, 0)
+
+            local tooltip = BlzGetAbilityExtendedTooltip(selector, 0)
+            if unit.owner.isLocal() then
+                tooltip = 
+                    "You currently did not unlock this stigmata yet." .. "\n" .. 
+                    "Unlock stigmata for more details."
+            end
+            BlzSetAbilityExtendedTooltip(selector, tooltip, 0)
+
             return self
         end
 
         function self.unlock()
             if self.requirement == nil then return self end
-            SetPlayerTechResearched(unit.owner.handle, self.requirement, 1)
+            unit.owner.setTechResearched(self.requirement, 1)
+
+            local tooltip = BlzGetAbilityExtendedTooltip(selector, 0)
+            if unit.owner.isLocal() then
+                tooltip = 
+                    "|cfffc7f61F|r|cfff4624ei|r|cffed463cr|r|cffe62a2ae|r: " .. self.fire .. "\n" ..
+                    "|cffcfcfcfP|r|cffc7c7c7h|r|cffc0c0c0y|r|cffb9b9b9s|r|cffb2b2b2i|r|cffabababc|r|cffa4a4a4a|r|cff9d9d9dl|r: " .. self.physical .. "\n" ..
+                    "|cffe585fbL|r|cffdf7ef6i|r|cffd977f1g|r|cffd370ech|r|cffce69e8t|r|cffc862e3n|r|cffc25bdei|r|cffbc54d9n|r|cffb74dd5g|r: " .. self.lightning .. "\n" ..
+                    "|cffc2c2f9Q|r|cffafadefu|r|cff9c99e5a|r|cff8985dbn|r|cff7670d1t|r|cff635cc8u|r|cff5048bem|r: " .. self.quantum
+            end
+            BlzSetAbilityExtendedTooltip(selector, tooltip, 0)
+
             return self
         end
 
         function self.equip()
             base.replaceItem(self)
+        end
+
+        function self.applyBonus()
+            affinitySys.bonusFire = affinitySys.bonusFire + self.fire
+            affinitySys.bonusPhysical = affinitySys.bonusPhysical + self.physical
+            affinitySys.bonusLightning = affinitySys.bonusLightning + self.lightning
+            affinitySys.bonusQuantum = affinitySys.bonusQuantum + self.quantum
+        end
+
+        function self.removeBonus()
+            affinitySys.bonusFire = affinitySys.bonusFire - self.fire
+            affinitySys.bonusPhysical = affinitySys.bonusPhysical - self.physical
+            affinitySys.bonusLightning = affinitySys.bonusLightning - self.lightning
+            affinitySys.bonusQuantum = affinitySys.bonusQuantum - self.quantum
         end
 
         unit.bind("on_spell_effect",
@@ -11401,6 +11487,14 @@ ItemSystem.new = function(IFramework, Ability, unit)
                 return
             end
 
+            -- Affinities Logic
+            if previous == nil then
+                current.applyBonus()
+            elseif previous.set ~= current.set then
+                previous.removeBonus()
+                current.applyBonus()
+            end
+
             -- Wc3 Logic
             RemoveItem(handle)
             UnitAddItemToSlotById(unit.handle, current.itemId, slot)
@@ -11409,9 +11503,7 @@ ItemSystem.new = function(IFramework, Ability, unit)
             -- Set Logic
             if previous == nil then
                 current.set.count = current.set.count + 1
-                return
-            end
-            if previous.set ~= current.set then
+            elseif previous.set ~= current.set then
                 previous.set.count = previous.set.count - 1
                 current.set.count = current.set.count + 1
             end
@@ -11558,6 +11650,8 @@ ItemSystem.new = function(IFramework, Ability, unit)
         return self
     end
 
+    local stigmaValue = 150
+
     local Benares = Set.new()
         -- .AddEffect()
         --     .Required(2)
@@ -11608,6 +11702,83 @@ ItemSystem.new = function(IFramework, Ability, unit)
             .OnApply(Ability.Welt_Aura.apply, Ability.Welt_Aura.remove)
             .Build()
 
+
+    local setRatio = {
+        [Benares] = {
+            ['fire'] = 25, 
+            ['physical'] = 75, 
+            ['lightning'] = 25, 
+            ['quantum'] = 25
+        },
+        [Herrscher] = {
+            ['fire'] = 50, 
+            ['physical'] = 25, 
+            ['lightning'] = 25, 
+            ['quantum'] = 50
+        },
+        [Holmes] = {
+            ['fire'] = 25, 
+            ['physical'] = 25, 
+            ['lightning'] = 75, 
+            ['quantum'] = 25
+        },
+        [Kafka] = {
+            ['fire'] = 25, 
+            ['physical'] = 50, 
+            ['lightning'] = 25, 
+            ['quantum'] = 50
+        },
+        [Welt] = {
+            ['fire'] = 37.5, 
+            ['physical'] = 37.5, 
+            ['lightning'] = 37.5, 
+            ['quantum'] = 37.5
+        },
+    }
+    local pieceRatio = {
+        ['top'] = {
+            ['fire'] = 75, 
+            ['physical'] = 25, 
+            ['lightning'] = 25, 
+            ['quantum'] = 25
+        },
+        ['middle'] = {
+            ['fire'] = 25, 
+            ['physical'] = 75, 
+            ['lightning'] = 25, 
+            ['quantum'] = 25
+        },
+        ['bottom'] = {
+            ['fire'] = 37.5, 
+            ['physical'] = 37.5, 
+            ['lightning'] = 37.5, 
+            ['quantum'] = 37.5
+        },
+    }
+
+    local function calculateBonus(set, piece)
+        local total = 0
+        local actual = 185
+        local stats = {
+            ['fire'] = 0, 
+            ['physical'] = 0, 
+            ['lightning'] = 0, 
+            ['quantum'] = 0
+        }
+        for k,v in pairs(setRatio[set]) do
+            stats[k] = stats[k] + v
+            total = total + v
+        end
+        for k,v in pairs(pieceRatio[piece]) do
+            stats[k] = stats[k] + v
+            total = total + v
+        end
+        for k,v in pairs(stats) do
+            stats[k] = stats[k] / 300 * actual
+        end
+        return stats['fire'], stats['physical'], stats['lightning'], stats['quantum']
+    end
+
     local weapon = Spellbook.new('IWSB', 0)
         .AddItem('IW00', 'AW00')
             .Build()
@@ -11643,26 +11814,31 @@ ItemSystem.new = function(IFramework, Ability, unit)
     local stigmaT = Spellbook.new('ISBT', 1)
         -- Benares
         .AddItem('IS01', 'AS01')
+            .Affinities(calculateBonus(Benares, 'top'))
             .Requirement('R00L')
             .Set(Benares)
             .Build()
         -- Herrscher
         .AddItem('IS04', 'AS04')
+            .Affinities(calculateBonus(Herrscher, 'top'))
             .Requirement('R00I')
             .Set(Herrscher)
             .Build()
         -- Holmes
         .AddItem('IS07', 'AS07')
+            .Affinities(calculateBonus(Holmes, 'top'))
             .Requirement('R00F')
             .Set(Holmes)
             .Build()
         -- Kafka
         .AddItem('IS10', 'AS10')
+            .Affinities(calculateBonus(Kafka, 'top'))
             .Requirement('R00B')
             .Set(Kafka)
             .Build()
         -- Welt
         .AddItem('IS13', 'AS13')
+            .Affinities(calculateBonus(Welt, 'top'))
             .Requirement('R00N')
             .Set(Welt)
             .Build()
@@ -11671,26 +11847,31 @@ ItemSystem.new = function(IFramework, Ability, unit)
     local stigmaM = Spellbook.new('ISBM', 3)
         -- Benares
         .AddItem('IS02', 'AS02')
+            .Affinities(calculateBonus(Benares, 'middle'))
             .Requirement('R00K')
             .Set(Benares)
             .Build()
         -- Herrscher
         .AddItem('IS05', 'AS05')
+            .Affinities(calculateBonus(Herrscher, 'middle'))
             .Requirement('R00H')
             .Set(Herrscher)
             .Build()
         -- Holmes
         .AddItem('IS08', 'AS08')
+            .Affinities(calculateBonus(Holmes, 'middle'))
             .Requirement('R00E')
             .Set(Holmes)
             .Build()
         -- Kafka
         .AddItem('IS11', 'AS11')
+            .Affinities(calculateBonus(Kafka, 'middle'))
             .Requirement('R00C')
             .Set(Kafka)
             .Build()
         -- Welt
         .AddItem('IS14', 'AS14')
+            .Affinities(calculateBonus(Welt, 'middle'))
             .Requirement('R00O')
             .Set(Welt)
             .Build()
@@ -11699,32 +11880,37 @@ ItemSystem.new = function(IFramework, Ability, unit)
     local stigmaB = Spellbook.new('ISBB', 5)
         -- Benares
         .AddItem('IS03', 'AS03')
+            .Affinities(calculateBonus(Benares, 'bottom'))
             .Requirement('R00J')
             .Set(Benares)
             .Build()
         -- Herrscher
         .AddItem('IS06', 'AS06')
+            .Affinities(calculateBonus(Herrscher, 'bottom'))
             .Requirement('R00G')
             .Set(Herrscher)
             .Build()
         -- Holmes
         .AddItem('IS09', 'AS09')
+            .Affinities(calculateBonus(Holmes, 'bottom'))
             .Requirement('R00A')
             .Set(Holmes)
             .Build()
         -- Kafka
         .AddItem('IS12', 'AS12')
+            .Affinities(calculateBonus(Kafka, 'bottom'))
             .Requirement('R00D')
             .Set(Kafka)
             .Build()
         -- Welt
         .AddItem('IS15', 'AS15')
+            .Affinities(calculateBonus(Welt, 'bottom'))
             .Requirement('R00M')
             .Set(Welt)
             .Build()
         .unlockAll()
 
-    SetPlayerTechResearched(unit.owner.handle, FourCC('R000'), 1)
+    unit.owner.setTechResearched(ONLY_SPAWN_TECH, 1)
 
     return self
 end
@@ -11754,11 +11940,51 @@ AffinitySystem.new = function(IFramework, unit)
     local bonusLightning = 0 -- Used for items & passives later on
     local bonusQuantum = 0 -- Used for items & passives later on
 
+    local mt = {}
+
     while unit.skillPoints > skillPoints do
         UnitModifySkillPoints(unit.handle, -1)
     end
     while unit.skillPoints < skillPoints do
         UnitModifySkillPoints(unit.handle, 1)
+    end
+
+    -- Getter
+    function mt.__index(table, index)
+        if index == "bonusFire" then
+            return bonusFire
+        elseif index == "bonusPhysical" then
+            return bonusPhysical
+        elseif index == "bonusLightning" then
+            return bonusLightning
+        elseif index == "bonusQuantum" then
+            return bonusQuantum
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+
+    -- Setter
+    function mt.__newindex(_table, index, value)
+        if index == "bonusFire" then
+            bonusFire = value
+            self.updateVisual()
+            self.updateAffinities()
+        elseif index == "bonusPhysical" then
+            bonusPhysical = value
+            self.updateVisual()
+            self.updateAffinities()
+        elseif index == "bonusLightning" then
+            bonusLightning = value
+            self.updateVisual()
+            self.updateAffinities()
+        elseif index == "bonusQuantum" then
+            bonusQuantum = value
+            self.updateVisual()
+            self.updateAffinities()
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
     end
 
     unit.bind("on_level",
@@ -11975,6 +12201,8 @@ AffinitySystem.new = function(IFramework, unit)
     self.updateAffinities()
 
     clock.start()
+
+    setmetatable(self, mt)
 
     return self
 end
@@ -12490,7 +12718,7 @@ do
     
                     -- Init Affinity System
                     local affinitySys = AffinitySystem.new(IFramework, unit)
-                    local itemSys = ItemSystem.new(IFramework, Ability, unit)
+                    local itemSys = ItemSystem.new(IFramework, Ability, affinitySys, unit)
     
                     local abilitySelection = {}
                     local pathChosen = nil
