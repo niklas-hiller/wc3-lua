@@ -11360,7 +11360,6 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
         end
 
         function self.Build()
-            -- currently nothing to do
             return base
         end
 
@@ -11388,8 +11387,9 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
         end
 
         function self.lock()
-            if self.requirement == nil then return self end
-            unit.owner.setTechResearched(self.requirement, 0)
+            if self.requirement ~= nil then 
+                unit.owner.setTechResearched(self.requirement, 0)
+            end
 
             local tooltip = BlzGetAbilityExtendedTooltip(selector, 0)
             if unit.owner.isLocal() then
@@ -11402,6 +11402,37 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             return self
         end
 
+        function self.getTooltip()
+            local tooltip = ""
+
+            if self.fire > 0 then
+                tooltip = tooltip .. "|cfffc7f61F|r|cfff4624ei|r|cffed463cr|r|cffe62a2ae|r: " .. self.fire .. "\n"
+            end
+            if self.physical > 0 then
+                tooltip = tooltip .. "|cffcfcfcfP|r|cffc7c7c7h|r|cffc0c0c0y|r|cffb9b9b9s|r|cffb2b2b2i|r|cffabababc|r|cffa4a4a4a|r|cff9d9d9dl|r: " .. self.physical .. "\n"
+            end
+            if self.lightning > 0 then
+                tooltip = tooltip .. "|cffe585fbL|r|cffdf7ef6i|r|cffd977f1g|r|cffd370ech|r|cffce69e8t|r|cffc862e3n|r|cffc25bdei|r|cffbc54d9n|r|cffb74dd5g|r: " .. self.lightning .. "\n"
+            end
+            if self.quantum > 0 then
+                tooltip = tooltip .. "|cffc2c2f9Q|r|cffafadefu|r|cff9c99e5a|r|cff8985dbn|r|cff7670d1t|r|cff635cc8u|r|cff5048bem|r: " .. self.quantum .. "\n"
+            end
+
+            if self.effect ~= nil then
+                tooltip = tooltip .. self.effect.getTooltip() .. "\n"
+            end
+
+            if self.set ~= nil then
+                tooltip = tooltip .. "\n" .. self.set.getTooltip()
+            end
+
+            if tooltip == "" then
+                tooltip = "No Effect"
+            end
+
+            return tooltip
+        end
+
         function self.unlock()
             if self.requirement ~= nil then 
                 unit.owner.setTechResearched(self.requirement, 1)
@@ -11409,32 +11440,7 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
 
             local tooltip = BlzGetAbilityExtendedTooltip(selector, 0)
             if unit.owner.isLocal() then
-                tooltip = ""
-
-                if self.fire > 0 then
-                    tooltip = tooltip .. "|cfffc7f61F|r|cfff4624ei|r|cffed463cr|r|cffe62a2ae|r: " .. self.fire .. "\n"
-                end
-                if self.physical > 0 then
-                    tooltip = tooltip .. "|cffcfcfcfP|r|cffc7c7c7h|r|cffc0c0c0y|r|cffb9b9b9s|r|cffb2b2b2i|r|cffabababc|r|cffa4a4a4a|r|cff9d9d9dl|r: " .. self.physical .. "\n"
-                end
-                if self.lightning > 0 then
-                    tooltip = tooltip .. "|cffe585fbL|r|cffdf7ef6i|r|cffd977f1g|r|cffd370ech|r|cffce69e8t|r|cffc862e3n|r|cffc25bdei|r|cffbc54d9n|r|cffb74dd5g|r: " .. self.lightning .. "\n"
-                end
-                if self.quantum > 0 then
-                    tooltip = tooltip .. "|cffc2c2f9Q|r|cffafadefu|r|cff9c99e5a|r|cff8985dbn|r|cff7670d1t|r|cff635cc8u|r|cff5048bem|r: " .. self.quantum .. "\n"
-                end
-
-                if self.effect ~= nil then
-                    tooltip = tooltip .. self.effect.getTooltip() .. "\n"
-                end
-
-                if self.set ~= nil then
-                    tooltip = tooltip .. "\n" .. self.set.getTooltip()
-                end
-
-                if tooltip == "" then
-                    tooltip = "No Effect"
-                end
+                tooltip = self.getTooltip()
             end
             BlzSetAbilityExtendedTooltip(selector, tooltip, 0)
 
@@ -11443,6 +11449,7 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
 
         function self.equip()
             base.replaceItem(self)
+            return self
         end
 
         function self.applyBonus()
@@ -11513,7 +11520,7 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             -- Affinities Logic
             if previous == nil then
                 current.applyBonus()
-            elseif previous.set ~= current.set then
+            elseif previous ~= current then
                 previous.removeBonus()
                 current.applyBonus()
             end
@@ -11522,13 +11529,20 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             RemoveItem(handle)
             UnitAddItemToSlotById(unit.handle, current.itemId, slot)
             handle = UnitItemInSlot(unit.handle, slot)
+            BlzSetItemIconPath(handle, item.getTooltip())
 
             -- Set Logic
             if previous == nil then
-                current.set.count = current.set.count + 1
+                if current.set ~= nil then
+                    current.set.count = current.set.count + 1
+                end
             elseif previous.set ~= current.set then
-                previous.set.count = previous.set.count - 1
-                current.set.count = current.set.count + 1
+                if previous.set ~= nil then
+                    previous.set.count = previous.set.count - 1
+                end
+                if current.set ~= nil then
+                    current.set.count = current.set.count + 1
+                end
             end
         end
 
@@ -11613,6 +11627,9 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
                 return
             end
             active = true
+            if self.onApply == nil then
+                return
+            end
             self.onApply(unit)
         end
 
@@ -11621,6 +11638,9 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
                 return
             end
             active = false
+            if self.onRemove == nil then
+                return
+            end
             self.onRemove(unit)
         end
 
@@ -11741,6 +11761,9 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
                     return
                 end
                 active = true
+                if self.onApply == nil then
+                    return
+                end
                 self.onApply(unit)
             end
 
@@ -11749,6 +11772,9 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
                     return
                 end
                 active = false
+                if self.onRemove == nil then
+                    return
+                end
                 self.onRemove(unit)
             end
 
@@ -11835,6 +11861,7 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
 
     local weapon = Spellbook.new('IWSB', 0)
         .AddItem('IW00', 'AW00')
+            .equip()
             .Build()
         .AddItem('IW01', 'AW01')
             .Requirement('R001')

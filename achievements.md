@@ -239,38 +239,26 @@ Available:
 # Items
 Items are representated as spellbooks, which contains all items, the player has of that type.
 ## Weapons
-Weapons can, just like the player, gain experience under the same conditions. 
-Weapons only gain 20% of the experience and are capped at Level 90.
-Weapon Damage is calculated as Base Damage.
+Weapons can be dropped from specific Boss.
 - Cinnabar Spindle
-    - Damage: 41 - 454
     - Effect: None
 - Aquila Favonia
-    - Damage: 48 - 674
     - Effect: Your experience rate is increased by 100%
 - Skyward Blade
-    - Damage: 46 - 608
     - Effect: When auto attacking an enemy, deal damage to the three most nearby enemies aswell.
 - Primoridal Jade Cutter
-    - Damage: 44 - 542
     - Effect: 35% of your HP is converted to Damage
 - Light of Foliar
-    - Damage: 44 - 542
     - Effect: When critical strike, heal by 20% of the damage (7 seconds cooldown)
 - Key of Khaj Nisut
-    - Damage: 44 - 542
     - Effect: Attack Speed is halved, but damage is increased by 100%.
 - Summit Shaper
-    - Damage: 46 - 608
     - Effect: Every third damage instance is negated.
 - Freedom Sworn
-    - Damage: 46 - 608
     - Effect: Your attack speed is fixed to 2.5 and your movement speed is fixed to 700.
 - Haran Geppaku Futsu
-    - Damage: 46 - 608
     - Effect: Every 3 seconds gain a stack (up to 5) increasing your damage by 20% each. Loose all stacks when taking damage
 - Mistsplitter Reforged
-    - Damage: 48 - 674
     - Effect: Your health are downgraded to 100 (after Quantum Shield Calculation) and your quantum shield strength is tripled
 
 ## Stigmata
