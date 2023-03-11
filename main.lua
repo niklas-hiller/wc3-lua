@@ -10435,7 +10435,6 @@ _Abilities.Benares_Aura.new = function(IFramework)
         local eventHolder = EventHolder.new(IFramework)
 
         do
-            print("Apply Benares Aura", unit)
             local auraEffect = IFramework.Effect()
             auraEffect.model = "Wings\\Benares Wings.mdx"
             auraEffect.attachTo(unit, "chest")
@@ -10488,7 +10487,6 @@ _Abilities.Herrscher_Aura.new = function(IFramework)
         local eventHolder = EventHolder.new(IFramework)
 
         do
-            print("Apply Herrscher Aura", unit)
             local auraEffect = IFramework.Effect()
             auraEffect.model = "Wings\\Herrscher Wings.mdx"
             auraEffect.attachTo(unit, "chest")
@@ -10541,7 +10539,6 @@ _Abilities.Holmes_Aura.new = function(IFramework)
         local eventHolder = EventHolder.new(IFramework)
 
         do
-            print("Apply Holmes Aura", unit)
             local auraEffect = IFramework.Effect()
             auraEffect.model = "Wings\\Holmes Wings.mdx"
             auraEffect.attachTo(unit, "chest")
@@ -10594,7 +10591,6 @@ _Abilities.Kafka_Aura.new = function(IFramework)
         local eventHolder = EventHolder.new(IFramework)
 
         do
-            print("Apply Kafka Aura", unit)
             local auraEffect = IFramework.Effect()
             auraEffect.model = "Wings\\Kafka Wings.mdx"
             auraEffect.attachTo(unit, "chest")
@@ -10647,7 +10643,6 @@ _Abilities.Welt_Aura.new = function(IFramework)
         local eventHolder = EventHolder.new(IFramework)
 
         do
-            print("Apply Welt Aura", unit)
             local auraEffect = IFramework.Effect()
             auraEffect.model = "Wings\\Welt Wings.mdx"
             auraEffect.attachTo(unit, "chest")
@@ -11310,22 +11305,20 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
         local itemId = FourCC(itemId)
         local selector = FourCC(abilId)
 
-        local damage = 0
         local fire = 0
         local physical = 0
         local lightning = 0
         local quantum = 0
 
         local requirement
+        local effect
         local set
 
         local mt = {}
 
         -- Getter
         function mt.__index(table, index)
-            if index == "damage" then
-                return damage
-            elseif index == "fire" then
+            if index == "fire" then
                 return fire
             elseif index == "physical" then
                 return physical
@@ -11335,6 +11328,8 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
                 return quantum
             elseif index == "requirement" then
                 return requirement
+            elseif index == "effect" then
+                return effect
             elseif index == "set" then
                 return set
             elseif index == "itemId" then
@@ -11345,9 +11340,7 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
         end
 
         function mt.__newindex(_table, index, value)
-            if index == "damage" then
-                damage = value
-            elseif index == "fire" then
+            if index == "fire" then
                 fire = math.floor(value)
             elseif index == "physical" then
                 physical = math.floor(value)
@@ -11357,8 +11350,8 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
                 quantum = math.floor(value)
             elseif index == "requirement" then
                 requirement = value
-            elseif index == "requirement" then
-                requirement = value
+            elseif index == "effect" then
+                effect = value
             elseif index == "set" then
                 set = value
             else
@@ -11371,11 +11364,6 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             return base
         end
 
-        function self.Damage(damage)
-            self.damage = damage
-            return self
-        end
-
         function self.Affinities(fire, physical, lightning, quantum)
             self.fire = fire
             self.physical = physical
@@ -11386,6 +11374,11 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
 
         function self.Requirement(requirement)
             self.requirement = requirement
+            return self
+        end
+
+        function self.Effect(effect)
+            self.effect = effect
             return self
         end
 
@@ -11410,12 +11403,13 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
         end
 
         function self.unlock()
-            if self.requirement == nil then return self end
-            unit.owner.setTechResearched(self.requirement, 1)
+            if self.requirement ~= nil then 
+                unit.owner.setTechResearched(self.requirement, 1)
+            end
 
             local tooltip = BlzGetAbilityExtendedTooltip(selector, 0)
             if unit.owner.isLocal() then
-                local tooltip = ""
+                tooltip = ""
 
                 if self.fire > 0 then
                     tooltip = tooltip .. "|cfffc7f61F|r|cfff4624ei|r|cffed463cr|r|cffe62a2ae|r: " .. self.fire .. "\n"
@@ -11430,8 +11424,16 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
                     tooltip = tooltip .. "|cffc2c2f9Q|r|cffafadefu|r|cff9c99e5a|r|cff8985dbn|r|cff7670d1t|r|cff635cc8u|r|cff5048bem|r: " .. self.quantum .. "\n"
                 end
 
+                if self.effect ~= nil then
+                    tooltip = tooltip .. self.effect.getTooltip() .. "\n"
+                end
+
                 if self.set ~= nil then
                     tooltip = tooltip .. "\n" .. self.set.getTooltip()
+                end
+
+                if tooltip == "" then
+                    tooltip = "No Effect"
                 end
             end
             BlzSetAbilityExtendedTooltip(selector, tooltip, 0)
@@ -11448,6 +11450,10 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             affinitySys.bonusPhysical = affinitySys.bonusPhysical + self.physical
             affinitySys.bonusLightning = affinitySys.bonusLightning + self.lightning
             affinitySys.bonusQuantum = affinitySys.bonusQuantum + self.quantum
+
+            if self.effect ~= nil then
+                self.effect.apply()
+            end
         end
 
         function self.removeBonus()
@@ -11455,6 +11461,10 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             affinitySys.bonusPhysical = affinitySys.bonusPhysical - self.physical
             affinitySys.bonusLightning = affinitySys.bonusLightning - self.lightning
             affinitySys.bonusQuantum = affinitySys.bonusQuantum - self.quantum
+
+            if self.effect ~= nil then
+                self.effect.remove()
+            end
         end
 
         unit.bind("on_spell_effect",
@@ -11540,6 +11550,91 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
         return self
     end
 
+    local ItemEffect = {}
+    ItemEffect.new = function()
+        local self = {}
+
+        local name = ""
+        local description = ""
+        local onApply
+        local onRemove
+
+        local active = false
+
+        local mt = {}
+
+        -- Getter
+        function mt.__index(table, index)
+            if index == "name" then
+                return name
+            elseif index == "description" then
+                return description
+            elseif index == "onApply" then
+                return onApply
+            elseif index == "onRemove" then
+                return onRemove
+            else
+                IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+            end
+        end
+
+        function mt.__newindex(_table, index, value)
+            if index == "name" then
+                name = value
+            elseif index == "description" then
+                description = value
+            elseif index == "onApply" then
+                onApply = value
+            elseif index == "onRemove" then
+                onRemove = value
+            else
+                IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+            end
+        end
+
+        function self.Name(name)
+            self.name = name
+            return self
+        end
+
+        function self.Description(description)
+            self.description = description
+            return self
+        end
+
+        function self.OnApply(onApply, onRemove)
+            self.onApply = onApply
+            self.onRemove = onRemove
+            return self
+        end
+
+        function self.apply()
+            if active then
+                return
+            end
+            active = true
+            self.onApply(unit)
+        end
+
+        function self.remove()
+            if not active then
+                return
+            end
+            active = false
+            self.onRemove(unit)
+        end
+
+        function self.getTooltip()
+            local tooltip = "|cff0a5983" .. self.name .. "|r: " .. self.description
+
+            return tooltip
+        end
+
+        setmetatable(self, mt)
+
+        return self
+    end
+
     local Set = {}
     Set.new = function()
         local self = {}
@@ -11578,7 +11673,6 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             local onApply
             local onRemove
 
-            local count = 0
             local active = false
 
             local mt = {}
@@ -11674,7 +11768,6 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
         end
 
         function self.checkEffects()
-            print("Checking Effecs", self.count)
             for k, v in pairs(setEffects) do
                 if self.count >= v.required then
                     v.apply()
@@ -11694,6 +11787,92 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
 
         return self
     end
+
+    local AquilaFavonia = ItemEffect.new()
+        .Name("Falcon's Defiance")
+        .Description("Some Effect...")
+        .OnApply(nil, nil)
+
+    local SkywardBlade = ItemEffect.new()
+        .Name("Sky-Piercing Fang")
+        .Description("Some Effect...")
+        .OnApply(nil, nil)
+
+    local PrimoridalJadeCutter = ItemEffect.new()
+        .Name("Protector's Virtue")
+        .Description("Some Effect...")
+        .OnApply(nil, nil)
+
+    local LightOfFoliar = ItemEffect.new()
+        .Name("Whitemoon Bristle")
+        .Description("Some Effect...")
+        .OnApply(nil, nil)
+
+    local KeyOfKhajNisut = ItemEffect.new()
+        .Name("Sunken Song of the Sands")
+        .Description("Some Effect...")
+        .OnApply(nil, nil)
+    
+    local SummitShaper = ItemEffect.new()
+        .Name("Golden Majesty")
+        .Description("Some Effect...")
+        .OnApply(nil, nil)
+
+    local FreedomSworn = ItemEffect.new()
+        .Name("Revolutionary Chorale")
+        .Description("Some Effect...")
+        .OnApply(nil, nil)
+
+    local HaranGeppakuFutsu = ItemEffect.new()
+        .Name("Honed Flow")
+        .Description("Some Effect...")
+        .OnApply(nil, nil)
+
+    local MistsplitterReforged = ItemEffect.new()
+        .Name("Mistsplitter's Edge")
+        .Description("Some Effect...")
+        .OnApply(nil, nil)
+
+    local weapon = Spellbook.new('IWSB', 0)
+        .AddItem('IW00', 'AW00')
+            .Build()
+        .AddItem('IW01', 'AW01')
+            .Requirement('R001')
+            .Effect(AquilaFavonia)
+            .Build()
+        .AddItem('IW02', 'AW02')
+            .Requirement('R002')
+            .Effect(SkywardBlade)
+            .Build()
+        .AddItem('IW03', 'AW03')
+            .Requirement('R003')
+            .Effect(PrimoridalJadeCutter)
+            .Build()
+        .AddItem('IW04', 'AW04')
+            .Requirement('R004')
+            .Effect(LightOfFoliar)
+            .Build()
+        .AddItem('IW05', 'AW05')
+            .Requirement('R005')
+            .Effect(KeyOfKhajNisut)
+            .Build()
+        .AddItem('IW06', 'AW06')
+            .Requirement('R006')
+            .Effect(SummitShaper)
+            .Build()
+        .AddItem('IW07', 'AW07')
+            .Requirement('R007')
+            .Effect(FreedomSworn)
+            .Build()
+        .AddItem('IW08', 'AW08')
+            .Requirement('R008')
+            .Effect(HaranGeppakuFutsu)
+            .Build()
+        .AddItem('IW09', 'AW09')
+            .Requirement('R009')
+            .Effect(MistsplitterReforged)
+            .Build()
+        .unlockAll()
 
     local stigmaValue = 150
 
@@ -11843,38 +12022,6 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
         end
         return stats['fire'], stats['physical'], stats['lightning'], stats['quantum']
     end
-
-    local weapon = Spellbook.new('IWSB', 0)
-        .AddItem('IW00', 'AW00')
-            .Build()
-        .AddItem('IW01', 'AW01')
-            .Requirement('R001')
-            .Build()
-        .AddItem('IW02', 'AW02')
-            .Requirement('R002')
-            .Build()
-        .AddItem('IW03', 'AW03')
-            .Requirement('R003')
-            .Build()
-        .AddItem('IW04', 'AW04')
-            .Requirement('R004')
-            .Build()
-        .AddItem('IW05', 'AW05')
-            .Requirement('R005')
-            .Build()
-        .AddItem('IW06', 'AW06')
-            .Requirement('R006')
-            .Build()
-        .AddItem('IW07', 'AW07')
-            .Requirement('R007')
-            .Build()
-        .AddItem('IW08', 'AW08')
-            .Requirement('R008')
-            .Build()
-        .AddItem('IW09', 'AW09')
-            .Requirement('R009')
-            .Build()
-        .unlockAll()
 
     local stigmaT = Spellbook.new('ISBT', 1)
         -- Benares
