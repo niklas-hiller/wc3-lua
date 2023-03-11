@@ -267,28 +267,28 @@ When Player has 3-Piece Stigmata, they will have a Wings Effect.
 - Benares
     - Focus: Physical > Fire, Physical, Lightning
         - Ratio: 25, 75, 25, 25
-    - 2-Piece: Increases Damage Reduction by 40%.
-    - 3-Piece: Regenerate 3.5% Max HP per second, and gain increasing Damage Reduction with missing health, capped at 10% HP (0%-40%).
+    - 2-Piece: 
+    - 3-Piece: 
 - Herrscher
     - Focus: Quantum, Fire > Physical, Lightning
         - Ratio: 50, 25, 25, 50
-    - 2-Piece: Doubles Quantum Shield Strength, excessive Critical Chance is converted to Critical Damage (1:3).
-    - 3-Piece: Doubles Critical Damage when Quantum Shield is active.
+    - 2-Piece: 
+    - 3-Piece: 
 - Holmes
     - Focus: Lightning > Fire, Physical, Quantum
         - Ratio: 25, 25, 75, 25
-    - 2-Piece: Your critical chance is always 100%.
-    - 3-Piece: Doubles Attack Speed.
+    - 2-Piece: 
+    - 3-Piece: 
 - Kafka
     - Focus: Physical, Quantum > Lightning, Fire
         - Ratio: 25, 50, 25, 50
-    - 2-Piece: Increases Omnivamp by 15%.
-    - 3-Piece: Every 5 seconds, apply a random buff (Attack, Defense, Speed) to you and allies in the same area, with a duration of 10 seconds.
+    - 2-Piece: 
+    - 3-Piece: 
 - Welt
     - Focus: All-Rounder
         - Ratio: 37.5, 37.5, 37.5, 37.5
-    - 2-Piece: Increases all affinities by 40%.
-    - 3-Piece: Spawns three drones nearby, that shoot at random enemies, dealing 350% damage per attack.
+    - 2-Piece: 
+    - 3-Piece: 
 ### Top
 - Focus: Fire > Physical, Lightning, Quantum
 - Ratio: 75, 25, 25, 25

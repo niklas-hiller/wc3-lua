@@ -2000,7 +2000,10 @@ Framework.new = function()
             local eventDispatcher = Interface.EventDispatcher(
                 {"on_leave", "on_message", "on_sync", "on_createUnit",
                 "on_unit_select", "on_unit_deselect", "on_unit_death_pre", "on_unit_death",
-                "on_unit_damage_pre", "on_unit_damaged_pre", "on_unit_damage_after", "on_unit_damaged_after", 
+                "on_unit_damage_pre_stage_1", "on_unit_damaged_pre_stage_1",
+                "on_unit_damage_pre_stage_2", "on_unit_damaged_pre_stage_2",
+                "on_unit_damage_pre_stage_3", "on_unit_damaged_pre_stage_3",
+                "on_unit_damage_after", "on_unit_damaged_after", 
                 "on_unit_attack", "on_unit_attacked",
                 "on_unit_level", "on_unit_skill",
                 "on_unit_drop_item", "on_unit_pickup_item", "on_unit_use_item", "on_unit_stack_item",
@@ -2081,21 +2084,57 @@ Framework.new = function()
                 if status then return val end
             end
 
-            function self._on_unit_damage_pre(source, target, attack)
-                eventDispatcher.dispatch("on_unit_damage_pre", source, target, attack)
+            function self._on_unit_damage_pre_1(source, target, attack)
+                eventDispatcher.dispatch("on_unit_damage_pre_stage_1", source, target, attack)
             end
 
-            self.on_unit_damage_pre = function(source, target, attack)
-                local status, val = xpcall(self._on_unit_damage_pre, Interface.Log.Error, source, target, attack)
+            function self._on_unit_damage_pre_2(source, target, attack)
+                eventDispatcher.dispatch("on_unit_damage_pre_stage_2", source, target, attack)
+            end
+
+            function self._on_unit_damage_pre_3(source, target, attack)
+                eventDispatcher.dispatch("on_unit_damage_pre_stage_3", source, target, attack)
+            end
+
+            self.on_unit_damage_pre_1 = function(source, target, attack)
+                local status, val = xpcall(self._on_unit_damage_pre_1, Interface.Log.Error, source, target, attack)
                 if status then return val end
             end
 
-            function self._on_unit_damaged_pre(source, target, attack)
-                eventDispatcher.dispatch("on_unit_damaged_pre", source, target, attack)
+            self.on_unit_damage_pre_2 = function(source, target, attack)
+                local status, val = xpcall(self._on_unit_damage_pre_2, Interface.Log.Error, source, target, attack)
+                if status then return val end
             end
 
-            self.on_unit_damaged_pre = function(source, target, attack)
-                local status, val = xpcall(self._on_unit_damaged_pre, Interface.Log.Error, source, target, attack)
+            self.on_unit_damage_pre_3 = function(source, target, attack)
+                local status, val = xpcall(self._on_unit_damage_pre_3, Interface.Log.Error, source, target, attack)
+                if status then return val end
+            end
+
+            function self._on_unit_damaged_pre_1(source, target, attack)
+                eventDispatcher.dispatch("on_unit_damaged_pre_stage_1", source, target, attack)
+            end
+
+            function self._on_unit_damaged_pre_2(source, target, attack)
+                eventDispatcher.dispatch("on_unit_damaged_pre_stage_2", source, target, attack)
+            end
+
+            function self._on_unit_damaged_pre_3(source, target, attack)
+                eventDispatcher.dispatch("on_unit_damaged_pre_stage_3", source, target, attack)
+            end
+
+            self.on_unit_damaged_pre_1 = function(source, target, attack)
+                local status, val = xpcall(self._on_unit_damaged_pre_1, Interface.Log.Error, source, target, attack)
+                if status then return val end
+            end
+
+            self.on_unit_damaged_pre_2 = function(source, target, attack)
+                local status, val = xpcall(self._on_unit_damaged_pre_2, Interface.Log.Error, source, target, attack)
+                if status then return val end
+            end
+
+            self.on_unit_damaged_pre_3 = function(source, target, attack)
+                local status, val = xpcall(self._on_unit_damaged_pre_3, Interface.Log.Error, source, target, attack)
                 if status then return val end
             end
 
@@ -2363,10 +2402,23 @@ Framework.new = function()
                         local target = GetEventDamageTarget()
                         local damageObject = ConstructDamageObject()
 
-                        source.owner.on_unit_damage_pre(source, target, damageObject)
-                        source.on_damage_pre(target, damageObject)
-                        target.owner.on_unit_damaged_pre(source, target, damageObject)
-                        target.on_damaged_pre(source, damageObject)
+                        -- Stage 1
+                        source.owner.on_unit_damage_pre_1(source, target, damageObject)
+                        source.on_damage_pre_1(target, damageObject)
+                        target.owner.on_unit_damaged_pre_1(source, target, damageObject)
+                        target.on_damaged_pre_1(source, damageObject)
+
+                        -- Stage 2
+                        source.owner.on_unit_damage_pre_2(source, target, damageObject)
+                        source.on_damage_pre_2(target, damageObject)
+                        target.owner.on_unit_damaged_pre_2(source, target, damageObject)
+                        target.on_damaged_pre_2(source, damageObject)
+
+                        -- Stage 3
+                        source.owner.on_unit_damage_pre_3(source, target, damageObject)
+                        source.on_damage_pre_3(target, damageObject)
+                        target.owner.on_unit_damaged_pre_3(source, target, damageObject)
+                        target.on_damaged_pre_3(source, damageObject)
 
                         damageObject.damage = damageObject.damage + damageObject.crit
                         if target.hp - damageObject.damage < 5 then
@@ -5254,7 +5306,10 @@ Framework.new = function()
             local eventDispatcher = Interface.EventDispatcher(
                 {"on_selected", "on_deselected",
                 "on_death_pre", "on_death", "on_remove", 
-                "on_damage_pre", "on_damaged_pre", "on_damage_after", "on_damaged_after", 
+                "on_damage_pre_stage_1", "on_damaged_pre_stage_1", 
+                "on_damage_pre_stage_2", "on_damaged_pre_stage_2",
+                "on_damage_pre_stage_3", "on_damaged_pre_stage_3",
+                "on_damage_after", "on_damaged_after", 
                 "on_attack", "on_attacked",
                 "on_exp", "on_level", "on_skill",
                 "on_drop_item", "on_pickup_item", "on_use_item", "on_stack_item",
@@ -5265,7 +5320,7 @@ Framework.new = function()
             self.unbind = eventDispatcher.unbind
 
             function self._on_deselected(deselector)
-                eventDispatcher.dispatch("_on_deselected", deselector, self)
+                eventDispatcher.dispatch("on_deselected", deselector, self)
             end
 
             self.on_deselected = function(deselector)
@@ -5309,21 +5364,57 @@ Framework.new = function()
                 if status then return val end
             end
 
-            function self._on_damage_pre(target, attack)
-                eventDispatcher.dispatch("on_damage_pre", self, target, attack)
+            function self._on_damage_pre_1(target, attack)
+                eventDispatcher.dispatch("on_damage_pre_stage_1", self, target, attack)
+            end
+            
+            function self._on_damage_pre_2(target, attack)
+                eventDispatcher.dispatch("on_damage_pre_stage_2", self, target, attack)
             end
 
-            self.on_damage_pre = function(target, attack)
-                local status, val = xpcall(self._on_damage_pre, Interface.Log.Error, target, attack)
+            function self._on_damage_pre_3(target, attack)
+                eventDispatcher.dispatch("on_damage_pre_stage_3", self, target, attack)
+            end
+
+            self.on_damage_pre_1 = function(target, attack)
+                local status, val = xpcall(self._on_damage_pre_1, Interface.Log.Error, target, attack)
                 if status then return val end
             end
 
-            function self._on_damaged_pre(source, attack)
-                eventDispatcher.dispatch("on_damaged_pre", source, self, attack)
+            self.on_damage_pre_2 = function(target, attack)
+                local status, val = xpcall(self._on_damage_pre_2, Interface.Log.Error, target, attack)
+                if status then return val end
             end
 
-            self.on_damaged_pre = function(source, attack)
-                local status, val = xpcall(self._on_damaged_pre, Interface.Log.Error, source, attack)
+            self.on_damage_pre_3 = function(target, attack)
+                local status, val = xpcall(self._on_damage_pre_3, Interface.Log.Error, target, attack)
+                if status then return val end
+            end
+
+            function self._on_damaged_pre_1(source, attack)
+                eventDispatcher.dispatch("on_damaged_pre_stage_1", source, self, attack)
+            end
+
+            function self._on_damaged_pre_2(source, attack)
+                eventDispatcher.dispatch("on_damaged_pre_stage_2", source, self, attack)
+            end
+
+            function self._on_damaged_pre_3(source, attack)
+                eventDispatcher.dispatch("on_damaged_pre_stage_3", source, self, attack)
+            end
+
+            self.on_damaged_pre_1 = function(source, attack)
+                local status, val = xpcall(self._on_damaged_pre_1, Interface.Log.Error, source, attack)
+                if status then return val end
+            end
+
+            self.on_damaged_pre_2 = function(source, attack)
+                local status, val = xpcall(self._on_damaged_pre_2, Interface.Log.Error, source, attack)
+                if status then return val end
+            end
+
+            self.on_damaged_pre_3 = function(source, attack)
+                local status, val = xpcall(self._on_damaged_pre_3, Interface.Log.Error, source, attack)
                 if status then return val end
             end
 
@@ -7305,7 +7396,7 @@ _Abilities.Reapers.new = function(IFramework)
                             slashEffect.create().destroy()
                         end
                     )
-                    summonUnit.bind("on_damage_pre",
+                    summonUnit.bind("on_damage_pre_stage_1",
                         function(source, target, damageObject)
                             damageObject.damage = 0
                             unit.damageTarget(target, unit.damage * 5.0, false, false, ATTACK_TYPE_HERO, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_CLAW_LIGHT_SLICE)
@@ -9425,7 +9516,7 @@ _Abilities.Blazing_Blade.new = function(IFramework, DefaultAttack)
                 end
             )
 
-            eventHolder.event = unit.bind("on_damage_pre",
+            eventHolder.event = unit.bind("on_damage_pre_stage_1",
                 function(source, target, damageObject)
                     damageObject.damage = 0
                     damageObject.crit = 0
@@ -9515,7 +9606,7 @@ _Abilities.Fiery_Hymns_Pledge.new = function(IFramework)
 
             local manaLast = unit.mp
 
-            eventHolder.event = unit.bind("on_damaged_pre",
+            eventHolder.event = unit.bind("on_damaged_pre_stage_1",
                 function(source, target, damageObject)
                     unit.manavamp = unit.omnivamp
                     if active then
@@ -9667,7 +9758,7 @@ _Abilities.Lone_Phoenixs_Plume.new = function(IFramework)
 
             local cooldown = false
 
-            eventHolder.event = unit.bind("on_damaged_pre",
+            eventHolder.event = unit.bind("on_damaged_pre_stage_1",
                 function(source, target, damageObject)
                     if not cooldown then
                         forceTrigger = true
@@ -10854,7 +10945,6 @@ AreaConfiguration.new = function(IFramework)
             elseif index == "movementspeed" then
                 movementspeed = value
             elseif index == "health" then
-                print("Changed Boss HP to " .. value)
                 health = value
             elseif index == "armor" then
                 armor = value
@@ -12393,8 +12483,12 @@ AffinitySystem.new = function(IFramework, unit)
     )
 
     local quantumShieldCooldown = false
-    unit.bind("on_damaged_pre",
+    unit.bind("on_damaged_pre_stage_3",
         function(source, target, damageObject)
+            -- Do not calculate anything if damage is 0
+            if damageObject.damage == 0 and damageObject.crit == 0 then
+                return
+            end
             -- Armor reduces damage by 1 per point (minimum 2 damage)
             if damageObject.damage - target.armor < 2 then
                 damageObject.damage = 2
