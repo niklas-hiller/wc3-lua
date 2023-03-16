@@ -11142,7 +11142,9 @@ _Abilities.Stigmata_Welt_2pc.new = function(IFramework)
             )
 
             eventHolder.cleanup = function()
-                unit.omnivamp = unit.omnivamp - 0.15
+                unit.damageReduction = unit.damageReduction - 10.0
+                unit.dodgeChance = unit.dodgeChance - 10.0
+                unit.omnivamp = unit.omnivamp - 0.05
             end
         end
 
@@ -11234,6 +11236,602 @@ _Abilities.Stigmata_Welt_3pc.new = function(IFramework)
                 BlzSetAbilityExtendedTooltip(STIGMATA_ABILITY, _description, 0)
                 BlzSetAbilityIcon(STIGMATA_ABILITY, _icon)
                 auraEffect.destroy()
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Weapon_CinnabarSpindle = {}
+_Abilities.Weapon_CinnabarSpindle.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            eventHolder.event = unit.bind("on_damage_pre_stage_1",
+                function(source, target, damageObject)
+                    damageObject.damageAmplifier = damageObject.damageAmplifier + 0.25
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return source == unit
+                end
+            )
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Weapon_AquilaFavonia = {}
+_Abilities.Weapon_AquilaFavonia.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            unit.damageReduction = unit.damageReduction + 10.0
+            unit.dodgeChance = unit.dodgeChance + 10.0
+
+            eventHolder.event = unit.bind("on_damage_pre_stage_1",
+                function(source, target, damageObject)
+                    damageObject.damageAmplifier = damageObject.damageAmplifier + 0.40
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return source == unit
+                end
+            )
+
+            eventHolder.cleanup = function()
+                unit.damageReduction = unit.damageReduction - 10.0
+                unit.dodgeChance = unit.dodgeChance - 10.0
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Weapon_SkywardBlade = {}
+_Abilities.Weapon_SkywardBlade.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            unit.omnivamp = unit.omnivamp + 0.05
+            unit.ignoreReduction = unit.ignoreReduction + 50.0
+
+            eventHolder.event = unit.bind("on_damage_pre_stage_1",
+                function(source, target, damageObject)
+                    damageObject.damageAmplifier = damageObject.damageAmplifier + 0.35
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return source == unit
+                end
+            )
+
+            eventHolder.cleanup = function()
+                unit.omnivamp = unit.omnivamp - 0.05
+                unit.ignoreReduction = unit.ignoreReduction - 50.0
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Weapon_PrimoridalJadeCutter = {}
+_Abilities.Weapon_PrimoridalJadeCutter.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            unit.omnivamp = unit.omnivamp + 0.10
+
+            eventHolder.event = unit.bind("on_damage_pre_stage_1",
+                function(source, target, damageObject)
+                    damageObject.damageAmplifier = damageObject.damageAmplifier + 0.60
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return source == unit
+                end
+            )
+
+            eventHolder.cleanup = function()
+                unit.omnivamp = unit.omnivamp - 0.10
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Weapon_LightOfFoliar = {}
+_Abilities.Weapon_LightOfFoliar.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            unit.dodgeChance = unit.dodgeChance + 10.0
+            unit.ignoreReduction = unit.ignoreReduction + 50.0
+
+            eventHolder.event = unit.bind("on_damage_pre_stage_1",
+                function(source, target, damageObject)
+                    damageObject.damageAmplifier = damageObject.damageAmplifier + 0.35
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return source == unit
+                end
+            )
+
+            eventHolder.cleanup = function()
+                unit.dodgeChance = unit.dodgeChance - 10.0
+                unit.ignoreReduction = unit.ignoreReduction - 50.0
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Weapon_KeyOfKhajNisut = {}
+_Abilities.Weapon_KeyOfKhajNisut.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            unit.omnivamp = unit.omnivamp + 0.05
+            unit.damageReduction = unit.damageReduction + 10.0
+
+            eventHolder.event = unit.bind("on_damage_pre_stage_1",
+                function(source, target, damageObject)
+                    damageObject.damageAmplifier = damageObject.damageAmplifier + 0.40
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return source == unit
+                end
+            )
+
+            eventHolder.cleanup = function()
+                unit.omnivamp = unit.omnivamp - 0.05
+                unit.damageReduction = unit.damageReduction - 10.0
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Weapon_SummitShaper = {}
+_Abilities.Weapon_SummitShaper.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            unit.damageReduction = unit.damageReduction + 20.0
+
+            eventHolder.event = unit.bind("on_damage_pre_stage_1",
+                function(source, target, damageObject)
+                    damageObject.damageAmplifier = damageObject.damageAmplifier + 0.50
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return source == unit
+                end
+            )
+
+            eventHolder.cleanup = function()
+                unit.damageReduction = unit.damageReduction - 20.0
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Weapon_FreedomSworn = {}
+_Abilities.Weapon_FreedomSworn.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            unit.dodgeChance = unit.dodgeChance + 20.0
+
+            eventHolder.event = unit.bind("on_damage_pre_stage_1",
+                function(source, target, damageObject)
+                    damageObject.damageAmplifier = damageObject.damageAmplifier + 0.50
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return source == unit
+                end
+            )
+
+            eventHolder.cleanup = function()
+                unit.dodgeChance = unit.dodgeChance - 20.0
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Weapon_HaranGeppakuFutsu = {}
+_Abilities.Weapon_HaranGeppakuFutsu.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            eventHolder.event = unit.bind("on_damage_pre_stage_1",
+                function(source, target, damageObject)
+                    damageObject.damageAmplifier = damageObject.damageAmplifier + 0.90
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return source == unit
+                end
+            )
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Weapon_MistsplitterReforged = {}
+_Abilities.Weapon_MistsplitterReforged.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    metadata.name = nil
+    metadata.description = nil
+    metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            unit.ignoreReduction = unit.ignoreReduction + 100.0
+
+            eventHolder.event = unit.bind("on_damage_pre_stage_1",
+                function(source, target, damageObject)
+                    damageObject.damageAmplifier = damageObject.damageAmplifier + 0.40
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return source == unit
+                end
+            )
+
+            eventHolder.cleanup = function()
+                unit.ignoreReduction = unit.ignoreReduction - 100.0
             end
         end
 
@@ -11350,7 +11948,19 @@ Abilities.new = function(IFramework)
     self.To_Blaze_Eternal = _Abilities.To_Blaze_Eternal.new(IFramework)
     self.Nihility_Aura = _Abilities.Nihility_Aura.new(IFramework)
 
-    -- Item Effects
+    -- Weapon Effects
+    self.Weapon_CinnabarSpindle = _Abilities.Weapon_CinnabarSpindle.new(IFramework)
+    self.Weapon_AquilaFavonia = _Abilities.Weapon_AquilaFavonia.new(IFramework)
+    self.Weapon_SkywardBlade = _Abilities.Weapon_SkywardBlade.new(IFramework)
+    self.Weapon_PrimoridalJadeCutter = _Abilities.Weapon_PrimoridalJadeCutter.new(IFramework)
+    self.Weapon_LightOfFoliar = _Abilities.Weapon_LightOfFoliar.new(IFramework)
+    self.Weapon_KeyOfKhajNisut = _Abilities.Weapon_KeyOfKhajNisut.new(IFramework)
+    self.Weapon_SummitShaper = _Abilities.Weapon_SummitShaper.new(IFramework)
+    self.Weapon_FreedomSworn = _Abilities.Weapon_FreedomSworn.new(IFramework)
+    self.Weapon_HaranGeppakuFutsu = _Abilities.Weapon_HaranGeppakuFutsu.new(IFramework)
+    self.Weapon_MistsplitterReforged = _Abilities.Weapon_MistsplitterReforged.new(IFramework)
+
+    -- Stigmata Effects
     self.Stigmata_Benares_2pc = _Abilities.Stigmata_Benares_2pc.new(IFramework)
     self.Stigmata_Herrscher_2pc = _Abilities.Stigmata_Herrscher_2pc.new(IFramework)
     self.Stigmata_Holmes_2pc = _Abilities.Stigmata_Holmes_2pc.new(IFramework)
@@ -12404,53 +13014,59 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
         return self
     end
 
+    local CinnabarSpindle = ItemEffect.new()
+        .Name("Spotless Heart")
+        .Description("Increases Damage by 25\x25.")
+        .OnApply(Ability.Weapon_CinnabarSpindle.apply, Ability.Weapon_CinnabarSpindle.remove)
+
     local AquilaFavonia = ItemEffect.new()
         .Name("Falcon's Defiance")
-        .Description("Some Effect...")
-        .OnApply(nil, nil)
+        .Description("Increases Damage by 40\x25, Dodge Chance by 10\x25, Damage Reduction by 10\x25.")
+        .OnApply(Ability.Weapon_AquilaFavonia.apply, Ability.Weapon_AquilaFavonia.remove)
 
     local SkywardBlade = ItemEffect.new()
         .Name("Sky-Piercing Fang")
-        .Description("Some Effect...")
-        .OnApply(nil, nil)
+        .Description("Increases Damage by 35\x25, Omnivamp by 5\x25, Ignore Enemy Defense by 50\x25.")
+        .OnApply(Ability.Weapon_SkywardBlade.apply, Ability.Weapon_SkywardBlade.remove)
 
     local PrimoridalJadeCutter = ItemEffect.new()
         .Name("Protector's Virtue")
-        .Description("Some Effect...")
-        .OnApply(nil, nil)
+        .Description("Increases Damage by 60\x25, Omnivamp by 10\x25.")
+        .OnApply(Ability.Weapon_PrimoridalJadeCutter.apply, Ability.Weapon_PrimoridalJadeCutter.remove)
 
     local LightOfFoliar = ItemEffect.new()
         .Name("Whitemoon Bristle")
-        .Description("Some Effect...")
-        .OnApply(nil, nil)
+        .Description("Increases Damage by 35\x25, Dodge Chance by 10\x25, Ignore Enemy Defense by 50\x25.")
+        .OnApply(Ability.Weapon_LightOfFoliar.apply, Ability.Weapon_LightOfFoliar.remove)
 
     local KeyOfKhajNisut = ItemEffect.new()
         .Name("Sunken Song of the Sands")
-        .Description("Some Effect...")
-        .OnApply(nil, nil)
+        .Description("Increases Damage by 40\x25, Omnivamp by 5\x25, Damage Reduction by 10\x25.")
+        .OnApply(Ability.Weapon_KeyOfKhajNisut.apply, Ability.Weapon_KeyOfKhajNisut.remove)
     
     local SummitShaper = ItemEffect.new()
         .Name("Golden Majesty")
-        .Description("Some Effect...")
-        .OnApply(nil, nil)
+        .Description("Increases Damage by 50\x25, Damage Reduction by 20\x25")
+        .OnApply(Ability.Weapon_SummitShaper.apply, Ability.Weapon_SummitShaper.remove)
 
     local FreedomSworn = ItemEffect.new()
         .Name("Revolutionary Chorale")
-        .Description("Some Effect...")
-        .OnApply(nil, nil)
+        .Description("Increases Damage by 50\x25, Dodge Chance by 20\x25.")
+        .OnApply(Ability.Weapon_FreedomSworn.apply, Ability.Weapon_FreedomSworn.remove)
 
     local HaranGeppakuFutsu = ItemEffect.new()
         .Name("Honed Flow")
-        .Description("Some Effect...")
-        .OnApply(nil, nil)
+        .Description("Increases Damage by 90\x25.")
+        .OnApply(Ability.Weapon_HaranGeppakuFutsu.apply, Ability.Weapon_HaranGeppakuFutsu.remove)
 
     local MistsplitterReforged = ItemEffect.new()
         .Name("Mistsplitter's Edge")
-        .Description("Some Effect...")
-        .OnApply(nil, nil)
+        .Description("Increases Damage by 40\x25, Ignore Enemy Defense by 100\x25")
+        .OnApply(Ability.Weapon_MistsplitterReforged.apply, Ability.Weapon_MistsplitterReforged.remove)
 
     local weapon = Spellbook.new('IWSB', 0)
         .AddItem('IW00', 'AW00')
+            .Effect(CinnabarSpindle)
             .equip()
             .Build()
         .AddItem('IW01', 'AW01')
@@ -12502,7 +13118,7 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             .Build()
         .AddEffect()
             .Name("Creation of Honkai")
-            .Description("Unlocks ... (R) Ability")
+            .Description("Unlocks Stigmata (R) Ability")
             .Required(3)
             .OnApply(Ability.Stigmata_Benares_3pc.apply, Ability.Stigmata_Benares_3pc.remove)
             .Build()
@@ -12516,7 +13132,7 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             .Build()
         .AddEffect()
             .Name("When Finality Emerges")
-            .Description("Unlocks ... (R) Ability")
+            .Description("Unlocks Stigmata (R) Ability")
             .Required(3)
             .OnApply(Ability.Stigmata_Herrscher_3pc.apply, Ability.Stigmata_Herrscher_3pc.remove)
             .Build()
@@ -12530,7 +13146,7 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             .Build()
         .AddEffect()
             .Name("Scarlet Flash")
-            .Description("Unlocks ... (R) Ability")
+            .Description("Unlocks Stigmata (R) Ability")
             .Required(3)
             .OnApply(Ability.Stigmata_Holmes_3pc.apply, Ability.Stigmata_Holmes_3pc.remove)
             .Build()
@@ -12544,7 +13160,7 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             .Build()
         .AddEffect()
             .Name("Death Scythe")
-            .Description("Unlocks ... (R) Ability")
+            .Description("Unlocks Stigmata (R) Ability")
             .Required(3)
             .OnApply(Ability.Stigmata_Kafka_3pc.apply, Ability.Stigmata_Kafka_3pc.remove)
             .Build()
@@ -12558,7 +13174,7 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
             .Build()
         .AddEffect()
             .Name("New World")
-            .Description("Unlocks ... (R) Ability")
+            .Description("Unlocks Stigmata (R) Ability")
             .Required(3)
             .OnApply(Ability.Stigmata_Welt_3pc.apply, Ability.Stigmata_Welt_3pc.remove)
             .Build()

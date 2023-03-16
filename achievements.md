@@ -241,25 +241,25 @@ Items are representated as spellbooks, which contains all items, the player has 
 ## Weapons
 Weapons can be dropped from specific Boss.
 - Cinnabar Spindle
-    - Effect: None
+    - Effect: Damage (25%)
 - Aquila Favonia
-    - Effect: EXP Rate (100%)
+    - Effect: Damage (40%), Dodge (10%), Damage Reduction (10%)
 - Skyward Blade
-    - Effect: Shockwave towards damage direction (5s Cooldown)
+    - Effect: Damage (35%), Omnivamp (5%), Ignore Enemy Defense (50%)
 - Primoridal Jade Cutter
-    - Effect: Omnivamp (10%)
+    - Effect: Damage (60%), Omnivamp (10%)
 - Light of Foliar
-    - Effect: Drop Rate (100%)
+    - Effect: Damage (35%), Dodge (10%), Ignore Enemy Defense (50%)
 - Key of Khaj Nisut
-    - Effect: Stats (150)
+    - Effect: Damage (40%), Omnivamp (5%), Damage Reduction (10%)
 - Summit Shaper
-    - Effect: Damage Reduction (20%)
+    - Effect: Damage (50%), Damage Reduction (20%)
 - Freedom Sworn
-    - Effect: Dodge (20%)
+    - Effect: Damage (50%), Dodge (20%)
 - Haran Geppaku Futsu
     - Effect: Damage (90%)
 - Mistsplitter Reforged
-    - Effect: Ignore Enemy Defense (100%)
+    - Effect: Damage (40%), Ignore Enemy Defense (100%)
 
 ## Stigmata
 Stigmata can be dropped from ANY Boss, only the drop chance increases on stronger bosses.
