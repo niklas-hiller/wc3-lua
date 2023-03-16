@@ -10599,7 +10599,7 @@ _Abilities.Stigmata_Benares_3pc.new = function(IFramework)
     defaultMetadata.icon = "ReplaceableTextures\\CommandButtons\\BTNStigmata_Ability.blp"
 
     metadata.name = "Benares"
-    metadata.description = "Undefined"
+    metadata.description = "Not implemented"
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNBenares_Ability.blp"
 
     function mt.__index(table, index)
@@ -10744,7 +10744,7 @@ _Abilities.Stigmata_Herrscher_3pc.new = function(IFramework)
     defaultMetadata.icon = "ReplaceableTextures\\CommandButtons\\BTNStigmata_Ability.blp"
 
     metadata.name = "Herrscher"
-    metadata.description = "Undefined"
+    metadata.description = "Not implemented"
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHerrscher_Ability.blp"
 
     function mt.__index(table, index)
@@ -10885,7 +10885,7 @@ _Abilities.Stigmata_Holmes_3pc.new = function(IFramework)
     defaultMetadata.icon = "ReplaceableTextures\\CommandButtons\\BTNStigmata_Ability.blp"
 
     metadata.name = "Holmes"
-    metadata.description = "Undefined"
+    metadata.description = "Not implemented"
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHolmes_Ability.blp"
 
     function mt.__index(table, index)
@@ -11026,7 +11026,7 @@ _Abilities.Stigmata_Kafka_3pc.new = function(IFramework)
     defaultMetadata.icon = "ReplaceableTextures\\CommandButtons\\BTNStigmata_Ability.blp"
 
     metadata.name = "Kafka"
-    metadata.description = "Undefined"
+    metadata.description = "Not implemented"
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNKafka_Ability.blp"
 
     function mt.__index(table, index)
@@ -11181,7 +11181,7 @@ _Abilities.Stigmata_Welt_3pc.new = function(IFramework)
     defaultMetadata.icon = "ReplaceableTextures\\CommandButtons\\BTNStigmata_Ability.blp"
 
     metadata.name = "Welt"
-    metadata.description = "Undefined"
+    metadata.description = "Not implemented"
     metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNWelt_Ability.blp"
 
     function mt.__index(table, index)
