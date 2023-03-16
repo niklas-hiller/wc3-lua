@@ -243,52 +243,54 @@ Weapons can be dropped from specific Boss.
 - Cinnabar Spindle
     - Effect: None
 - Aquila Favonia
-    - Effect: Your experience rate is increased by 100%
+    - Effect: EXP Rate (100%)
 - Skyward Blade
-    - Effect: When auto attacking an enemy, deal damage to the three most nearby enemies aswell.
+    - Effect: Shockwave towards damage direction (5s Cooldown)
 - Primoridal Jade Cutter
-    - Effect: 35% of your HP is converted to Damage
+    - Effect: Omnivamp (10%)
 - Light of Foliar
-    - Effect: When critical strike, heal by 20% of the damage (7 seconds cooldown)
+    - Effect: Drop Rate (100%)
 - Key of Khaj Nisut
-    - Effect: Attack Speed is halved, but damage is increased by 100%.
+    - Effect: Stats (150)
 - Summit Shaper
-    - Effect: Every third damage instance is negated.
+    - Effect: Damage Reduction (20%)
 - Freedom Sworn
-    - Effect: Your attack speed is fixed to 2.5 and your movement speed is fixed to 700.
+    - Effect: Dodge (20%)
 - Haran Geppaku Futsu
-    - Effect: Every 3 seconds gain a stack (up to 5) increasing your damage by 20% each. Loose all stacks when taking damage
+    - Effect: Damage (90%)
 - Mistsplitter Reforged
-    - Effect: Your health are downgraded to 100 (after Quantum Shield Calculation) and your quantum shield strength is tripled
+    - Effect: Ignore Enemy Defense (100%)
 
 ## Stigmata
 Stigmata can be dropped from ANY Boss, only the drop chance increases on stronger bosses.
+Stigmata 2-Piece Set Effect -> Passive
+Stigmata 3-Piece Set Effect -> Active
 When Player has 3-Piece Stigmata, they will have a Wings Effect.
 - Benares
     - Focus: Physical > Fire, Physical, Lightning
         - Ratio: 25, 75, 25, 25
-    - 2-Piece: 
-    - 3-Piece: 
+    - 2-Piece: Damage Reduction (30%)
+    - 3-Piece: Invincibility (Team)
 - Herrscher
     - Focus: Quantum, Fire > Physical, Lightning
         - Ratio: 50, 25, 25, 50
-    - 2-Piece: 
-    - 3-Piece: 
+    - 2-Piece: Damage (150%)
+    - 3-Piece: Time-Stop
 - Holmes
     - Focus: Lightning > Fire, Physical, Quantum
         - Ratio: 25, 25, 75, 25
-    - 2-Piece: 
-    - 3-Piece: 
+    - 2-Piece: Dodge (30%)
+    - 3-Piece: Damages everything in Area (can attack from anywhere)
 - Kafka
     - Focus: Physical, Quantum > Lightning, Fire
         - Ratio: 25, 50, 25, 50
-    - 2-Piece: 
-    - 3-Piece: 
+    - 2-Piece: Omnivamp (15%)
+    - 3-Piece: Carrion Swarm (30% Omnivamp)
 - Welt
     - Focus: All-Rounder
         - Ratio: 37.5, 37.5, 37.5, 37.5
-    - 2-Piece: 
-    - 3-Piece: 
+    - 2-Piece: Damage Reduction (10%), Damage (50%), Dodge (10%), Omnivamp (5%)
+    - 3-Piece: Drones
 ### Top
 - Focus: Fire > Physical, Lightning, Quantum
 - Ratio: 75, 25, 25, 25

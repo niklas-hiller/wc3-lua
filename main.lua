@@ -6,7 +6,7 @@ Framework.new = function()
     local Interface = {}
     local Initializer
     local VERSION = "1.0.0"
-    local RELEASE_DATE = "2023-02-24"
+    local RELEASE_DATE = "2023-03-12"
     local DISCORD = "https://discord.gg/example"
 
     do
@@ -801,14 +801,27 @@ Framework.new = function()
     local ConstructDamageObject = function()
         local self = {}
         self.damage = GetEventDamage()
+        self.source = GetEventDamageSource()
+        self.target = GetEventDamageTarget()
+        self.damageAmplifier = 1.0
+        self.critAmplifier = 0.0
+        self.reductionAmplifier = 0.0
         self.attackType = BlzGetEventAttackType()
         self.damageType = BlzGetEventDamageType()
         self.weaponType = BlzGetEventWeaponType()
         self.isAttack = BlzGetEventIsAttack()
-        self.crit = 0
 
-        if math.random(0., 100.) <= GetEventDamageSource().critChance then
-            self.crit = GetEventDamageSource().critDamage * self.damage
+        -- Damage Reduction
+        self.reductionAmplifier = (self.target.damageReduction * (1.0 - self.source.ignoreReduction / 100.)) / 100.
+
+        -- Critical
+        if math.random(0., 100.) <= self.source.critChance then
+            self.critAmplifier = self.source.critDamage
+        end
+
+        -- Dodge
+        if math.random(0., 100.) <= self.target.dodgeChance then
+            self.damage = 0
         end
 
         damageObjects.last = damageObjects.last + 1
@@ -816,6 +829,7 @@ Framework.new = function()
 
         return self
     end
+
     local GetDamageObject = function()
         local self = {}
         self.damage = GetEventDamage()
@@ -2402,26 +2416,32 @@ Framework.new = function()
                         local target = GetEventDamageTarget()
                         local damageObject = ConstructDamageObject()
 
-                        -- Stage 1
+                        -- Stage 1 (Initial)
                         source.owner.on_unit_damage_pre_1(source, target, damageObject)
                         source.on_damage_pre_1(target, damageObject)
                         target.owner.on_unit_damaged_pre_1(source, target, damageObject)
                         target.on_damaged_pre_1(source, damageObject)
 
-                        -- Stage 2
+                        damageObject.damage = damageObject.damage * damageObject.damageAmplifier * (1 + damageObject.critAmplifier)
+
+                        -- Stage 2 (After Increase)
                         source.owner.on_unit_damage_pre_2(source, target, damageObject)
                         source.on_damage_pre_2(target, damageObject)
                         target.owner.on_unit_damaged_pre_2(source, target, damageObject)
                         target.on_damaged_pre_2(source, damageObject)
 
-                        -- Stage 3
+                        damageObject.damage = damageObject.damage - damageObject.damage * damageObject.reductionAmplifier
+                        if damageObject.damage < 0 then
+                            damageObject.damage = 0
+                        end
+
+                        -- Stage 3 (After Reduction)
                         source.owner.on_unit_damage_pre_3(source, target, damageObject)
                         source.on_damage_pre_3(target, damageObject)
                         target.owner.on_unit_damaged_pre_3(source, target, damageObject)
                         target.on_damaged_pre_3(source, damageObject)
-
-                        damageObject.damage = damageObject.damage + damageObject.crit
-                        if target.hp - damageObject.damage < 5 then
+                        
+                        if target.hp - damageObject.damage < 1 then
                             target.on_death_pre(source, damageObject)
                             target.owner.on_unit_death_pre(source, target, damageObject)
                         end
@@ -4659,6 +4679,10 @@ Framework.new = function()
             local critChance = 0
             local critDamage = 0
 
+            local ignoreReduction = 0
+            local damageReduction = 0
+            local dodgeChance = 0
+
             local omnivamp = 0
             local manavamp = 0
             local healingEfficiency = 1
@@ -4813,6 +4837,12 @@ Framework.new = function()
                     critChance = value
                 elseif index == "critDamage" then
                     critDamage = value
+                elseif index == "ignoreReduction" then
+                    ignoreReduction = value
+                elseif index == "damageReduction" then
+                    damageReduction = value
+                elseif index == "dodgeChance" then
+                    dodgeChance = value
                 elseif index == "omnivamp" then
                     omnivamp = value
                 elseif index == "manavamp" then
@@ -4927,6 +4957,12 @@ Framework.new = function()
                     return critChance
                 elseif index == "critDamage" then
                     return critDamage
+                elseif index == "ignoreReduction" then
+                    return ignoreReduction
+                elseif index == "damageReduction" then
+                    return damageReduction
+                elseif index == "dodgeChance" then
+                    return dodgeChance
                 elseif index == "omnivamp" then
                     return omnivamp
                 elseif index == "manavamp" then
@@ -9519,7 +9555,6 @@ _Abilities.Blazing_Blade.new = function(IFramework, DefaultAttack)
             eventHolder.event = unit.bind("on_damage_pre_stage_1",
                 function(source, target, damageObject)
                     damageObject.damage = 0
-                    damageObject.crit = 0
 
                     local rad = math.rad(source.face)
                     local x = source.x + 75. * math.cos(rad)
@@ -9611,7 +9646,6 @@ _Abilities.Fiery_Hymns_Pledge.new = function(IFramework)
                     unit.manavamp = unit.omnivamp
                     if active then
                         damageObject.damage = 0
-                        damageObject.crit = 0
                     end
                 end
             ).setCondition(
@@ -9636,7 +9670,6 @@ _Abilities.Fiery_Hymns_Pledge.new = function(IFramework)
                 function(source, target, damageObject)
                     if not cooldown then
                         damageObject.damage = 0
-                        damageObject.crit = 0
                         forceTrigger = true
                         cooldown = true
                     end
@@ -10499,8 +10532,8 @@ _Abilities.Nihility_Aura.new = function(IFramework)
     return self
 end
 
-_Abilities.Benares_Aura = {}
-_Abilities.Benares_Aura.new = function(IFramework)
+_Abilities.Stigmata_Benares_2pc = {}
+_Abilities.Stigmata_Benares_2pc.new = function(IFramework)
     local self = {}
     local _eventHolder = {}
     local group = IFramework.Group()
@@ -10510,6 +10543,64 @@ _Abilities.Benares_Aura.new = function(IFramework)
     metadata.name = nil
     metadata.description = nil
     metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            unit.damageReduction = unit.damageReduction + 30.0
+
+            eventHolder.cleanup = function()
+                unit.damageReduction = unit.damageReduction - 30.0
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Stigmata_Benares_3pc = {}
+_Abilities.Stigmata_Benares_3pc.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    local STIGMATA_ABILITY = FourCC('ASTG')
+    local STIGMATA_RESEARCH = 'R00P'
+
+    local defaultMetadata = MetaData.new()
+    defaultMetadata.name = "[Locked] Stigmata"
+    defaultMetadata.description = "You currently did not unlock this ability yet.|nCan be unlocked through stigmata."
+    defaultMetadata.icon = "ReplaceableTextures\\CommandButtons\\BTNStigmata_Ability.blp"
+
+    metadata.name = "Benares"
+    metadata.description = "Undefined"
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNBenares_Ability.blp"
 
     function mt.__index(table, index)
         if index == "metadata" then
@@ -10529,8 +10620,39 @@ _Abilities.Benares_Aura.new = function(IFramework)
             local auraEffect = IFramework.Effect()
             auraEffect.model = "Wings\\Benares Wings.mdx"
             auraEffect.attachTo(unit, "chest")
+            unit.owner.setTechResearched(STIGMATA_RESEARCH, 1)
+
+            -- Store current ability data
+            local _name = BlzGetAbilityTooltip(STIGMATA_ABILITY, 0)
+            local _description = BlzGetAbilityExtendedTooltip(STIGMATA_ABILITY, 0)
+            local _icon = BlzGetAbilityIcon(STIGMATA_ABILITY)
+            -- Update for local
+            if unit.owner.isLocal() then
+                _name = metadata.name
+                _description = metadata.description
+                _icon = metadata.icon
+            end
+            -- Update ability
+            BlzSetAbilityTooltip(STIGMATA_ABILITY, _name, 0)
+            BlzSetAbilityExtendedTooltip(STIGMATA_ABILITY, _description, 0)
+            BlzSetAbilityIcon(STIGMATA_ABILITY, _icon)
 
             eventHolder.cleanup = function()
+                unit.owner.setTechResearched(STIGMATA_RESEARCH, 0)
+                -- Store current ability data
+                local _name = BlzGetAbilityTooltip(STIGMATA_ABILITY, 0)
+                local _description = BlzGetAbilityExtendedTooltip(STIGMATA_ABILITY, 0)
+                local _icon = BlzGetAbilityIcon(STIGMATA_ABILITY)
+                -- Update for local
+                if unit.owner.isLocal() then
+                    _name = defaultMetadata.name
+                    _description = defaultMetadata.description
+                    _icon = defaultMetadata.icon
+                end
+                -- Update ability
+                BlzSetAbilityTooltip(STIGMATA_ABILITY, _name, 0)
+                BlzSetAbilityExtendedTooltip(STIGMATA_ABILITY, _description, 0)
+                BlzSetAbilityIcon(STIGMATA_ABILITY, _icon)
                 auraEffect.destroy()
             end
         end
@@ -10551,8 +10673,8 @@ _Abilities.Benares_Aura.new = function(IFramework)
     return self
 end
 
-_Abilities.Herrscher_Aura = {}
-_Abilities.Herrscher_Aura.new = function(IFramework)
+_Abilities.Stigmata_Herrscher_2pc = {}
+_Abilities.Stigmata_Herrscher_2pc.new = function(IFramework)
     local self = {}
     local _eventHolder = {}
     local group = IFramework.Group()
@@ -10562,6 +10684,68 @@ _Abilities.Herrscher_Aura.new = function(IFramework)
     metadata.name = nil
     metadata.description = nil
     metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            eventHolder.event = unit.bind("on_damage_pre_stage_1",
+                function(source, target, damageObject)
+                    damageObject.damageAmplifier = damageObject.damageAmplifier + 1.5
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return source == unit
+                end
+            )
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Stigmata_Herrscher_3pc = {}
+_Abilities.Stigmata_Herrscher_3pc.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    local STIGMATA_ABILITY = FourCC('ASTG')
+    local STIGMATA_RESEARCH = 'R00P'
+
+    local defaultMetadata = MetaData.new()
+    defaultMetadata.name = "[Locked] Stigmata"
+    defaultMetadata.description = "You currently did not unlock this ability yet.|nCan be unlocked through stigmata."
+    defaultMetadata.icon = "ReplaceableTextures\\CommandButtons\\BTNStigmata_Ability.blp"
+
+    metadata.name = "Herrscher"
+    metadata.description = "Undefined"
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHerrscher_Ability.blp"
 
     function mt.__index(table, index)
         if index == "metadata" then
@@ -10581,8 +10765,39 @@ _Abilities.Herrscher_Aura.new = function(IFramework)
             local auraEffect = IFramework.Effect()
             auraEffect.model = "Wings\\Herrscher Wings.mdx"
             auraEffect.attachTo(unit, "chest")
+            unit.owner.setTechResearched(STIGMATA_RESEARCH, 1)
+
+            -- Store current ability data
+            local _name = BlzGetAbilityTooltip(STIGMATA_ABILITY, 0)
+            local _description = BlzGetAbilityExtendedTooltip(STIGMATA_ABILITY, 0)
+            local _icon = BlzGetAbilityIcon(STIGMATA_ABILITY)
+            -- Update for local
+            if unit.owner.isLocal() then
+                _name = metadata.name
+                _description = metadata.description
+                _icon = metadata.icon
+            end
+            -- Update ability
+            BlzSetAbilityTooltip(STIGMATA_ABILITY, _name, 0)
+            BlzSetAbilityExtendedTooltip(STIGMATA_ABILITY, _description, 0)
+            BlzSetAbilityIcon(STIGMATA_ABILITY, _icon)
 
             eventHolder.cleanup = function()
+                unit.owner.setTechResearched(STIGMATA_RESEARCH, 0)
+                -- Store current ability data
+                local _name = BlzGetAbilityTooltip(STIGMATA_ABILITY, 0)
+                local _description = BlzGetAbilityExtendedTooltip(STIGMATA_ABILITY, 0)
+                local _icon = BlzGetAbilityIcon(STIGMATA_ABILITY)
+                -- Update for local
+                if unit.owner.isLocal() then
+                    _name = defaultMetadata.name
+                    _description = defaultMetadata.description
+                    _icon = defaultMetadata.icon
+                end
+                -- Update ability
+                BlzSetAbilityTooltip(STIGMATA_ABILITY, _name, 0)
+                BlzSetAbilityExtendedTooltip(STIGMATA_ABILITY, _description, 0)
+                BlzSetAbilityIcon(STIGMATA_ABILITY, _icon)
                 auraEffect.destroy()
             end
         end
@@ -10603,8 +10818,8 @@ _Abilities.Herrscher_Aura.new = function(IFramework)
     return self
 end
 
-_Abilities.Holmes_Aura = {}
-_Abilities.Holmes_Aura.new = function(IFramework)
+_Abilities.Stigmata_Holmes_2pc = {}
+_Abilities.Stigmata_Holmes_2pc.new = function(IFramework)
     local self = {}
     local _eventHolder = {}
     local group = IFramework.Group()
@@ -10614,6 +10829,64 @@ _Abilities.Holmes_Aura.new = function(IFramework)
     metadata.name = nil
     metadata.description = nil
     metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            unit.dodgeChance = unit.dodgeChance + 30.0
+
+            eventHolder.cleanup = function()
+                unit.dodgeChance = unit.dodgeChance - 30.0
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Stigmata_Holmes_3pc = {}
+_Abilities.Stigmata_Holmes_3pc.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    local STIGMATA_ABILITY = FourCC('ASTG')
+    local STIGMATA_RESEARCH = 'R00P'
+
+    local defaultMetadata = MetaData.new()
+    defaultMetadata.name = "[Locked] Stigmata"
+    defaultMetadata.description = "You currently did not unlock this ability yet.|nCan be unlocked through stigmata."
+    defaultMetadata.icon = "ReplaceableTextures\\CommandButtons\\BTNStigmata_Ability.blp"
+
+    metadata.name = "Holmes"
+    metadata.description = "Undefined"
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNHolmes_Ability.blp"
 
     function mt.__index(table, index)
         if index == "metadata" then
@@ -10633,8 +10906,39 @@ _Abilities.Holmes_Aura.new = function(IFramework)
             local auraEffect = IFramework.Effect()
             auraEffect.model = "Wings\\Holmes Wings.mdx"
             auraEffect.attachTo(unit, "chest")
+            unit.owner.setTechResearched(STIGMATA_RESEARCH, 1)
+
+            -- Store current ability data
+            local _name = BlzGetAbilityTooltip(STIGMATA_ABILITY, 0)
+            local _description = BlzGetAbilityExtendedTooltip(STIGMATA_ABILITY, 0)
+            local _icon = BlzGetAbilityIcon(STIGMATA_ABILITY)
+            -- Update for local
+            if unit.owner.isLocal() then
+                _name = metadata.name
+                _description = metadata.description
+                _icon = metadata.icon
+            end
+            -- Update ability
+            BlzSetAbilityTooltip(STIGMATA_ABILITY, _name, 0)
+            BlzSetAbilityExtendedTooltip(STIGMATA_ABILITY, _description, 0)
+            BlzSetAbilityIcon(STIGMATA_ABILITY, _icon)
 
             eventHolder.cleanup = function()
+                unit.owner.setTechResearched(STIGMATA_RESEARCH, 0)
+                -- Store current ability data
+                local _name = BlzGetAbilityTooltip(STIGMATA_ABILITY, 0)
+                local _description = BlzGetAbilityExtendedTooltip(STIGMATA_ABILITY, 0)
+                local _icon = BlzGetAbilityIcon(STIGMATA_ABILITY)
+                -- Update for local
+                if unit.owner.isLocal() then
+                    _name = defaultMetadata.name
+                    _description = defaultMetadata.description
+                    _icon = defaultMetadata.icon
+                end
+                -- Update ability
+                BlzSetAbilityTooltip(STIGMATA_ABILITY, _name, 0)
+                BlzSetAbilityExtendedTooltip(STIGMATA_ABILITY, _description, 0)
+                BlzSetAbilityIcon(STIGMATA_ABILITY, _icon)
                 auraEffect.destroy()
             end
         end
@@ -10655,8 +10959,8 @@ _Abilities.Holmes_Aura.new = function(IFramework)
     return self
 end
 
-_Abilities.Kafka_Aura = {}
-_Abilities.Kafka_Aura.new = function(IFramework)
+_Abilities.Stigmata_Kafka_2pc = {}
+_Abilities.Stigmata_Kafka_2pc.new = function(IFramework)
     local self = {}
     local _eventHolder = {}
     local group = IFramework.Group()
@@ -10666,6 +10970,64 @@ _Abilities.Kafka_Aura.new = function(IFramework)
     metadata.name = nil
     metadata.description = nil
     metadata.icon = nil
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
+            unit.omnivamp = unit.omnivamp + 0.15
+
+            eventHolder.cleanup = function()
+                unit.omnivamp = unit.omnivamp - 0.15
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Stigmata_Kafka_3pc = {}
+_Abilities.Stigmata_Kafka_3pc.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    local STIGMATA_ABILITY = FourCC('ASTG')
+    local STIGMATA_RESEARCH = 'R00P'
+
+    local defaultMetadata = MetaData.new()
+    defaultMetadata.name = "[Locked] Stigmata"
+    defaultMetadata.description = "You currently did not unlock this ability yet.|nCan be unlocked through stigmata."
+    defaultMetadata.icon = "ReplaceableTextures\\CommandButtons\\BTNStigmata_Ability.blp"
+
+    metadata.name = "Kafka"
+    metadata.description = "Undefined"
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNKafka_Ability.blp"
 
     function mt.__index(table, index)
         if index == "metadata" then
@@ -10685,8 +11047,39 @@ _Abilities.Kafka_Aura.new = function(IFramework)
             local auraEffect = IFramework.Effect()
             auraEffect.model = "Wings\\Kafka Wings.mdx"
             auraEffect.attachTo(unit, "chest")
+            unit.owner.setTechResearched(STIGMATA_RESEARCH, 1)
+
+            -- Store current ability data
+            local _name = BlzGetAbilityTooltip(STIGMATA_ABILITY, 0)
+            local _description = BlzGetAbilityExtendedTooltip(STIGMATA_ABILITY, 0)
+            local _icon = BlzGetAbilityIcon(STIGMATA_ABILITY)
+            -- Update for local
+            if unit.owner.isLocal() then
+                _name = metadata.name
+                _description = metadata.description
+                _icon = metadata.icon
+            end
+            -- Update ability
+            BlzSetAbilityTooltip(STIGMATA_ABILITY, _name, 0)
+            BlzSetAbilityExtendedTooltip(STIGMATA_ABILITY, _description, 0)
+            BlzSetAbilityIcon(STIGMATA_ABILITY, _icon)
 
             eventHolder.cleanup = function()
+                unit.owner.setTechResearched(STIGMATA_RESEARCH, 0)
+                -- Store current ability data
+                local _name = BlzGetAbilityTooltip(STIGMATA_ABILITY, 0)
+                local _description = BlzGetAbilityExtendedTooltip(STIGMATA_ABILITY, 0)
+                local _icon = BlzGetAbilityIcon(STIGMATA_ABILITY)
+                -- Update for local
+                if unit.owner.isLocal() then
+                    _name = defaultMetadata.name
+                    _description = defaultMetadata.description
+                    _icon = defaultMetadata.icon
+                end
+                -- Update ability
+                BlzSetAbilityTooltip(STIGMATA_ABILITY, _name, 0)
+                BlzSetAbilityExtendedTooltip(STIGMATA_ABILITY, _description, 0)
+                BlzSetAbilityIcon(STIGMATA_ABILITY, _icon)
                 auraEffect.destroy()
             end
         end
@@ -10707,8 +11100,8 @@ _Abilities.Kafka_Aura.new = function(IFramework)
     return self
 end
 
-_Abilities.Welt_Aura = {}
-_Abilities.Welt_Aura.new = function(IFramework)
+_Abilities.Stigmata_Welt_2pc = {}
+_Abilities.Stigmata_Welt_2pc.new = function(IFramework)
     local self = {}
     local _eventHolder = {}
     local group = IFramework.Group()
@@ -10734,11 +11127,112 @@ _Abilities.Welt_Aura.new = function(IFramework)
         local eventHolder = EventHolder.new(IFramework)
 
         do
+            unit.damageReduction = unit.damageReduction + 10.0
+            unit.dodgeChance = unit.dodgeChance + 10.0
+            unit.omnivamp = unit.omnivamp + 0.05
+
+            eventHolder.event = unit.bind("on_damage_pre_stage_1",
+                function(source, target, damageObject)
+                    damageObject.damageAmplifier = damageObject.damageAmplifier + 0.5
+                end
+            ).setCondition(
+                function(source, target, attack)
+                    return source == unit
+                end
+            )
+
+            eventHolder.cleanup = function()
+                unit.omnivamp = unit.omnivamp - 0.15
+            end
+        end
+
+        _eventHolder[unit] = eventHolder
+    end
+
+    function self.remove(unit)
+        if _eventHolder[unit] == nil then
+            return
+        end
+        _eventHolder[unit].unbindAll()
+        _eventHolder[unit] = nil
+    end
+
+    setmetatable(self, mt)
+
+    return self
+end
+
+_Abilities.Stigmata_Welt_3pc = {}
+_Abilities.Stigmata_Welt_3pc.new = function(IFramework)
+    local self = {}
+    local _eventHolder = {}
+    local group = IFramework.Group()
+    local metadata = MetaData.new()
+    local mt = {}
+
+    local STIGMATA_ABILITY = FourCC('ASTG')
+    local STIGMATA_RESEARCH = 'R00P'
+
+    local defaultMetadata = MetaData.new()
+    defaultMetadata.name = "[Locked] Stigmata"
+    defaultMetadata.description = "You currently did not unlock this ability yet.|nCan be unlocked through stigmata."
+    defaultMetadata.icon = "ReplaceableTextures\\CommandButtons\\BTNStigmata_Ability.blp"
+
+    metadata.name = "Welt"
+    metadata.description = "Undefined"
+    metadata.icon = "ReplaceableTextures\\CommandButtons\\BTNWelt_Ability.blp"
+
+    function mt.__index(table, index)
+        if index == "metadata" then
+            return metadata
+        else
+            IFramework.Log.Error("Unknown attribute '" .. index .. "'.")
+        end
+    end
+    
+    function self.apply(unit)
+        if _eventHolder[unit] ~= nil then
+            return
+        end
+        local eventHolder = EventHolder.new(IFramework)
+
+        do
             local auraEffect = IFramework.Effect()
             auraEffect.model = "Wings\\Welt Wings.mdx"
             auraEffect.attachTo(unit, "chest")
+            unit.owner.setTechResearched(STIGMATA_RESEARCH, 1)
+
+            -- Store current ability data
+            local _name = BlzGetAbilityTooltip(STIGMATA_ABILITY, 0)
+            local _description = BlzGetAbilityExtendedTooltip(STIGMATA_ABILITY, 0)
+            local _icon = BlzGetAbilityIcon(STIGMATA_ABILITY)
+            -- Update for local
+            if unit.owner.isLocal() then
+                _name = metadata.name
+                _description = metadata.description
+                _icon = metadata.icon
+            end
+            -- Update ability
+            BlzSetAbilityTooltip(STIGMATA_ABILITY, _name, 0)
+            BlzSetAbilityExtendedTooltip(STIGMATA_ABILITY, _description, 0)
+            BlzSetAbilityIcon(STIGMATA_ABILITY, _icon)
 
             eventHolder.cleanup = function()
+                unit.owner.setTechResearched(STIGMATA_RESEARCH, 0)
+                -- Store current ability data
+                local _name = BlzGetAbilityTooltip(STIGMATA_ABILITY, 0)
+                local _description = BlzGetAbilityExtendedTooltip(STIGMATA_ABILITY, 0)
+                local _icon = BlzGetAbilityIcon(STIGMATA_ABILITY)
+                -- Update for local
+                if unit.owner.isLocal() then
+                    _name = defaultMetadata.name
+                    _description = defaultMetadata.description
+                    _icon = defaultMetadata.icon
+                end
+                -- Update ability
+                BlzSetAbilityTooltip(STIGMATA_ABILITY, _name, 0)
+                BlzSetAbilityExtendedTooltip(STIGMATA_ABILITY, _description, 0)
+                BlzSetAbilityIcon(STIGMATA_ABILITY, _icon)
                 auraEffect.destroy()
             end
         end
@@ -10857,11 +11351,17 @@ Abilities.new = function(IFramework)
     self.Nihility_Aura = _Abilities.Nihility_Aura.new(IFramework)
 
     -- Item Effects
-    self.Benares_Aura = _Abilities.Benares_Aura.new(IFramework)
-    self.Herrscher_Aura = _Abilities.Herrscher_Aura.new(IFramework)
-    self.Holmes_Aura = _Abilities.Holmes_Aura.new(IFramework)
-    self.Kafka_Aura = _Abilities.Kafka_Aura.new(IFramework)
-    self.Welt_Aura = _Abilities.Welt_Aura.new(IFramework)
+    self.Stigmata_Benares_2pc = _Abilities.Stigmata_Benares_2pc.new(IFramework)
+    self.Stigmata_Herrscher_2pc = _Abilities.Stigmata_Herrscher_2pc.new(IFramework)
+    self.Stigmata_Holmes_2pc = _Abilities.Stigmata_Holmes_2pc.new(IFramework)
+    self.Stigmata_Kafka_2pc = _Abilities.Stigmata_Kafka_2pc.new(IFramework)
+    self.Stigmata_Welt_2pc = _Abilities.Stigmata_Welt_2pc.new(IFramework)
+
+    self.Stigmata_Benares_3pc = _Abilities.Stigmata_Benares_3pc.new(IFramework)
+    self.Stigmata_Herrscher_3pc = _Abilities.Stigmata_Herrscher_3pc.new(IFramework)
+    self.Stigmata_Holmes_3pc = _Abilities.Stigmata_Holmes_3pc.new(IFramework)
+    self.Stigmata_Kafka_3pc = _Abilities.Stigmata_Kafka_3pc.new(IFramework)
+    self.Stigmata_Welt_3pc = _Abilities.Stigmata_Welt_3pc.new(IFramework)
 
 
     -- Leftovers
@@ -11996,71 +12496,71 @@ ItemSystem.new = function(IFramework, Ability, affinitySys, unit)
     local Benares = Set.new()
         .AddEffect()
             .Name("Moon Dragon")
-            .Description("Some Effect...")
+            .Description("Increases Damage Reduction 30\x25.")
             .Required(2)
-            .OnApply(nil, nil)
+            .OnApply(Ability.Stigmata_Benares_2pc.apply, Ability.Stigmata_Benares_2pc.remove)
             .Build()
         .AddEffect()
             .Name("Creation of Honkai")
-            .Description("Some Effect...")
+            .Description("Unlocks ... (R) Ability")
             .Required(3)
-            .OnApply(Ability.Benares_Aura.apply, Ability.Benares_Aura.remove)
+            .OnApply(Ability.Stigmata_Benares_3pc.apply, Ability.Stigmata_Benares_3pc.remove)
             .Build()
     
     local Herrscher = Set.new()
         .AddEffect()
             .Name("Time Sanctuary")
-            .Description("Some Effect...")
+            .Description("Increases Damage by 150\x25.")
             .Required(2)
-            .OnApply(nil, nil)
+            .OnApply(Ability.Stigmata_Herrscher_2pc.apply, Ability.Stigmata_Herrscher_2pc.remove)
             .Build()
         .AddEffect()
             .Name("When Finality Emerges")
-            .Description("Some Effect...")
+            .Description("Unlocks ... (R) Ability")
             .Required(3)
-            .OnApply(Ability.Herrscher_Aura.apply, Ability.Herrscher_Aura.remove)
+            .OnApply(Ability.Stigmata_Herrscher_3pc.apply, Ability.Stigmata_Herrscher_3pc.remove)
             .Build()
     
     local Holmes = Set.new()
         .AddEffect()
-            .Name("Rip & Tear ")
-            .Description("Some Effect...")
+            .Name("Rip & Tear")
+            .Description("Increases Dodge Chance by 30\x25")
             .Required(2)
-            .OnApply(nil, nil)
+            .OnApply(Ability.Stigmata_Holmes_2pc.apply, Ability.Stigmata_Holmes_2pc.remove)
             .Build()
         .AddEffect()
             .Name("Scarlet Flash")
-            .Description("Some Effect...")
+            .Description("Unlocks ... (R) Ability")
             .Required(3)
-            .OnApply(Ability.Holmes_Aura.apply, Ability.Holmes_Aura.remove)
+            .OnApply(Ability.Stigmata_Holmes_3pc.apply, Ability.Stigmata_Holmes_3pc.remove)
             .Build()
     
     local Kafka = Set.new()
         .AddEffect()
             .Name("Plague Transfer")
-            .Description("Some Effect...")
+            .Description("Increases Omnivamp by 15\x25")
             .Required(2)
-            .OnApply(nil, nil)
+            .OnApply(Ability.Stigmata_Kafka_2pc.apply, Ability.Stigmata_Kafka_2pc.remove)
             .Build()
         .AddEffect()
             .Name("Death Scythe")
-            .Description("Some Effect...")
+            .Description("Unlocks ... (R) Ability")
             .Required(3)
-            .OnApply(Ability.Kafka_Aura.apply, Ability.Kafka_Aura.remove)
+            .OnApply(Ability.Stigmata_Kafka_3pc.apply, Ability.Stigmata_Kafka_3pc.remove)
             .Build()
     
     local Welt = Set.new()
         .AddEffect()
             .Name("Legacy")
-            .Description("Some Effect...")
+            .Description("Increases Damage Reduction by 10\x25, Damage by 50\x25, Dodge Chance by 10\x25, Omnivamp by 5\x25.")
             .Required(2)
-            .OnApply(nil, nil)
+            .OnApply(Ability.Stigmata_Welt_2pc.apply, Ability.Stigmata_Welt_2pc.remove)
             .Build()
         .AddEffect()
             .Name("New World")
-            .Description("Some Effect...")
+            .Description("Unlocks ... (R) Ability")
             .Required(3)
-            .OnApply(Ability.Welt_Aura.apply, Ability.Welt_Aura.remove)
+            .OnApply(Ability.Stigmata_Welt_3pc.apply, Ability.Stigmata_Welt_3pc.remove)
             .Build()
 
 
@@ -12486,7 +12986,7 @@ AffinitySystem.new = function(IFramework, unit)
     unit.bind("on_damaged_pre_stage_3",
         function(source, target, damageObject)
             -- Do not calculate anything if damage is 0
-            if damageObject.damage == 0 and damageObject.crit == 0 then
+            if damageObject.damage == 0 then
                 return
             end
             -- Armor reduces damage by 1 per point (minimum 2 damage)
