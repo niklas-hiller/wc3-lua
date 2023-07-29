@@ -44,7 +44,7 @@ Framework.new = function()
                             beforeInit(IFramework)
                         end
 
-                        print("Map uses Niklas#0786's Framework v" .. VERSION .. ". (" .. RELEASE_DATE .. ")")
+                        print("Map uses niklas293's Framework v" .. VERSION .. ". (" .. RELEASE_DATE .. ")")
                         print("For more information check: " .. DISCORD)
                         for _, task in ipairs(scheduledTasks) do
                             task()
