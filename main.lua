@@ -17,6 +17,7 @@ Framework.new = function()
             local GameClock = IFramework.Clock()
             local scheduledTasks = scheduledTasks
             local repeatingTasks = {}
+            local beforeInit
             local afterInit
 
             function self.beforeInit(func)
@@ -1011,13 +1012,13 @@ Framework.new = function()
                 if status then return val end
             end
 
-            function self._registerPlayerStateEvent(varName, opcode, limitval)
-                TriggerRegisterPlayerStateEvent(handle, whichPlayer.handle, whichState, lopcode, limitval)
+            function self._registerPlayerStateEvent(whichPlayer, whichState, opcode, limitval)
+                TriggerRegisterPlayerStateEvent(handle, whichPlayer.handle, whichState, opcode, limitval)
                 return self
             end
 
-            self.registerPlayerStateEvent = function(varName, opcode, limitval)
-                local status, val = xpcall(self._registerPlayerStateEvent, Interface.Log.Error, varName, opcode, limitval)
+            self.registerPlayerStateEvent = function(whichPlayer, whichState, opcode, limitval)
+                local status, val = xpcall(self._registerPlayerStateEvent, Interface.Log.Error, whichPlayer, whichState, opcode, limitval)
                 if status then return val end
             end
 
@@ -1665,11 +1666,6 @@ Framework.new = function()
                 return GetLocalPlayer() == handle
             end
 
-            self.kick = function()
-                local status, val = xpcall(self._kick, Interface.Log.Error)
-                if status then return val end
-            end
-
             function self._kick()
                 RemovePlayer(handle, PLAYER_GAME_RESULT_NEUTRAL)
             end
@@ -1757,7 +1753,7 @@ Framework.new = function()
                 return self
             end
 
-            self.resetCamera = function()
+            self.resetCamera = function(duration)
                 local status, val = xpcall(self._resetCamera, Interface.Log.Error, duration)
                 if status then return val end
             end
@@ -1985,12 +1981,13 @@ Framework.new = function()
             end
 
             function self._createUnit(unitId, x, y, face)
+                local unit
                 if type(unitId) == 'number' then
                     unit = CreateUnit(handle, unitId, x, y, face)
                 else
                     unit = CreateUnit(handle, FourCC(unitId), x, y, face)
                 end
-                _unit = Interface.Unit(unit)
+                local _unit = Interface.Unit(unit)
                 units.append(_unit)
                 self.on_createUnit(_unit)
                 return _unit
@@ -3646,7 +3643,7 @@ Framework.new = function()
                 return self
             end
 
-            self.reset = function()
+            self.reset = function(duration)
                 local status, val = xpcall(self._reset, Interface.Log.Error, duration)
                 if status then return val end
             end
@@ -4048,6 +4045,7 @@ Framework.new = function()
             .registerPlayerEvent(player, EVENT_PLAYER_MOUSE_DOWN)
             .addAction(
                 function()
+                    local whichButton
                     if BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_LEFT then
                         whichButton = "left"
                     elseif BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_MIDDLE then
@@ -4066,6 +4064,7 @@ Framework.new = function()
             .registerPlayerEvent(player, EVENT_PLAYER_MOUSE_UP)
             .addAction(
                 function()
+                    local whichButton
                     if BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_LEFT then
                         whichButton = "left"
                     elseif BlzGetTriggerPlayerMouseButton() == MOUSE_BUTTON_TYPE_MIDDLE then
@@ -4406,6 +4405,7 @@ Framework.new = function()
         local SoundLoader = {}
         SoundLoader.new = function()
             local self = {}
+            local mt = {}
             local clock = Interface.Clock()
             clock.start()
 
@@ -4430,11 +4430,11 @@ Framework.new = function()
                         SetSoundVolume(sound, volume)
                         volume = value
                     elseif index == "pos" then
-                        SetSoundPlayPosition(sound, miliseconds)
                         pos = value
+                        SetSoundPlayPosition(sound, pos)
                     elseif index == "pitch" then
-                        SetSoundPitch(sound, pitch)
                         pitch = value
+                        SetSoundPitch(sound, pitch)
                     elseif index == "channel" then
                         SetSoundChannel(sound, value)
                     elseif index == "distance" then
@@ -4538,6 +4538,8 @@ Framework.new = function()
                     local status, val = xpcall(self._on_stop, Interface.Log.Error)
                     if status then return val end
                 end
+
+                setmetatable(self, mt)
 
                 return self
 
@@ -5717,7 +5719,7 @@ Framework.new = function()
                 GroupEnumUnitsInRect(handle, rect, Filter(
                     function()
                         local filterUnit = GetFilterUnit()
-                        if filter(group, filterUnit) then
+                        if filter(self, filterUnit) then
                             table.insert(units, filterUnit)
                         end
                     end
@@ -5735,7 +5737,7 @@ Framework.new = function()
                 GroupEnumUnitsInRange(handle, x, y, range, Filter(
                     function()
                         local filterUnit = GetFilterUnit()
-                        if filter(group, filterUnit) then
+                        if filter(self, filterUnit) then
                             table.insert(units, filterUnit)
                         end
                     end
@@ -5781,22 +5783,6 @@ Framework.new = function()
                 else
                     Interface.Log.Error("Unknown attribute '" .. index .. "'.")
                 end
-            end
-
-            -- currently wont work
-            function self.__sub(group)
-                newGroup = Group.new({self, group})
-                for index, unit in ipairs(group.unit) do
-                    newGroup.remove(unit)
-                end
-                return newGroup
-            end
-
-            -- currently wont work
-            function self.__add(group)
-                return Group.new(
-                    {self, group}
-                )
             end
 
             function self._clear()
@@ -8943,7 +8929,7 @@ _Abilities.I_Am_Atomic.new = function(IFramework)
                             explodeEffect2.create()
 
                             local damageFactor = 250.
-                            local damage_per_tick = damage_factor / (totalDuration / tickrate)
+                            local damage_per_tick = damageFactor / (totalDuration / tickrate)
 
                             triggeringClock.schedule_interval(
                                 function(triggeringClock, triggeringSchedule)
@@ -9530,8 +9516,8 @@ _Abilities.Blazing_Blade.new = function(IFramework, DefaultAttack)
                     local dx = target.x - source.x
                     local dy = target.y - source.y
                     local rad = math.atan(dy, dx)
-                    local x = source.x + 120. * Cos(rad)
-                    local y = source.y + 120. * Sin(rad)
+                    local x = source.x + 120. * math.cos(rad)
+                    local y = source.y + 120. * math.sin(rad)
                     flameCrack.x = x
                     flameCrack.y = y
                     flameCrack.create().destroy()
@@ -9794,7 +9780,6 @@ _Abilities.Lone_Phoenixs_Plume.new = function(IFramework)
             eventHolder.event = unit.bind("on_damaged_pre_stage_1",
                 function(source, target, damageObject)
                     if not cooldown then
-                        forceTrigger = true
                         cooldown = true
 
                         local tx = target.x
