@@ -398,6 +398,23 @@
         "CameraSetSmoothingFactor",
         "CameraSetSourceNoiseEx",
         "CameraSetTargetNoiseEx",
-        "CameraSetSourceNoise"
+        "CameraSetSourceNoise",
+        "gg_rct_SpawnT",
+        "gg_rct_SpawnR",
+        "gg_rct_Area1T1",
+        "gg_rct_Area1T2",
+        "gg_rct_Area1T3",
+        "gg_rct_Area1T4",
+        "gg_rct_Area1R",
+        "gg_rct_Area1",
+        "gg_rct_Area4S2",
+        "gg_rct_Area4S1",
+        "gg_rct_Area4",
+        "gg_rct_Area4S3",
+        "gg_rct_Area4T1",
+        "gg_rct_Area4T2",
+        "gg_rct_Area4T3",
+        "gg_rct_Area4R",
+        "GetHeroProperName"
     ]
 }
